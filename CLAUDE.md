@@ -61,7 +61,7 @@ See `~/.claude/docs/integrations.md` for full details including prerequisites an
 
 ## Workspace Preferences
 
-- **Terminal app:** `Alacritty` (options: `Terminal`, `Alacritty`, `iTerm` — used when opening new windows for worktrees)
+- **Terminal app:** `Alacritty` (options: `Alacritty`, `Terminal`, `iTerm`, `Warp`, `Kitty`, `WezTerm`, `Ghostty` — used when opening new windows for worktrees)
 - To change, update the terminal app name above
 
 ## Repo Monorepo

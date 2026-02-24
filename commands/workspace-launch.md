@@ -102,31 +102,13 @@ Show the user the output — it lists all assigned ports.
 
 This uses the self-contained launcher script at `~/.claude/scripts/launch-workspace.sh` which handles everything: cd, unset CLAUDECODE, start tmux, launch Claude, and attach.
 
-**Check the user's terminal preference** in `~/.claude/CLAUDE.md` under "Workspace Preferences" for the configured terminal app:
+**Check the user's terminal preference** in `~/.claude/CLAUDE.md` under "Workspace Preferences" for the configured terminal app. Then open a new window running the launcher script:
 
-**For Alacritty:**
 ```bash
-alacritty -e bash ~/.claude/scripts/launch-workspace.sh "<TICKET_ID>" &
+bash ~/.claude/scripts/open-terminal.sh "<TERMINAL_APP>" "bash ~/.claude/scripts/launch-workspace.sh '<TICKET_ID>'"
 ```
 
-**For Terminal.app:**
-```bash
-osascript -e 'tell application "Terminal"
-    activate
-    do script "bash ~/.claude/scripts/launch-workspace.sh \"<TICKET_ID>\""
-end tell'
-```
-
-**For iTerm:**
-```bash
-osascript -e 'tell application "iTerm"
-    activate
-    set newWindow to (create window with default profile)
-    tell current session of newWindow
-        write text "bash ~/.claude/scripts/launch-workspace.sh \"<TICKET_ID>\""
-    end tell
-end tell'
-```
+Replace `<TERMINAL_APP>` with the configured app (Alacritty, Terminal, iTerm, Warp, Kitty, WezTerm, or Ghostty).
 
 ### Step 8: Provide Dream Team Instructions
 

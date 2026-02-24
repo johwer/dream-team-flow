@@ -82,29 +82,11 @@ This uses the self-contained launcher script at `~/.claude/scripts/launch-worksp
 
 **Check the user's terminal preference** in `~/.claude/CLAUDE.md` under "Workspace Preferences" for the configured terminal app. Then open a new window running the launcher script:
 
-**For Alacritty:**
 ```bash
-alacritty -e bash ~/.claude/scripts/launch-workspace.sh "<TICKET_ID>" "/my-dream-team <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>" &
+bash ~/.claude/scripts/open-terminal.sh "<TERMINAL_APP>" "bash ~/.claude/scripts/launch-workspace.sh '<TICKET_ID>' '/my-dream-team <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>'"
 ```
 
-**For Terminal.app:**
-```bash
-osascript -e 'tell application "Terminal"
-    activate
-    do script "bash ~/.claude/scripts/launch-workspace.sh \"<TICKET_ID>\" \"/my-dream-team <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>\""
-end tell'
-```
-
-**For iTerm:**
-```bash
-osascript -e 'tell application "iTerm"
-    activate
-    set newWindow to (create window with default profile)
-    tell current session of newWindow
-        write text "bash ~/.claude/scripts/launch-workspace.sh \"<TICKET_ID>\" \"/my-dream-team <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>\""
-    end tell
-end tell'
-```
+Replace `<TERMINAL_APP>` with the configured app (Alacritty, Terminal, iTerm, Warp, Kitty, WezTerm, or Ghostty).
 
 **Important:** Escape any special characters (quotes, parentheses) in the ticket text. Keep the description concise.
 
@@ -150,29 +132,11 @@ When the user says "resume PROJ-1234" or "pick up PROJ-1234" or "continue PROJ-1
 
 3. **Launch with the resume script**:
 
-   **For Alacritty:**
    ```bash
-   alacritty -e bash ~/.claude/scripts/resume-workspace.sh "<TICKET_ID>" &
+   bash ~/.claude/scripts/open-terminal.sh "<TERMINAL_APP>" "bash ~/.claude/scripts/resume-workspace.sh '<TICKET_ID>'"
    ```
 
-   **For Terminal.app:**
-   ```bash
-   osascript -e 'tell application "Terminal"
-       activate
-       do script "bash ~/.claude/scripts/resume-workspace.sh \"<TICKET_ID>\""
-   end tell'
-   ```
-
-   **For iTerm:**
-   ```bash
-   osascript -e 'tell application "iTerm"
-       activate
-       set newWindow to (create window with default profile)
-       tell current session of newWindow
-           write text "bash ~/.claude/scripts/resume-workspace.sh \"<TICKET_ID>\""
-       end tell
-   end tell'
-   ```
+   Replace `<TERMINAL_APP>` with the configured app from Workspace Preferences.
 
 4. **Confirm** to the user that the workspace is resuming. Remind them to `tmux attach -t <TICKET_ID>`.
 
