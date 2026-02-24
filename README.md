@@ -41,53 +41,59 @@ Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human 
 ### Prerequisites
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed
-- [Homebrew](https://brew.sh)
-- Git, Node.js (via nvm)
-- A terminal: Alacritty, Terminal.app, or iTerm
+- [Homebrew](https://brew.sh) (macOS/Linux)
+- Git, Node.js (via nvm), jq
+- A terminal (10 supported — see below)
 
-### Install
+### Install (one command)
 
 ```bash
+# Clone and run the installer:
 git clone https://github.com/your-username/dream-team-flow.git
-cd dream-team-flow
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
 
-# Create directories
-mkdir -p ~/.claude/{commands,scripts,skills/mermaid-diagram}
-
-# Copy everything
-cp commands/*.md ~/.claude/commands/
-cp scripts/*.sh ~/.claude/scripts/
-chmod +x ~/.claude/scripts/*.sh
-cp skills/mermaid-diagram/*.md ~/.claude/skills/mermaid-diagram/
-cp CLAUDE.md ~/.claude/CLAUDE.md
-cp settings.json ~/.claude/settings.json
-
-# Install CLI tools
-brew install tmux
-brew tap atlassian/homebrew-acli
-brew install acli
-
-# Authenticate Jira
-acli jira auth login --web
+# Install CLI tools:
+brew install tmux jq
 ```
 
-Then edit `~/.claude/CLAUDE.md` to configure your repo path and terminal preference.
+The installer:
+1. Asks your name, GitHub username, monorepo path, and terminal preference
+2. Symlinks all commands, scripts, agents, and skills into `~/.claude/`
+3. Generates your personal `CLAUDE.md` with your settings
+4. Merges hooks into `settings.json`
 
-### Customize for Your Project
+### Team / Enterprise Install
 
-The commands use generic placeholder names. Replace them with your project's names:
+If your team lead shared a `company-config.json`, pass it during install to auto-configure everything:
 
 ```bash
-cd ~/.claude
-sed -i '' \
-  -e 's/Repo/YourProject/g' \
-  -e 's/repo/your-project/g' \
-  -e 's/ServiceA/YourFirstService/g' \
-  -e 's/ServiceB/YourSecondService/g' \
-  commands/*.md scripts/*.sh CLAUDE.md
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-org/dream-team-flow \
+  --company-config ~/Downloads/company-config.json
 ```
 
-See [NAME-MAPPING.md](NAME-MAPPING.md) for the full mapping table.
+This de-sanitizes all generic names (Repo, ServiceA, PROJ-) with your company's real names, sets default paths, and asks about any project-specific paths your team uses.
+
+### Update
+
+```bash
+dtf update    # Pull latest, verify symlinks, regenerate CLAUDE.md
+dtf doctor    # Health check — config, symlinks, tools
+```
+
+### Supported Terminals (10)
+
+| Terminal | macOS | Linux | Windows (WSL) |
+|----------|-------|-------|---------------|
+| Alacritty | yes | yes | yes |
+| Kitty | yes | yes | - |
+| WezTerm | yes | yes | yes |
+| Ghostty | yes | yes | - |
+| Warp | yes | yes | - |
+| Terminal.app | yes | - | - |
+| iTerm/iTerm2 | yes | - | - |
+| GNOME Terminal | - | yes | - |
+| Konsole | - | yes | - |
+| Windows Terminal | - | - | yes |
 
 ---
 
@@ -214,6 +220,9 @@ flowchart TD
 
 ## Key Features
 
+- **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
+- **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
+- **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
 - **Dynamic team sizing** — Architect analyzes complexity and spawns only the agents needed
 - **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
 - **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
@@ -225,10 +234,12 @@ flowchart TD
 - **Non-destructive PR updates** — Reads current PR body before editing, preserving manually added images
 - **AI review polling** — Waits for GitHub AI bots (Gemini, Copilot) before human review
 - **CI check polling** — Monitors GitHub Actions, routes failures to the right agent
+- **Guardrail hooks** — Migration guard, lock file guard, auto-lint reminders prevent common mistakes
 - **Visual verification** — Frontend devs can verify against designs using Chrome extension
 - **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
 - **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
 - **How to Test section** — Every PR includes exact URLs, steps, and expected results
+- **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
 
 ---
 
@@ -246,47 +257,78 @@ The agent prompts reference these technologies, but the framework is adaptable. 
 ## Project Structure
 
 ```
-~/.claude/
-  CLAUDE.md                     # Global config & preferences
-  settings.json                 # Claude Code settings
+dream-team-flow/                  # Public repo (or company fork)
+  .gitignore                      # Ignores dtf-config.json (personal)
+  README.md                       # This file
+  SETUP-GUIDE.md                  # Detailed setup reference
+  CONTRIBUTING.md                 # How to propose changes
+  CLAUDE.md.template              # Template → generates ~/.claude/CLAUDE.md
+  dtf-config.template.json        # Template for per-user config
+  company-config.example.json     # Example company config with docs
+  settings.json                   # Claude Code settings (hooks, env)
   commands/
-    create-stories.md           # /create-stories — full lifecycle
-    my-dream-team.md            # /my-dream-team — agent team
-    workspace-launch.md         # /workspace-launch — create worktree
-    workspace-cleanup.md        # /workspace-cleanup — tear down
-    review-pr.md                # /review-pr — standalone PR review
-    acli-jira-cheatsheet.md     # Jira CLI reference
-    ticket-scout.md             # Pre-sprint ticket analysis
-    team-stats.md               # Session statistics
-    team-review.md              # Team performance review
+    create-stories.md             # /create-stories — full lifecycle
+    my-dream-team.md              # /my-dream-team — agent team
+    workspace-launch.md           # /workspace-launch — create worktree
+    workspace-cleanup.md          # /workspace-cleanup — tear down
+    review-pr.md                  # /review-pr — standalone PR review
+    acli-jira-cheatsheet.md       # Jira CLI reference
+    ticket-scout.md               # Pre-sprint ticket analysis
+    team-stats.md                 # Session statistics
+    team-review.md                # Team performance review
   scripts/
-    launch-workspace.sh         # Terminal launcher
-    resume-workspace.sh         # Resume paused workspace
-    pause-workspace.sh          # Pause workspace for the day
-    poll-ai-reviews.sh          # Poll for AI bot reviews
-    poll-ci-checks.sh           # Poll GitHub Actions
-    chrome-queue.sh             # Chrome browser queue
+    dtf.sh                        # DTF CLI (install, update, doctor, contribute)
+    dtf-env.sh                    # Config loader for shell scripts
+    launch-workspace.sh           # Terminal launcher (starts Claude in tmux)
+    open-terminal.sh              # Cross-platform terminal opener (10 terminals)
+    resume-workspace.sh           # Resume paused workspace
+    pause-workspace.sh            # Pause workspace for the day
+    poll-ai-reviews.sh            # Poll for AI bot reviews
+    poll-ci-checks.sh             # Poll GitHub Actions
+    chrome-queue.sh               # Chrome browser queue
+    migration-guard.sh            # Hook: warns on migration edits
+    lockfile-guard.sh             # Hook: warns on lock file edits
+    auto-lint-notify.sh           # Hook: lint reminders for .cs/.ts/.tsx
+  agents/
+    architect.md                  # Architecture analysis subagent
+    backend-dev.md                # .NET backend implementation
+    frontend-dev.md               # React/TypeScript frontend
+    pr-reviewer.md                # Code review subagent
+    data-engineer.md              # Data mapping & migrations
   skills/
-    mermaid-diagram/            # Mermaid diagram generation
+    mermaid-diagram/              # Mermaid diagram generation
+  docs/
+    integrations.md               # Integration reference & setup
+  learnings/
+    aggregated-learnings.md       # Team-curated retro learnings
+    contributions/                # Per-user retro submissions
 ```
+
+After `dtf install`, everything is symlinked into `~/.claude/` — updates are instant via `git pull`.
 
 ---
 
 ## Detailed Setup
 
-See [SETUP-GUIDE.md](SETUP-GUIDE.md) for step-by-step installation instructions covering:
-- Claude Code settings configuration
-- tmux installation
-- Jira CLI (ACLI) setup
-- Chrome plugin for image viewing
-- Terminal configuration
+See [SETUP-GUIDE.md](SETUP-GUIDE.md) for:
+- Prerequisites and tool installation (tmux, jq, ACLI)
+- Company config creation guide
+- DTF CLI reference
 - Full lifecycle walkthrough
+- Troubleshooting
 
 ---
 
 ## Contributing
 
-This is an actively evolving project. If you adapt it for your team or tech stack, PRs are welcome.
+This is an actively evolving project. Contributions are welcome:
+
+- **Workflow improvements:** After Dream Team sessions, run `dtf contribute` to export your retro learnings as a PR
+- **New agent types:** Add agent definitions to `agents/` for your tech stack
+- **Terminal support:** Add new terminals to `scripts/open-terminal.sh`
+- **Bug fixes & features:** Standard GitHub PR workflow
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 

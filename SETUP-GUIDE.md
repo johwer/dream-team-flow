@@ -1,4 +1,4 @@
-# Dream Team — Complete Setup Guide
+# Dream Team Flow — Setup Guide
 
 ```
 ██████╗ ██████╗ ███████╗ █████╗ ███╗   ███╗    ████████╗███████╗ █████╗ ███╗   ███╗
@@ -9,128 +9,281 @@
 ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
 ```
 
-This guide covers everything needed to set up the Claude Code Dream Team workflow for your monorepo. Follow each section in order.
-
----
-
-## Quick Install
-
-Clone the repo and run:
-
-```bash
-git clone https://github.com/your-username/shared-claude-files.git
-cd shared-claude-files
-
-# Create directories
-mkdir -p ~/.claude/{commands,scripts,skills/mermaid-diagram}
-
-# Copy everything
-cp commands/*.md ~/.claude/commands/
-cp scripts/launch-workspace.sh ~/.claude/scripts/
-chmod +x ~/.claude/scripts/launch-workspace.sh
-cp skills/mermaid-diagram/*.md ~/.claude/skills/mermaid-diagram/
-cp CLAUDE.md ~/.claude/CLAUDE.md
-cp settings.json ~/.claude/settings.json
-
-# Install CLI tools
-brew install tmux
-brew tap atlassian/homebrew-acli
-brew install acli
-
-# Authenticate Jira
-acli jira auth login --web
-
-echo "Setup complete! Start Claude Code and try: /create-stories PROJ-1234"
-```
-
-> **After installing**, edit `~/.claude/CLAUDE.md` to set your repo path and terminal preference. See [Section 9](#9-configure-claudemd) for details.
-
-For a detailed breakdown of each step, continue reading below.
-
----
-
-## Summary
-
-Everything is packaged in the `shared-claude-files/` folder. Here's what's included:
-
-### Files
-
-| File | Purpose |
-|------|---------|
-| `SETUP-GUIDE.md` | This document — complete setup documentation |
-| `CLAUDE.md` | Global Claude config with workspace preferences |
-| `settings.json` | Claude Code settings (agent teams + tmux split panes) |
-| `commands/create-stories.md` | `/create-stories` — Full lifecycle orchestrator |
-| `commands/workspace-launch.md` | `/workspace-launch` — Create worktree and start Dream Team |
-| `commands/workspace-cleanup.md` | `/workspace-cleanup` — Tear down workspace |
-| `commands/my-dream-team.md` | `/my-dream-team` — Multi-agent implementation team |
-| `commands/acli-jira-cheatsheet.md` | `/acli-jira-cheatsheet` — Jira CLI reference |
-| `scripts/launch-workspace.sh` | Self-contained terminal launcher script |
-| `skills/mermaid-diagram/SKILL.md` | Mermaid diagram skill definition |
-| `skills/mermaid-diagram/common-errors.md` | Common Mermaid syntax errors |
-| `skills/mermaid-diagram/flowchart-reference.md` | Flowchart syntax reference |
-| `skills/mermaid-diagram/sequence-reference.md` | Sequence diagram syntax reference |
-| `skills/mermaid-diagram/class-reference.md` | Class diagram syntax reference |
-
-### What this guide covers
-
-1. **Prerequisites** — what you need before starting
-2. **Claude Code settings** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` and `tmuxSplitPanes`
-3. **tmux** — install via Homebrew for session management
-4. **ACLI** — Jira CLI install + authentication
-5. **Chrome plugin** — for viewing Jira attachment images
-6. **Custom commands** — where to place them (`~/.claude/commands/`)
-7. **Launcher script** — where to place it (`~/.claude/scripts/`)
-8. **Mermaid skill** — where to place it (`~/.claude/skills/mermaid-diagram/`)
-9. **CLAUDE.md config** — terminal preference and repo paths
-10. **Supported terminals** — Alacritty, Terminal.app, iTerm
-11. **Full lifecycle walkthrough** — from `/create-stories` to cleanup
-12. **Work in progress** — known limitations and planned improvements
-13. **File reference** — directory structure and one-shot install script
+Detailed setup and reference for Dream Team Flow. For quick start, see [README.md](README.md).
 
 ---
 
 ## Table of Contents
 
 1. [Prerequisites](#1-prerequisites)
-2. [Claude Code Settings](#2-claude-code-settings)
-3. [Install tmux](#3-install-tmux)
-4. [Install ACLI (Jira CLI)](#4-install-acli-jira-cli)
-5. [Chrome Claude Plugin](#5-chrome-claude-plugin)
-6. [Place Custom Commands](#6-place-custom-commands)
-7. [Place the Launcher Script](#7-place-the-launcher-script)
-8. [Install the Mermaid Diagram Skill](#8-install-the-mermaid-diagram-skill)
-9. [Configure CLAUDE.md](#9-configure-claudemd)
-10. [Supported Terminals](#10-supported-terminals)
-11. [Full Lifecycle Walkthrough](#11-full-lifecycle-walkthrough)
-12. [Work in Progress](#12-work-in-progress)
-13. [File Reference](#13-file-reference)
+2. [Install (Individual)](#2-install-individual)
+3. [Install (Team / Enterprise)](#3-install-team--enterprise)
+4. [Creating a Company Config](#4-creating-a-company-config)
+5. [DTF CLI Reference](#5-dtf-cli-reference)
+6. [Tool Installation](#6-tool-installation)
+7. [Claude Code Settings](#7-claude-code-settings)
+8. [Supported Terminals](#8-supported-terminals)
+9. [Full Lifecycle Walkthrough](#9-full-lifecycle-walkthrough)
+10. [Pause & Resume](#10-pause--resume)
+11. [Hooks & Guardrails](#11-hooks--guardrails)
+12. [Subagents](#12-subagents)
+13. [Troubleshooting](#13-troubleshooting)
+14. [File Reference](#14-file-reference)
 
 ---
 
 ## 1. Prerequisites
 
-- **Claude Code CLI** installed (`claude` command available in terminal)
-- **Homebrew** installed (https://brew.sh)
-- **Git** installed
-- **Node.js** (managed via nvm, the project uses v25)
-- A terminal app: **Alacritty**, **Terminal.app**, or **iTerm**
+| Tool | Required | Install |
+|------|----------|---------|
+| [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) | Yes | `npm install -g @anthropic-ai/claude-code` |
+| Git | Yes | Pre-installed on macOS; `apt install git` on Linux |
+| [Homebrew](https://brew.sh) | Recommended | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+| tmux | Yes | `brew install tmux` |
+| jq | Yes | `brew install jq` |
+| [gh](https://cli.github.com) | Recommended | `brew install gh` |
+| Node.js | For frontend | Via [nvm](https://github.com/nvm-sh/nvm) |
+| A supported terminal | Yes | See [Section 8](#8-supported-terminals) |
+
+**Optional:**
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| [ACLI](https://developer.atlassian.com/cloud/jira/platform/acli/) | Jira integration | `brew tap atlassian/homebrew-acli && brew install acli` |
+| Chrome | Jira attachment viewing | Pre-installed or download |
 
 ---
 
-## 2. Claude Code Settings
+## 2. Install (Individual)
 
-Claude Code needs experimental agent teams enabled and tmux split panes configured.
-
-**File:** `~/.claude/settings.json`
-
-Copy the provided `settings.json` to `~/.claude/settings.json`:
+For solo use or trying it out:
 
 ```bash
-cp shared-claude-files/settings.json ~/.claude/settings.json
+# 1. Clone the repo
+git clone https://github.com/your-username/dream-team-flow.git
+
+# 2. Install CLI tools
+brew install tmux jq
+
+# 3. Run the installer
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
 ```
 
-Or create it manually with this content:
+The installer will ask you:
+1. Your name and GitHub username
+2. Where your monorepo lives (e.g., `~/Documents/MyProject`)
+3. Where to create worktrees (e.g., `~/Documents`)
+4. Which terminal you use (pick from 10)
+
+**What it does:**
+- Creates `~/.claude/dtf-config.json` with your personal settings
+- Symlinks all commands, scripts, agents, skills, and docs into `~/.claude/`
+- Merges hooks into your existing `~/.claude/settings.json`
+- Generates `~/.claude/CLAUDE.md` from the template with your settings
+- Adds `dtf` to your PATH
+
+---
+
+## 3. Install (Team / Enterprise)
+
+For teams sharing a workflow:
+
+### Option A: Company fork with config baked in
+
+Your team lead forks the repo, adds `company-config.json` to the fork, and shares the fork URL:
+
+```bash
+# Team members just run:
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-org/dream-team-flow
+```
+
+The installer detects `company-config.json` in the repo and applies it automatically.
+
+### Option B: Public repo + separate config file
+
+Your team lead shares a `company-config.json` file (via Slack, email, or internal docs):
+
+```bash
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+  --company-config ~/Downloads/company-config.json
+```
+
+### What company config does
+
+During install, the company config:
+1. **De-sanitizes generic names** — Replaces `Repo` with your project name, `ServiceA` with real service names, `PROJ-` with your Jira prefix
+2. **Sets default paths** — Suggests your team's standard paths (users can override)
+3. **Asks about extra paths** — Project-specific directories defined by the team lead
+4. **Configures Jira** — Sets your Jira domain and ticket prefix
+
+After install, each team member has a fully personalized setup that follows team conventions.
+
+---
+
+## 4. Creating a Company Config
+
+Team leads create a `company-config.json` to standardize the setup for their team.
+
+### Template
+
+```json
+{
+  "projectName": "YourProject",
+  "repoUrl": "git@github.com:your-org/your-repo.git",
+  "ticketPrefix": "PROJ",
+  "jiraDomain": "your-company.atlassian.net",
+
+  "services": {
+    "ServiceA": "RealServiceName",
+    "ServiceB": "AnotherService"
+  },
+
+  "defaultPaths": {
+    "monorepo": "~/Documents/YourProject",
+    "worktreeParent": "~/Documents"
+  },
+
+  "extraPaths": {
+    "frontendApp": {
+      "description": "Frontend app directory (relative to monorepo)",
+      "default": "apps/web"
+    },
+    "backendServices": {
+      "description": "Backend services directory (relative to monorepo)",
+      "default": "services"
+    }
+  }
+}
+```
+
+### Field Reference
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `projectName` | Yes | Replaces `Repo` in all files |
+| `repoUrl` | No | Git URL shown as default during install |
+| `ticketPrefix` | Yes | Replaces `PROJ-` (e.g., `PLRS`, `JIRA`) |
+| `jiraDomain` | No | Your Jira instance (e.g., `company.atlassian.net`) |
+| `services` | No | Map of generic → real service names. Add as many as needed |
+| `defaultPaths` | No | Suggested paths shown during install (users override) |
+| `extraPaths` | No | Project-specific named paths. Each has a `description` and `default` |
+
+**Services** can be any number — the installer replaces all occurrences in all text files:
+```json
+"services": {
+  "ServiceA": "Absence",
+  "ServiceB": "HCM",
+  "ServiceC": "IAM",
+  "ServiceD": "Messenger",
+  "TranslationService": "Lokalise"
+}
+```
+
+**Extra paths** are asked during install. Users can accept the default or enter their own:
+```json
+"extraPaths": {
+  "frontendApp": {
+    "description": "Path to the frontend app within the monorepo (relative to monorepo root)",
+    "default": "apps/web"
+  }
+}
+```
+
+See `company-config.example.json` in the repo for a fully documented example.
+
+---
+
+## 5. DTF CLI Reference
+
+After install, the `dtf` command is available globally.
+
+### `dtf install <URL> [--company-config <path>]`
+
+Full setup: clone repo, interactive wizard, create symlinks, apply company config, generate CLAUDE.md.
+
+### `dtf update`
+
+```bash
+dtf update
+```
+
+Pulls latest changes from the workflow repo, verifies symlinks, re-merges settings.json, regenerates CLAUDE.md, and shows what changed.
+
+### `dtf doctor`
+
+```bash
+dtf doctor
+```
+
+Health check that verifies:
+- `~/.claude/dtf-config.json` exists and is valid
+- All symlinks are intact
+- Required tools are installed (jq, tmux, gh)
+- Monorepo path exists
+
+### `dtf contribute`
+
+```bash
+dtf contribute
+```
+
+Exports your local Dream Team retro learnings as a PR to the workflow repo. Team leads review and curate into `learnings/aggregated-learnings.md`.
+
+---
+
+## 6. Tool Installation
+
+### tmux
+
+Used for session management — running Claude in background tmux sessions.
+
+```bash
+brew install tmux
+tmux -V  # verify
+```
+
+**Key tmux commands:**
+
+| Command | What it does |
+|---------|-------------|
+| `tmux attach -t PROJ-1234` | Attach to a running session |
+| `tmux list-sessions` | List all sessions |
+| `Ctrl+B` then `D` | Detach (keeps session running) |
+| `tmux kill-session -t PROJ-1234` | Kill a session |
+
+### jq
+
+Used by DTF scripts for JSON config parsing.
+
+```bash
+brew install jq
+```
+
+### ACLI (Jira CLI) — Optional
+
+Enables Claude to fetch Jira tickets automatically.
+
+```bash
+brew tap atlassian/homebrew-acli
+brew install acli
+acli jira auth login --web  # authenticate via browser
+acli jira workitem view PROJ-1234  # verify
+```
+
+### gh (GitHub CLI) — Recommended
+
+Used for PR creation, review, and CI polling.
+
+```bash
+brew install gh
+gh auth login  # authenticate
+```
+
+---
+
+## 7. Claude Code Settings
+
+The `dtf install` command merges these settings into your `~/.claude/settings.json` automatically. For reference:
 
 ```json
 {
@@ -143,261 +296,39 @@ Or create it manually with this content:
 }
 ```
 
-**What each setting does:**
-
 | Setting | Purpose |
 |---------|---------|
-| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | Enables the multi-agent team features (TeamCreate, SendMessage, etc.) |
-| `tmuxSplitPanes` | Allows Claude to use tmux split panes for parallel agent work |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | Enables multi-agent team features |
+| `tmuxSplitPanes` | Allows Claude to use tmux split panes |
 
-> **Note:** If you already have a `settings.json` with other settings (hooks, statusLine, etc.), just merge the `env` and `preferences` keys into your existing file.
-
----
-
-## 3. Install tmux
-
-tmux is used to run Claude sessions in the background so you can detach/reattach.
-
-```bash
-brew install tmux
-```
-
-Verify it works:
-
-```bash
-tmux -V
-```
-
-**Basic tmux commands you'll need:**
-
-| Command | What it does |
-|---------|-------------|
-| `tmux attach -t PROJ-1234` | Attach to a running session |
-| `tmux list-sessions` | List all tmux sessions |
-| `Ctrl+B` then `D` | Detach from a session (keeps it running) |
-| `tmux kill-session -t PROJ-1234` | Kill a session |
+Hooks are also merged — see [Section 11](#11-hooks--guardrails).
 
 ---
 
-## 4. Install ACLI (Jira CLI)
+## 8. Supported Terminals
 
-ACLI lets Claude fetch ticket details from Jira automatically.
+Dream Team Flow supports 10 terminals across macOS, Linux, and Windows (WSL).
 
-### Install
+| Terminal | macOS | Linux | Windows (WSL) | Install |
+|----------|-------|-------|---------------|---------|
+| **Alacritty** | yes | yes | yes | `brew install --cask alacritty` |
+| **Kitty** | yes | yes | - | `brew install --cask kitty` |
+| **WezTerm** | yes | yes | yes | `brew install --cask wezterm` |
+| **Ghostty** | yes | yes | - | [ghostty.org](https://ghostty.org) |
+| **Warp** | yes | yes | - | [warp.dev](https://warp.dev) |
+| **Terminal.app** | yes | - | - | Built-in on macOS |
+| **iTerm/iTerm2** | yes | - | - | `brew install --cask iterm2` |
+| **GNOME Terminal** | - | yes | - | `apt install gnome-terminal` |
+| **Konsole** | - | yes | - | `apt install konsole` |
+| **Windows Terminal** | - | - | yes | Microsoft Store |
 
-```bash
-brew tap atlassian/homebrew-acli
-brew install acli
-```
+Your terminal preference is set during `dtf install` and stored in `~/.claude/dtf-config.json`. To change it later, edit the `terminal` field.
 
-### Authenticate
-
-```bash
-acli jira auth login --web
-```
-
-This opens your browser for OAuth authentication. Follow the prompts to log in with your Jira account.
-
-### Verify
-
-```bash
-acli jira workitem view PROJ-1234
-```
-
-(Replace with any valid ticket ID)
-
-### Troubleshooting
-
-- If `acli` is not found after install, restart your terminal or run `source ~/.zshrc`
-- If authentication expires, re-run `acli jira auth login --web`
-- See the `acli-jira-cheatsheet.md` command for a full reference of Jira CLI operations
+Platform guards prevent selecting a terminal that doesn't work on your OS (e.g., Terminal.app on Linux).
 
 ---
 
-## 5. Chrome Claude Plugin
-
-The Chrome plugin is needed for Claude to view images and screenshots from Jira tickets.
-
-### Install the MCP Chrome Connector
-
-1. Open Chrome and go to the Chrome Web Store
-2. Search for **"Claude Code Chrome Connector"** (or the Puppeteer MCP connector your team uses)
-3. Install the extension
-4. Enable it in Chrome settings
-
-### Why it's needed
-
-- Jira attachments (design mockups, screenshots) require browser authentication
-- `curl`/`wget` will get 401 Unauthorized on Jira attachment URLs
-- The workflow uses `open -a "Google Chrome" "<URL>"` to download attachments through the authenticated browser session
-- Claude can then read the downloaded files from `~/Downloads/`
-
-### How it works in the workflow
-
-When a Jira ticket has attachments:
-1. Claude opens each attachment URL in Chrome
-2. Chrome downloads the file (authenticated session)
-3. Claude reads the downloaded file to understand the design/context
-
----
-
-## 6. Place Custom Commands
-
-Custom commands are slash commands (`/command-name`) available in Claude Code. They go in `~/.claude/commands/`.
-
-### Create the directory
-
-```bash
-mkdir -p ~/.claude/commands
-```
-
-### Copy the command files
-
-```bash
-cp shared-claude-files/commands/*.md ~/.claude/commands/
-```
-
-### What each command does
-
-| File | Slash Command | Purpose |
-|------|--------------|---------|
-| `create-stories.md` | `/create-stories` | Full lifecycle orchestrator: fetches Jira ticket, creates worktree, installs deps, opens terminal, launches Dream Team |
-| `workspace-launch.md` | `/workspace-launch` | Creates a git worktree from a ticket and sets up the workspace |
-| `workspace-cleanup.md` | `/workspace-cleanup` | Tears down a worktree, tmux session, and optionally deletes the branch |
-| `my-dream-team.md` | `/my-dream-team` | Orchestrates a multi-agent team (architect, devs, reviewer) to implement a feature |
-| `acli-jira-cheatsheet.md` | `/acli-jira-cheatsheet` | Quick reference for ACLI Jira CLI commands |
-
-### Verify
-
-Start Claude Code and type `/` — you should see all commands listed.
-
----
-
-## 7. Place the Launcher Script
-
-The launcher script runs in new terminal windows to start Claude sessions without the "nested session" error.
-
-### Create the directory
-
-```bash
-mkdir -p ~/.claude/scripts
-```
-
-### Copy the script
-
-```bash
-cp shared-claude-files/scripts/launch-workspace.sh ~/.claude/scripts/
-chmod +x ~/.claude/scripts/launch-workspace.sh
-```
-
-### What it does
-
-The script is called automatically by `/create-stories`. It:
-1. `cd`s to the worktree directory
-2. Unsets the `CLAUDECODE` environment variable (prevents nested session error)
-3. Starts a tmux session
-4. Launches `claude --dangerously-skip-permissions` inside tmux
-5. Waits for Claude to boot, then sends the `/my-dream-team` command
-6. Attaches to the tmux session so you can see the output
-
-### Manual usage
-
-```bash
-bash ~/.claude/scripts/launch-workspace.sh PROJ-1234 "/my-dream-team Your ticket description here"
-```
-
----
-
-## 8. Install the Mermaid Diagram Skill
-
-Skills are reusable capabilities that Claude can invoke. The mermaid-diagram skill helps create valid Mermaid diagrams for domain model proposals.
-
-### Create the directory
-
-```bash
-mkdir -p ~/.claude/skills/mermaid-diagram
-```
-
-### Copy the skill files
-
-```bash
-cp shared-claude-files/skills/mermaid-diagram/*.md ~/.claude/skills/mermaid-diagram/
-```
-
-### Skill files
-
-| File | Purpose |
-|------|---------|
-| `SKILL.md` | Main skill definition — Claude reads this to understand how to create diagrams |
-| `common-errors.md` | List of common Mermaid syntax errors and how to avoid them |
-| `flowchart-reference.md` | Flowchart diagram syntax reference |
-| `sequence-reference.md` | Sequence diagram syntax reference |
-| `class-reference.md` | Class diagram syntax reference |
-
-### How it's used
-
-The Dream Team's tech-architect uses this skill when domain model changes are proposed. It generates ER diagrams, class diagrams, and flow charts for the user to review before approving schema changes.
-
-### Downloading from source
-
-If you want the latest version instead of the copy provided here:
-1. Go to the skill's source repository/marketplace
-2. Download the skill package (usually a `.zip` or folder)
-3. Extract/place all `.md` files into `~/.claude/skills/mermaid-diagram/`
-4. The `SKILL.md` file is required — it must have the YAML frontmatter with `name`, `description`, and `allowed-tools`
-
----
-
-## 9. Configure CLAUDE.md
-
-`CLAUDE.md` is Claude Code's global instruction file. It tells Claude about your project setup, preferences, and available commands.
-
-### Copy the template
-
-```bash
-cp shared-claude-files/CLAUDE.md ~/.claude/CLAUDE.md
-```
-
-### Customize
-
-Edit `~/.claude/CLAUDE.md` to set your preferences:
-
-**Terminal preference** — change `Alacritty` to your preferred terminal:
-
-```markdown
-- **Terminal app:** `Alacritty` (options: `Terminal`, `Alacritty`, `iTerm`)
-```
-
-**Monorepo paths** — update if your repo is in a different location:
-
-```markdown
-- Main repo: `~/Documents/Repo`
-- Worktrees: `~/Documents/<TICKET_ID>`
-```
-
----
-
-## 10. Supported Terminals
-
-The workspace launcher supports three terminal emulators. Set your preference in `~/.claude/CLAUDE.md`.
-
-| Terminal | Launch Method | Notes |
-|----------|-------------|-------|
-| **Alacritty** | `alacritty -e bash ...` | Fast GPU-accelerated terminal. Install: `brew install --cask alacritty` |
-| **Terminal.app** | AppleScript `do script` | Built into macOS, no install needed |
-| **iTerm** | AppleScript iTerm API | Popular macOS terminal. Install: `brew install --cask iterm2` |
-
-To change your default, edit `~/.claude/CLAUDE.md`:
-
-```markdown
-- **Terminal app:** `Terminal` (options: `Terminal`, `Alacritty`, `iTerm`)
-```
-
----
-
-## 11. Full Lifecycle Walkthrough
-
-Here's how everything works end-to-end:
+## 9. Full Lifecycle Walkthrough
 
 ### Starting work on a ticket
 
@@ -405,7 +336,7 @@ Here's how everything works end-to-end:
 /create-stories PROJ-1234
 ```
 
-or for multiple tickets:
+Or multiple tickets:
 
 ```
 /create-stories PROJ-1234 PROJ-1235
@@ -414,93 +345,234 @@ or for multiple tickets:
 **What happens automatically:**
 
 1. **Fetches ticket** from Jira via ACLI
-2. **Handles attachments** — opens in Chrome if the ticket has design mockups
+2. **Handles attachments** — opens in Chrome for authenticated download
 3. **Confirms** ticket details with you
-4. **Creates git worktree** at `~/Documents/PROJ-1234` with a new branch
-5. **Installs npm dependencies** in the frontend
+4. **Creates git worktree** at `<worktreeParent>/PROJ-1234` with a new branch
+5. **Installs dependencies** in the frontend
 6. **Copies `.env.local`** from the main repo
-7. **Opens a new terminal window** (your configured terminal)
+7. **Opens your terminal** with a new window
 8. **Starts Claude in tmux** with `--dangerously-skip-permissions`
 9. **Sends `/my-dream-team`** with the ticket description
 
 ### What the Dream Team does
 
-The team works in phases:
-
 | Phase | What happens |
 |-------|-------------|
-| **1. Architecture** | Tech Architect analyzes the ticket, reads docs, explores codebase, determines scope |
-| **2. Implementation** | Spawns needed agents (backend-dev, frontend-dev, infra-engineer) based on architect's analysis |
-| **3. Coordination** | Team Lead monitors progress, routes questions between agents, handles blockers |
-| **4. PR Review** | PR Reviewer checks all changes for security, conventions, tests, i18n |
-| **5. Summary** | Lead Summary Writer produces a structured report of all changes |
-| **6. User Review** | You are asked for feedback — provide changes or say "done" |
-| **7. Cleanup** | Team shuts down, worktree is removed, branch optionally deleted, tmux session killed |
+| **1. Architecture** | Amara analyzes the ticket, reads codebase, determines scope, sizes the team |
+| **2. Implementation** | Spawns agents (Kenji, Ingrid, Diego, etc.) based on architect's analysis — work in parallel |
+| **3. Review** | Maya reviews all changes for security, conventions, i18n, tests |
+| **4. Testing** | Suki runs functional tests (when flagged by architect) |
+| **5. PR & CI** | Creates draft PR, polls CI checks and AI bot reviews |
+| **6. User Review** | You review — ship it, give feedback, or test first |
+| **7. Cleanup** | Worktree removed, branch optionally deleted, tmux killed |
 
 ### The feedback loop (Phase 6)
 
 After the team finishes, you get three options:
 
-- **"Done — ship it"** — triggers cleanup, removes worktree, kills tmux
-- **"I have feedback"** — describe what to change, agents fix it, re-review cycle
-- **"Let me test first"** — team stays alive while you test, come back when ready
+- **"Done — ship it"** — triggers cleanup, merges PR
+- **"I have feedback"** — describe what to change, agents fix it, re-review
+- **"Let me test first"** — team stays alive while you test
 
-### Manual cleanup (if needed)
+### Standalone team (no lifecycle management)
 
-From your main Claude session:
+Already have a branch? Run the team directly:
 
 ```
-/workspace-cleanup PROJ-1234
+/my-dream-team <paste ticket description or Jira ID>
+```
+
+Local only (no PR, no push):
+
+```
+/my-dream-team --local <paste ticket description>
+```
+
+### PR review (no local checkout needed)
+
+```
+/review-pr              # auto-detect from current branch
+/review-pr 1670         # fast mode (API only)
+/review-pr 1670 --full  # full mode (local worktree + builds)
 ```
 
 ---
 
-## 12. Work in Progress
+## 10. Pause & Resume
 
-These items are known limitations or planned improvements:
+### Pause (close for the day)
 
-### Timing sensitivity
-The launcher script uses `sleep 8` to wait for Claude to boot before sending the `/my-dream-team` command. On slower machines, this might not be enough. If the command doesn't go through, you can manually type it in the tmux session.
+```
+pause PROJ-1234
+```
 
-### tmux socket isolation
-When launching tmux from a new terminal window, the tmux server runs independently. The parent Claude session cannot send commands to it via `tmux send-keys`. The launcher script works around this by running everything self-contained in the new terminal.
+Keeps the worktree intact but kills the tmux session and stops any dev servers.
 
-### CLAUDECODE environment variable
-Claude Code sets a `CLAUDECODE` env var to detect nested sessions. When launching Claude from within another Claude session (even via tmux/osascript), this variable can leak through. The launcher script explicitly runs `unset CLAUDECODE` to prevent this.
+### Resume (continue tomorrow)
 
-### Terminal support
-Currently three terminals are supported (Alacritty, Terminal.app, iTerm). Adding a new terminal requires updating the launch commands in both `create-stories.md` and `workspace-launch.md`.
+```
+resume PROJ-1234
+```
 
-### Self-cleanup limitations
-The Dream Team can clean up its own worktree by `cd`-ing to the main repo first, then removing the worktree directory. The final `tmux kill-session` command terminates the session from within — this works but the terminal window may remain open (empty). Close it manually.
+Rebuilds context from agent notes in `.dream-team/notes/`, starts a fresh tmux session in the worktree directory, and relaunches Claude.
 
 ---
 
-## 13. File Reference
+## 11. Hooks & Guardrails
 
-### Complete directory structure
+These hooks are merged into `~/.claude/settings.json` during install:
+
+| Hook | Trigger | What it does |
+|------|---------|-------------|
+| **Tool usage logging** | PostToolUse | Logs all tool calls to file for analytics |
+| **Desktop notification** | Notification | macOS notification when Claude needs attention |
+| **Migration guard** | Edit/Write | Warns when editing files in `migrations/` directories |
+| **Lock file guard** | Edit/Write | Warns when editing lock files (package-lock.json, etc.) |
+| **Auto-lint reminder** | Edit/Write | Reminds to run CSharpier (.cs) or ESLint (.ts/.tsx) before committing |
+
+Hooks are non-destructive — they warn but don't block. Add more by editing `~/.claude/settings.json` or the `settings.json` in the workflow repo.
+
+---
+
+## 12. Subagents
+
+Standalone agents available from any project:
+
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| `architect` | Opus | Architecture analysis, conventions, implementation plans |
+| `backend-dev` | Sonnet | .NET backend implementation |
+| `frontend-dev` | Sonnet | React/TypeScript frontend implementation |
+| `pr-reviewer` | Opus | Code review with MUST FIX / SUGGESTION / QUESTION / PRAISE categories |
+| `data-engineer` | Sonnet | Data mapping, EF Core migrations, pipelines |
+
+**Usage:** Claude delegates automatically, or invoke explicitly:
+
+```
+Use the pr-reviewer subagent to review the changes in this PR
+Use the architect subagent to analyze what files need changing
+```
+
+These are general-purpose standalone agents. The Dream Team (`/my-dream-team`) uses its own detailed prompts with coordination, context management, and phase-specific instructions on top.
+
+---
+
+## 13. Troubleshooting
+
+### `dtf: command not found`
+
+The installer creates a symlink at `/usr/local/bin/dtf`. If your PATH doesn't include that:
+
+```bash
+# Add to ~/.zshrc or ~/.bashrc:
+export PATH="$PATH:/usr/local/bin"
+```
+
+Or run directly: `bash ~/.claude/scripts/dtf.sh <command>`
+
+### `dtf doctor` reports broken symlinks
+
+```bash
+dtf update  # re-creates broken symlinks automatically
+```
+
+### Claude doesn't start in tmux
+
+The launcher uses `sleep 8` to wait for Claude to boot. On slower machines, increase this in `~/.claude/scripts/launch-workspace.sh`.
+
+### CLAUDECODE environment variable error
+
+Claude Code sets `CLAUDECODE` to detect nested sessions. The launcher script runs `unset CLAUDECODE` automatically. If you still get errors, check that you're using the launcher script (not starting Claude manually inside an existing Claude session).
+
+### Jira authentication expired
+
+```bash
+acli jira auth login --web
+```
+
+### Terminal window stays open after cleanup
+
+After `tmux kill-session`, the terminal window may remain open but empty. Close it manually — this is a known limitation of terminal automation.
+
+### Config file not found
+
+If commands aren't finding your config:
+
+```bash
+# Check it exists:
+cat ~/.claude/dtf-config.json
+
+# Regenerate if missing:
+dtf install <your-repo-url>
+```
+
+---
+
+## 14. File Reference
+
+### After `dtf install`, your `~/.claude/` looks like:
 
 ```
 ~/.claude/
-  CLAUDE.md                              # Global instructions & preferences
-  settings.json                          # Claude Code settings (agent teams, tmux)
+  CLAUDE.md                              # Generated from template
+  settings.json                          # Merged with hooks
+  dtf-config.json                        # Personal config (never committed)
   commands/
-    create-stories.md                    # /create-stories — full lifecycle orchestrator
-    workspace-launch.md                  # /workspace-launch — create worktree & start team
-    workspace-cleanup.md                 # /workspace-cleanup — tear down workspace
-    my-dream-team.md                     # /my-dream-team — multi-agent implementation team
-    acli-jira-cheatsheet.md              # /acli-jira-cheatsheet — Jira CLI reference
+    create-stories.md        → repo      # /create-stories
+    my-dream-team.md         → repo      # /my-dream-team
+    workspace-launch.md      → repo      # /workspace-launch
+    workspace-cleanup.md     → repo      # /workspace-cleanup
+    review-pr.md             → repo      # /review-pr
+    acli-jira-cheatsheet.md  → repo      # /acli-jira-cheatsheet
+    ticket-scout.md          → repo      # /ticket-scout
+    team-stats.md            → repo      # /team-stats
+    team-review.md           → repo      # /team-review
   scripts/
-    launch-workspace.sh                  # Self-contained launcher for new terminal windows
+    dtf.sh                   → repo      # DTF CLI
+    dtf-env.sh               → repo      # Config loader
+    launch-workspace.sh      → repo      # Terminal launcher
+    open-terminal.sh         → repo      # Cross-platform terminal opener
+    resume-workspace.sh      → repo      # Resume paused workspace
+    pause-workspace.sh       → repo      # Pause for the day
+    poll-ai-reviews.sh       → repo      # AI bot review polling
+    poll-ci-checks.sh        → repo      # CI check polling
+    chrome-queue.sh          → repo      # Chrome browser queue
+    migration-guard.sh       → repo      # Hook: migration guard
+    lockfile-guard.sh        → repo      # Hook: lock file guard
+    auto-lint-notify.sh      → repo      # Hook: lint reminders
+  agents/
+    architect.md             → repo      # Architecture analysis
+    backend-dev.md           → repo      # .NET backend
+    frontend-dev.md          → repo      # React/TypeScript frontend
+    pr-reviewer.md           → repo      # Code review
+    data-engineer.md         → repo      # Data engineering
   skills/
-    mermaid-diagram/
-      SKILL.md                           # Skill definition
-      common-errors.md                   # Common Mermaid syntax errors
-      flowchart-reference.md             # Flowchart syntax reference
-      sequence-reference.md              # Sequence diagram syntax reference
-      class-reference.md                 # Class diagram syntax reference
+    mermaid-diagram/         → repo      # Mermaid diagram generation
+  docs/
+    integrations.md          → repo      # Integration reference
 ```
 
-### Quick install
+`→ repo` = symlinked to the workflow repo. Changes via `git pull` are reflected immediately.
 
-See the [Quick Install](#quick-install) section at the top of this guide.
+### Personal config (`~/.claude/dtf-config.json`)
+
+```json
+{
+  "version": 1,
+  "user": {
+    "name": "Your Name",
+    "githubUsername": "your-username"
+  },
+  "paths": {
+    "monorepo": "~/Documents/YourProject",
+    "worktreeParent": "~/Documents",
+    "workflowRepo": "~/path/to/dream-team-flow"
+  },
+  "extraPaths": {
+    "frontendApp": "apps/web"
+  },
+  "terminal": "Alacritty"
+}
+```
+
+This file is `.gitignore`d and never committed. Each team member has their own.
