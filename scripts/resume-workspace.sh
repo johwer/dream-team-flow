@@ -34,8 +34,8 @@ fi
 # Build resume prompt
 RESUME_PROMPT="/my-dream-team --resume $TICKET_ID"
 
-# Start tmux detached, send claude, wait, send resume command, then attach
-tmux new-session -d -s "$TICKET_ID"
+# Start tmux detached in the worktree directory, send claude, wait, send resume command, then attach
+tmux new-session -d -s "$TICKET_ID" -c "$WORKTREE"
 tmux send-keys -t "$TICKET_ID" "claude --dangerously-skip-permissions --chrome" Enter
 
 echo "Waiting for Claude to start..."

@@ -14,13 +14,18 @@ fi
 
 echo "=== Pausing workspace: $TICKET_ID ==="
 
-# Kill any running Vite dev servers in this worktree
+# Kill any running Vite/Node dev servers in this worktree
 WORKTREE="$HOME/Documents/$TICKET_ID"
 if [ -d "$WORKTREE" ]; then
-  VITE_PIDS=$(lsof -i -P 2>/dev/null | grep node | grep LISTEN | grep "$WORKTREE" | awk '{print $2}' | sort -u)
-  if [ -n "$VITE_PIDS" ]; then
-    echo "Stopping Vite dev server(s): $VITE_PIDS"
-    echo "$VITE_PIDS" | xargs kill 2>/dev/null
+  # Find node processes whose cwd is inside this worktree
+  PIDS=$(pgrep -f "node.*$WORKTREE" 2>/dev/null || true)
+  if [ -z "$PIDS" ]; then
+    # Fallback: check lsof for listening node processes in this worktree
+    PIDS=$(lsof -i -P 2>/dev/null | grep node | grep LISTEN | grep "$WORKTREE" | awk '{print $2}' | sort -u || true)
+  fi
+  if [ -n "$PIDS" ]; then
+    echo "Stopping dev server(s): $PIDS"
+    echo "$PIDS" | xargs kill 2>/dev/null || true
   fi
 fi
 

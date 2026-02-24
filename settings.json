@@ -19,6 +19,27 @@
             "async": true
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/migration-guard.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/lockfile-guard.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/auto-lint-notify.sh",
+            "timeout": 5,
+            "async": true
+          }
+        ]
       }
     ],
     "Notification": [

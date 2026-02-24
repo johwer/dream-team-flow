@@ -13,13 +13,11 @@ Reference for all Claude Code integrations — what's active, what needs setup, 
 |------|-------|-------------|
 | Tool usage logging | PostToolUse | Logs all tool calls to file for analytics |
 | Desktop notification | Notification | macOS notification when Claude needs attention (idle, permission prompt, auth) |
+| Migration guard | PostToolUse (Edit/Write) | Warns when editing files in `migrations/` directories |
+| Lock file guard | PostToolUse (Edit/Write) | Warns when editing `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock` |
+| Auto-lint reminder | PostToolUse (Edit/Write) | Reminds to run CSharpier (.cs) or ESLint (.ts/.tsx) before committing |
 
 To add more hooks, edit `~/.claude/settings.json` or run `/hooks` interactively.
-
-**Useful hooks to consider adding:**
-- Migration guard: Block edits to `migrations/` without architect approval
-- Auto-lint: Run ESLint/CSharpier after file edits
-- Lock file guard: Warn on `package-lock.json` modifications
 
 ### Custom Subagents
 
@@ -79,11 +77,27 @@ Use the architect subagent to analyze what files need changing for this feature
 **Status:** Active
 **Location:** `~/.claude/commands/review-pr.md`
 
-Two modes:
+Three ways to invoke:
+- `/review-pr` — Auto-detects PR from current branch (fast mode)
 - `/review-pr <PR>` — Fast: GitHub API only
 - `/review-pr <PR> --full` — Full: local worktree at `.claude/worktrees/` + builds + deeper review
 
 See the command file for full workflow details.
+
+### CI & AI Review Polling
+
+**Status:** Active
+**Location:** `~/.claude/scripts/poll-ci-checks.sh`, `~/.claude/scripts/poll-ai-reviews.sh`
+
+Used by the Dream Team in Phase 5 (after PR push) to wait for CI and AI bot reviews before proceeding:
+- **poll-ci-checks.sh** — Polls GitHub Actions check runs until all pass, any fail, or timeout. Early exits on first failure. Logs timing to `~/.claude/logs/ci-check-times.csv`.
+- **poll-ai-reviews.sh** — Polls for AI bot review comments (Gemini, Copilot, CodeRabbit, etc.) until found or timeout. Logs timing to `~/.claude/logs/ai-review-times.csv`.
+
+Both scripts are standalone and can be used outside Dream Team:
+```bash
+bash ~/.claude/scripts/poll-ci-checks.sh RepoAB/Repo 1709 10 30
+bash ~/.claude/scripts/poll-ai-reviews.sh RepoAB/Repo 1709 6 45
+```
 
 ---
 
@@ -183,7 +197,7 @@ From https://code.claude.com/docs/en/best-practices:
 | **Writer/Reviewer pattern** | Maya reviews after Kenji/Ingrid implement |
 | **Subagent investigation** | Architect subagent explores before devs code |
 | **Headless mode** | `claude -p` used in sync-config, CI workflows |
-| **Hooks for guardrails** | Tool usage logging, desktop notifications |
+| **Hooks for guardrails** | Tool usage logging, desktop notifications, migration guard, lock file guard, lint reminders |
 
 ---
 

@@ -8,7 +8,7 @@ Review a pull request with line-level comments on GitHub. Can approve, request c
 
 ## Input
 
-The user provides a PR number, URL, or branch name. Optionally with flags.
+The user provides a PR number, URL, or branch name. Optionally with flags. If **no PR is specified**, auto-detect from the current branch.
 
 $ARGUMENTS
 
@@ -21,6 +21,22 @@ $ARGUMENTS
 - `--focus <pattern>` — Only review files matching this pattern (ignore all others)
 
 ## Workflow
+
+### Step 0: Resolve PR Identifier
+
+If the user provided a PR number, URL, or branch name, use it directly.
+
+If **no PR was specified** (arguments are empty or only flags), auto-detect from the current branch:
+
+```bash
+cd ~/Documents/Repo
+gh pr view --json number,headRefName --jq '.number' 2>/dev/null
+```
+
+If this returns a number, use it. If it fails (no PR for the current branch), tell the user:
+```
+No PR found for the current branch. Please specify a PR number: /review-pr <number>
+```
 
 ### Step 1: Fetch PR Details
 

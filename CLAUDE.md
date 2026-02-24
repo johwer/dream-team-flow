@@ -11,7 +11,7 @@ These commands are available globally from any project:
 - `/my-dream-team` — Orchestrate a multi-agent team to implement a Repo feature ticket
 
 **Code Review & Analysis:**
-- `/review-pr` — Review a PR with line-level GitHub comments. Fast (API-only) or full (local worktree + builds + deeper review with `--full`)
+- `/review-pr` — Review a PR with line-level GitHub comments. Auto-detects PR from current branch, or specify a PR number. Fast (API-only) or full (local worktree + builds + deeper review with `--full`)
 - `/ticket-scout` — Pre-analyze upcoming Jira tickets before sprint planning
 
 **Team & Config:**
@@ -39,6 +39,9 @@ Usage: "Use the pr-reviewer subagent to review this" or Claude delegates automat
 Active hooks in `~/.claude/settings.json`:
 - **Tool usage logging** — Logs all tool calls for analytics (async, non-blocking)
 - **Desktop notification** — macOS notification when Claude needs attention (idle, permission prompt)
+- **Migration guard** — Warns when editing files in `migrations/` directories
+- **Lock file guard** — Warns when editing lock files (package-lock.json, pnpm-lock.yaml, yarn.lock)
+- **Auto-lint reminder** — Reminds to run CSharpier (.cs) or ESLint (.ts/.tsx) before committing
 
 ## Integrations
 
