@@ -2,6 +2,111 @@
 
 Reference for all Claude Code integrations — what's active, what needs setup, and prerequisites.
 
+## Team Setup — DTF CLI
+
+**Status:** Active
+**Location:** `~/.claude/scripts/dtf.sh`
+
+Dream Team Flow is designed for team-wide deployment. The `dtf` CLI handles installation, updates, and shared learnings across a team.
+
+### Architecture
+
+```
+Public repo (generic framework)
+  │
+  ├─ Company forks privately, adds company-config.json
+  │   └─ service names, Jira domain, default paths, extra paths
+  │
+  └─ Team members install from fork (or public + company-config file)
+      └─ dtf install <URL> --company-config company-config.json
+          ├─ Interactive wizard (personal: name, paths, terminal)
+          ├─ Symlinks commands/scripts/agents into ~/.claude/
+          ├─ De-sanitizes generic names → real company names
+          └─ Generates CLAUDE.md from template
+```
+
+### Commands
+
+| Command | What it does |
+|---------|-------------|
+| `dtf install <URL> [--company-config <path>]` | Full setup: clone, wizard, symlinks, de-sanitize, generate CLAUDE.md |
+| `dtf update` | Pull latest, verify symlinks, re-merge settings, regenerate CLAUDE.md |
+| `dtf doctor` | Health check: config, symlinks, required tools (jq, tmux, gh) |
+| `dtf contribute` | Export session retro learnings as a PR to the workflow repo |
+
+### Company Config (`company-config.json`)
+
+Shared by a team lead with new members. Defines company-specific values:
+
+```json
+{
+  "projectName": "YourProject",
+  "repoUrl": "git@github.com:your-org/your-repo.git",
+  "ticketPrefix": "PROJ",
+  "jiraDomain": "your-company.atlassian.net",
+  "services": {
+    "ServiceA": "RealNameA",
+    "ServiceB": "RealNameB"
+  },
+  "defaultPaths": {
+    "monorepo": "~/Documents/YourProject",
+    "worktreeParent": "~/Documents"
+  },
+  "extraPaths": {
+    "frontendApp": {
+      "description": "Frontend app directory (relative to monorepo)",
+      "default": "apps/web"
+    }
+  }
+}
+```
+
+- **Services**: Any number — companies add/remove as needed
+- **Default paths**: Suggested during install, users can override
+- **Extra paths**: Project-specific paths the team uses, each with description and default. Users are asked to set each one during install, and can add their own custom paths on top.
+
+### Personal Config (`~/.claude/dtf-config.json`)
+
+Per-user, never committed. Created by `dtf install`:
+
+```json
+{
+  "version": 1,
+  "user": { "name": "...", "githubUsername": "..." },
+  "paths": { "monorepo": "...", "worktreeParent": "...", "workflowRepo": "..." },
+  "extraPaths": { "frontendApp": "apps/web" },
+  "terminal": "Alacritty"
+}
+```
+
+All command files read this config via a **Config Resolution** section — paths adapt per user automatically.
+
+### Shared Learnings
+
+After Dream Team sessions, retro learnings stay local per user. When ready to share:
+1. Run `dtf contribute` — creates a PR with your learnings
+2. Team reviews and curates into `learnings/aggregated-learnings.md`
+3. Everyone pulls via `dtf update` — aggregated learnings available to all agents
+
+### Onboarding a New Team Member
+
+1. Team lead shares `company-config.json` (Slack, email, or in the company fork)
+2. New member runs: `dtf install <REPO_URL> --company-config company-config.json`
+3. Answers personal questions (name, monorepo path, terminal)
+4. Done — all commands, scripts, agents, hooks are symlinked and ready
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/dtf.sh` | Main CLI |
+| `scripts/dtf-env.sh` | Config loader (exports DTF_* vars for scripts) |
+| `dtf-config.template.json` | Template for personal config |
+| `company-config.example.json` | Example company config with all options documented |
+| `CLAUDE.md.template` | Template with `{{MONOREPO_PATH}}`, `{{TERMINAL}}` placeholders |
+
+---
+
 ## Active Integrations
 
 ### Hooks (Notifications + Guardrails)
@@ -161,25 +266,15 @@ bash ~/.claude/scripts/poll-ai-reviews.sh RepoAB/Repo 1709 6 45
 
 ### Plugin Packaging (Future)
 
-**Status:** Planned for future — not yet implemented
+**Status:** Partially superseded by DTF CLI
 **Docs:** https://code.claude.com/docs/en/plugins
 
-**What it would do:**
-- Package the entire Dream Team setup (commands, scripts, agents, hooks) as a single installable plugin
-- Other Repo developers install with one command
-- Versioned, updatable, namespaced
+The `dtf install` command now handles what plugin packaging would do — one-command installation with symlinks and auto-updates. A native Claude Code plugin could still be valuable for:
+- Marketplace discoverability
+- Automatic version management by Claude Code itself
+- Tighter integration with `/plugin` command
 
-**Structure would be:**
-```
-dream-team-plugin/
-  plugin.json           # Plugin metadata
-  skills/               # Commands as skills
-  agents/               # Subagent definitions
-  hooks/                # Hook configurations
-  scripts/              # Supporting scripts
-```
-
-**When to do this:** When more than 2-3 developers want the Dream Team setup. Current sync-config approach works well for single-user distribution.
+**When to consider:** If Claude Code's plugin ecosystem matures and offers advantages over the current `dtf` approach (e.g., automatic updates without `dtf update`, conflict resolution with other plugins).
 
 ---
 
@@ -205,9 +300,14 @@ From https://code.claude.com/docs/en/best-practices:
 
 | Integration | Files |
 |-------------|-------|
+| DTF CLI | `~/.claude/scripts/dtf.sh`, `~/.claude/scripts/dtf-env.sh` |
+| DTF Config (personal) | `~/.claude/dtf-config.json` |
+| DTF Config (template) | `<workflow-repo>/dtf-config.template.json` |
+| Company Config (example) | `<workflow-repo>/company-config.example.json` |
+| CLAUDE.md template | `<workflow-repo>/CLAUDE.md.template` |
 | Hooks | `~/.claude/settings.json` |
 | Subagents | `~/.claude/agents/*.md` |
-| GitHub Actions | `~/Documents/Repo/.github/workflows/claude.yml` |
+| GitHub Actions | `<monorepo>/.github/workflows/claude.yml` |
 | Commands | `~/.claude/commands/*.md` |
 | Scripts | `~/.claude/scripts/*.sh` |
 | Skills | `~/.claude/skills/*/SKILL.md` |

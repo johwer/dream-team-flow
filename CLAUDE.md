@@ -1,5 +1,39 @@
 # Global Claude Configuration
 
+## Team Setup (DTF CLI)
+
+Dream Team Flow supports team-wide deployment via the `dtf` CLI. One command to install, one command to update.
+
+**For new team members:**
+```bash
+# Public repo (generic):
+dtf install https://github.com/your-username/dream-team-flow
+
+# With company config (de-sanitizes names, sets defaults):
+dtf install https://github.com/your-username/dream-team-flow --company-config company-config.json
+```
+
+**Key commands:**
+| Command | What it does |
+|---------|-------------|
+| `dtf install <URL> [--company-config <path>]` | Clone repo, interactive wizard, symlink everything into `~/.claude/` |
+| `dtf update` | Pull latest changes, verify symlinks, regenerate CLAUDE.md |
+| `dtf doctor` | Health check — config, symlinks, required tools |
+| `dtf contribute` | Export your retro learnings as a PR to the shared repo |
+
+**Company config** (`company-config.json`) — shared by a team lead, contains:
+- Project/repo name, Jira domain, ticket prefix
+- Service name mappings (any number)
+- Default paths and extra project-specific paths
+- During install, all generic names get replaced with real ones
+
+**Personal config** (`~/.claude/dtf-config.json`) — per-user, never committed:
+- Monorepo path, worktree parent, terminal preference
+- Extra paths (from company config + user-added)
+- All commands read this config and adapt automatically
+
+See `~/.claude/docs/integrations.md` for full details.
+
 ## Custom Commands
 
 These commands are available globally from any project:
