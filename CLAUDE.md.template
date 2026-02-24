@@ -75,6 +75,14 @@ See `~/.claude/docs/integrations.md` for full details including prerequisites an
 ## Monorepo
 
 - Main repo: `{{MONOREPO_PATH}}`
-- Worktrees (Dream Team): `~/Documents/<TICKET_ID>`
+- Worktrees (Dream Team): `<worktreeParent>/<TICKET_ID>`
 - Worktrees (PR Review): `{{MONOREPO_PATH}}/.claude/worktrees/pr-review-<PR>`
 - Tech stack: React/Vite/TypeScript/Tailwind frontend, .NET microservices backend
+
+## DTF Config
+
+All paths and preferences are stored in `~/.claude/dtf-config.json`. Run `dtf doctor` to verify your setup.
+- Core paths: `paths.monorepo`, `paths.worktreeParent`, `paths.workflowRepo`
+- Extra paths: `extraPaths.*` (project-specific, defined by company config)
+- Update: `dtf update` pulls latest workflow changes
+- Contribute: `dtf contribute` exports your retro learnings as a PR

@@ -24,10 +24,18 @@ if ! command -v jq &>/dev/null; then
   return 1 2>/dev/null || exit 1
 fi
 
-# Extract values
+# Extract core values
 export DTF_MONOREPO=$(jq -r '.paths.monorepo // "~/Documents/Repo"' "$DTF_CONFIG" | sed "s|~|$HOME|")
 export DTF_WORKTREE_PARENT=$(jq -r '.paths.worktreeParent // "~/Documents"' "$DTF_CONFIG" | sed "s|~|$HOME|")
 export DTF_WORKFLOW_REPO=$(jq -r '.paths.workflowRepo // ""' "$DTF_CONFIG" | sed "s|~|$HOME|")
 export DTF_GH_USER=$(jq -r '.user.githubUsername // ""' "$DTF_CONFIG")
 export DTF_TERMINAL=$(jq -r '.terminal // "Alacritty"' "$DTF_CONFIG")
 export DTF_USER_NAME=$(jq -r '.user.name // ""' "$DTF_CONFIG")
+
+# Export extra paths as DTF_EXTRA_<KEY> (uppercased, hyphens to underscores)
+while IFS='=' read -r _dtf_key _dtf_value; do
+  [[ -z "$_dtf_key" ]] && continue
+  _dtf_var="DTF_EXTRA_$(echo "$_dtf_key" | tr '[:lower:]-' '[:upper:]_')"
+  export "$_dtf_var"="$_dtf_value"
+done < <(jq -r '.extraPaths // {} | to_entries[] | "\(.key)=\(.value)"' "$DTF_CONFIG" 2>/dev/null || true)
+unset _dtf_key _dtf_value _dtf_var

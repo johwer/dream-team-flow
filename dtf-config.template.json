@@ -9,5 +9,6 @@
     "worktreeParent": "~/Documents",
     "workflowRepo": "~/dream-team-flow"
   },
+  "extraPaths": {},
   "terminal": "Alacritty"
 }

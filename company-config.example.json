@@ -1,8 +1,21 @@
 {
-  "_comment": "Company config for de-sanitizing the public Dream Team Flow repo. Share this file with team members. They pass it to: dtf install <REPO_URL> --company-config company-config.json",
+  "_comment": "Company config for Dream Team Flow. Share this with team members. They pass it to: dtf install <REPO_URL> --company-config company-config.json",
+
+  "_instructions": {
+    "projectName": "Your project/repo name (replaces 'Repo' in all files)",
+    "repoUrl": "Git URL for the monorepo (shown during install as default clone target)",
+    "ticketPrefix": "Jira ticket prefix (replaces 'PROJ-')",
+    "jiraDomain": "Your Jira instance domain",
+    "services": "Map generic names to your real service names. Add as many as you need. Keys are the generic placeholders, values are the real names.",
+    "defaultPaths": "Suggested defaults shown during install. Users can override all of these.",
+    "extraPaths": "Additional named paths your team uses. Users will be asked to set each one during install."
+  },
+
   "projectName": "Repo",
+  "repoUrl": "git@github.com:RepoAB/Repo.git",
   "ticketPrefix": "PLRS",
   "jiraDomain": "your-company.atlassian.net",
+
   "services": {
     "ServiceA": "ServiceA",
     "ServiceB": "ServiceB",
@@ -10,5 +23,21 @@
     "ServiceD": "ServiceD",
     "ServiceE": "ServiceE",
     "TranslationService": "TranslationService"
+  },
+
+  "defaultPaths": {
+    "monorepo": "~/Documents/Repo",
+    "worktreeParent": "~/Documents"
+  },
+
+  "extraPaths": {
+    "frontendApp": {
+      "description": "Path to the frontend app within the monorepo (relative to monorepo root)",
+      "default": "apps/web"
+    },
+    "backendServices": {
+      "description": "Path to backend services directory (relative to monorepo root)",
+      "default": "services"
+    }
   }
 }

@@ -121,11 +121,56 @@ cmd_install() {
 
   ask "Your name" "" user_name
   ask "GitHub username" "" gh_user
-  ask "Path to your monorepo" "$HOME/Documents/Repo" monorepo
-  ask "Parent directory for worktrees" "$HOME/Documents" worktree_parent
+
+  # Use company config defaults if available, otherwise generic defaults
+  local default_monorepo="$HOME/Documents/Repo"
+  local default_worktree="$HOME/Documents"
+  if [[ -n "$company_config" && -f "$company_config" ]]; then
+    local cc_monorepo=$(jq -r '.defaultPaths.monorepo // empty' "$company_config" | sed "s|~|$HOME|")
+    local cc_worktree=$(jq -r '.defaultPaths.worktreeParent // empty' "$company_config" | sed "s|~|$HOME|")
+    [[ -n "$cc_monorepo" ]] && default_monorepo="$cc_monorepo"
+    [[ -n "$cc_worktree" ]] && default_worktree="$cc_worktree"
+  fi
+
+  ask "Path to your monorepo" "$default_monorepo" monorepo
+  ask "Parent directory for worktrees" "$default_worktree" worktree_parent
   ask_choice "Preferred terminal" terminal "${TERMINALS[@]}"
 
-  # 4. Write dtf-config.json
+  # 4. Ask about extra paths from company config
+  local extra_paths_json="{}"
+  if [[ -n "$company_config" && -f "$company_config" ]]; then
+    local extra_keys
+    extra_keys=$(jq -r '.extraPaths // {} | keys[]' "$company_config" 2>/dev/null || true)
+    if [[ -n "$extra_keys" ]]; then
+      header "Project-Specific Paths"
+      info "Your company config defines additional paths. Set them for your machine:"
+      echo ""
+      while IFS= read -r key; do
+        local desc=$(jq -r ".extraPaths[\"$key\"].description // \"$key\"" "$company_config")
+        local default_val=$(jq -r ".extraPaths[\"$key\"].default // \"\"" "$company_config")
+        local val
+        ask "$desc" "$default_val" val
+        extra_paths_json=$(echo "$extra_paths_json" | jq --arg k "$key" --arg v "$val" '. + {($k): $v}')
+      done <<< "$extra_keys"
+    fi
+  fi
+
+  # 5. Ask if user wants to add more custom paths
+  echo ""
+  local add_more="y"
+  read -rp "  Add any custom paths? (y/N): " add_more
+  while [[ "$add_more" =~ ^[yY] ]]; do
+    local path_name path_value
+    ask "Path name (e.g., 'dataDir', 'configDir')" "" path_name
+    ask "Path value" "" path_value
+    if [[ -n "$path_name" && -n "$path_value" ]]; then
+      extra_paths_json=$(echo "$extra_paths_json" | jq --arg k "$path_name" --arg v "$path_value" '. + {($k): $v}')
+      ok "Added: $path_name = $path_value"
+    fi
+    read -rp "  Add another? (y/N): " add_more
+  done
+
+  # 6. Write dtf-config.json
   mkdir -p "$CLAUDE_DIR"
   cat > "$DTF_CONFIG" << EOF
 {
@@ -139,6 +184,7 @@ cmd_install() {
     "worktreeParent": "$worktree_parent",
     "workflowRepo": "$install_dir"
   },
+  "extraPaths": $extra_paths_json,
   "terminal": "$terminal"
 }
 EOF
