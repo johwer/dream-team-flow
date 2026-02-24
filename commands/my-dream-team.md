@@ -9,7 +9,16 @@
 ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
 ```
 
-You are the **Team Lead** orchestrating a multi-agent team to implement a feature ticket for the Repo monorepo. Follow this workflow exactly.
+You are the **Team Lead** orchestrating a multi-agent team to implement a feature ticket. Follow this workflow exactly.
+
+## Config Resolution
+
+Read `~/.claude/dtf-config.json` if it exists. Use:
+- `paths.monorepo` instead of `~/Documents/Repo`
+- `paths.worktreeParent` instead of `~/Documents`
+If no config exists, fall back to the values in `~/.claude/CLAUDE.md`.
+
+For memory/learnings files, look in your project memory directory (`~/.claude/projects/*/memory/`) — find the directory matching your current project.
 
 ## Agent Roster
 
@@ -156,7 +165,7 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
        - **Spawn a second frontend dev (Elsa)** only if: there are 2+ distinct UI areas (e.g., admin views vs user-facing views), OR the frontend scope spans 8+ files across different feature areas
        - **Spawn the data engineer (Mei)** when the ticket involves: complex database queries, report generation, data aggregation/service-e, data mapping between models, or features in the Reports & ServiceE / Analytics Dashboard area. Mei handles the data layer (query services, data mappers, report generators) while Kenji focuses on API endpoints/controllers. If the backend work is primarily data-heavy (mostly queries and transformations), spawn Mei instead of a second backend dev — not both.
        - **Bias toward fewer agents.** Each extra agent costs coordination overhead and token budget. Only add one if the work is genuinely parallelizable (not just large). When in doubt, use one dev.
-       - **Check team sizing history**: Read `~/.claude/projects/-Users-username/memory/dream-team-history.json` (if it exists). If past sessions with similar ticket types used extra devs, check whether it helped (fewer review rounds) or hurt (coordination issues in journal highlights). Calibrate accordingly.
+       - **Check team sizing history**: Read `your project memory directory (see Config Resolution above) for `dream-team-history.json`` (if it exists). If past sessions with similar ticket types used extra devs, check whether it helped (fewer review rounds) or hurt (coordination issues in journal highlights). Calibrate accordingly.
      - **Model tier decision**: For each dev agent, recommend a model tier based on task complexity:
        - **`opus`** — Complex architectural work, multi-service coordination, tricky edge cases, domain model changes. Use for: Amara (always), Diego.
        - **`sonnet`** — Default for ALL dev agents (Kenji, Ingrid, Ravi, Elsa). Standard implementation, CRUD, component work, i18n, config changes.
@@ -869,7 +878,7 @@ Before shutting down the team, run a retrospective to capture learnings that imp
    - **Doc gaps** — Issues with Repo repo docs that should be flagged (don't fix them now, just note them)
    - **Process improvements** — Workflow or coordination changes (e.g., "backend should share API contracts earlier")
 
-5. **Check persistent learnings** — Read `~/.claude/projects/-Users-username/memory/dream-team-learnings.md` (create it if it doesn't exist). Check if any previously recorded learnings are relevant or have been addressed.
+5. **Check persistent learnings** — Read `your project memory directory for `dream-team-learnings.md`` (create it if it doesn't exist). Check if any previously recorded learnings are relevant or have been addressed.
 
 6. **Present findings to the user** in this format (include vote tallies for team-endorsed improvements):
 
@@ -905,7 +914,7 @@ Before shutting down the team, run a retrospective to capture learnings that imp
 
 8. **Based on user choice:**
    - If applying changes: Edit `my-dream-team.md` with the approved improvements
-   - Always append a session entry to `~/.claude/projects/-Users-username/memory/dream-team-learnings.md` with:
+   - Always append a session entry to `your project memory directory for `dream-team-learnings.md`` with:
      ```
      ## Session: [date] — [ticket ID]
      ### Applied
@@ -922,7 +931,7 @@ Before shutting down the team, run a retrospective to capture learnings that imp
    - **journalEntryCount**: Count entries in each agent's `.dream-team/journal/<name>.md`
    - **journalBreakdown**: Tally journal entries by category (instruction-gap, tool-failure, etc.) across all agents
 
-10. **Record session history and achievements** — Append an entry to `~/.claude/projects/-Users-username/memory/dream-team-history.json`. Create the file with an empty array `[]` if it doesn't exist. Each entry is a JSON object:
+10. **Record session history and achievements** — Append an entry to `your project memory directory (see Config Resolution above) for `dream-team-history.json``. Create the file with an empty array `[]` if it doesn't exist. Each entry is a JSON object:
 
    ```json
    {

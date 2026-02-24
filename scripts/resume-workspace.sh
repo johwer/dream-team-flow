@@ -9,7 +9,12 @@ if [ -z "$TICKET_ID" ]; then
   exit 1
 fi
 
-WORKTREE="$HOME/Documents/$TICKET_ID"
+# Load config for worktree parent path (falls back to ~/Documents)
+source "$(dirname "$0")/dtf-env.sh" 2>/dev/null || true
+WORKTREE_PARENT="${DTF_WORKTREE_PARENT:-$HOME/Documents}"
+MONOREPO="${DTF_MONOREPO:-$HOME/Documents/Repo}"
+
+WORKTREE="$WORKTREE_PARENT/$TICKET_ID"
 
 if [ ! -d "$WORKTREE" ]; then
   echo "Error: Worktree not found at $WORKTREE"
@@ -23,7 +28,7 @@ unset CLAUDECODE
 tmux kill-session -t "$TICKET_ID" 2>/dev/null
 
 # Gather context for the resume prompt
-PR_INFO=$(cd ~/Documents/Repo && gh pr list --head "$TICKET_ID" --json number,title,state,url --jq '.[0] // empty' 2>/dev/null)
+PR_INFO=$(cd "$MONOREPO" && gh pr list --head "$TICKET_ID" --json number,title,state,url --jq '.[0] // empty' 2>/dev/null)
 GIT_STATUS=$(git status --short 2>/dev/null)
 GIT_LOG=$(git log --oneline -5 2>/dev/null)
 NOTES_EXISTS=""

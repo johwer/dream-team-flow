@@ -6,13 +6,13 @@ Analyze accumulated Dream Team session data (retro learnings, history, journals)
 
 Read these files (skip any that don't exist yet):
 
-1. **Session history**: `~/.claude/projects/-Users-username/memory/dream-team-history.json`
+1. **Session history**: Look for `dream-team-history.json` in your project memory directory (`~/.claude/projects/*/memory/`)
    - Team sizing decisions and verdicts (good / over-spawned / under-spawned)
    - Complexity ratings, review rounds, must-fix counts
    - Journal highlights from each session
    - Achievement distribution
 
-2. **Retro learnings**: `~/.claude/projects/-Users-username/memory/dream-team-learnings.md`
+2. **Retro learnings**: Look for `dream-team-learnings.md` in the same project memory directory
    - Applied and deferred command file changes per session
    - Doc gaps found
    - Process notes

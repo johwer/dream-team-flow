@@ -1,5 +1,11 @@
 # Review PR — Code Review for Any Pull Request
 
+## Config Resolution
+
+Read `~/.claude/dtf-config.json` if it exists. Use:
+- `paths.monorepo` instead of `~/Documents/Repo`
+If no config exists, fall back to the values in `~/.claude/CLAUDE.md`.
+
 Review a pull request with line-level comments on GitHub. Can approve, request changes, or leave advisory comments. Supports skipping files that aren't valuable to review (generated code, large diffs, lock files).
 
 **Two modes:**

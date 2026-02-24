@@ -2,6 +2,13 @@
 
 Tear down a workspace that was created by `/workspace-launch`.
 
+## Config Resolution
+
+Read `~/.claude/dtf-config.json` if it exists. Use:
+- `paths.monorepo` instead of `~/Documents/Repo`
+- `paths.worktreeParent` instead of `~/Documents`
+If no config exists, fall back to the values in `~/.claude/CLAUDE.md`.
+
 ## Input
 
 The user provides a ticket ID (e.g., `PROJ-1234`). If not provided, list existing worktrees and ask which one to clean up.

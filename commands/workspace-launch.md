@@ -2,6 +2,14 @@
 
 You are setting up a new development workspace from a Jira ticket.
 
+## Config Resolution
+
+Read `~/.claude/dtf-config.json` if it exists. Use:
+- `paths.monorepo` instead of `~/Documents/Repo`
+- `paths.worktreeParent` instead of `~/Documents`
+- `terminal` instead of the hardcoded terminal name
+If no config exists, fall back to the values in `~/.claude/CLAUDE.md`.
+
 ## Input
 
 The user provides either:

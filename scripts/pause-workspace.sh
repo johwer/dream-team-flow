@@ -15,7 +15,11 @@ fi
 echo "=== Pausing workspace: $TICKET_ID ==="
 
 # Kill any running Vite/Node dev servers in this worktree
-WORKTREE="$HOME/Documents/$TICKET_ID"
+# Load config for worktree parent path (falls back to ~/Documents)
+source "$(dirname "$0")/dtf-env.sh" 2>/dev/null || true
+WORKTREE_PARENT="${DTF_WORKTREE_PARENT:-$HOME/Documents}"
+
+WORKTREE="$WORKTREE_PARENT/$TICKET_ID"
 if [ -d "$WORKTREE" ]; then
   # Find node processes whose cwd is inside this worktree
   PIDS=$(pgrep -f "node.*$WORKTREE" 2>/dev/null || true)

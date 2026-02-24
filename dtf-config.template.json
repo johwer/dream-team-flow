@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "user": {
+    "name": "Your Name",
+    "githubUsername": "your-github-username"
+  },
+  "paths": {
+    "monorepo": "~/Documents/Repo",
+    "worktreeParent": "~/Documents",
+    "workflowRepo": "~/dream-team-flow"
+  },
+  "terminal": "Alacritty"
+}

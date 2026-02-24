@@ -1,0 +1,14 @@
+{
+  "_comment": "Company config for de-sanitizing the public Dream Team Flow repo. Share this file with team members. They pass it to: dtf install <REPO_URL> --company-config company-config.json",
+  "projectName": "Repo",
+  "ticketPrefix": "PLRS",
+  "jiraDomain": "your-company.atlassian.net",
+  "services": {
+    "ServiceA": "ServiceA",
+    "ServiceB": "ServiceB",
+    "ServiceC": "ServiceC",
+    "ServiceD": "ServiceD",
+    "ServiceE": "ServiceE",
+    "TranslationService": "TranslationService"
+  }
+}

@@ -10,7 +10,11 @@ if [ -z "$TICKET_ID" ]; then
   exit 1
 fi
 
-cd ~/Documents/"$TICKET_ID" || exit 1
+# Load config for worktree parent path (falls back to ~/Documents)
+source "$(dirname "$0")/dtf-env.sh" 2>/dev/null || true
+WORKTREE_PARENT="${DTF_WORKTREE_PARENT:-$HOME/Documents}"
+
+cd "$WORKTREE_PARENT/$TICKET_ID" || exit 1
 unset CLAUDECODE
 
 # Start tmux detached, send claude, wait, send dream team command, then attach

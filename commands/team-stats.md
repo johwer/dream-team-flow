@@ -4,7 +4,7 @@ Show cumulative service-e, achievements, and shoutouts for the Dream Team agents
 
 ## Workflow
 
-1. **Read the history file** at `~/.claude/projects/-Users-username/memory/dream-team-history.json`. If it doesn't exist, tell the user no sessions have been recorded yet.
+1. **Read the history file** — look for `dream-team-history.json` in your project memory directory (`~/.claude/projects/*/memory/`). Search for the directory matching your current project. If it doesn't exist, tell the user no sessions have been recorded yet.
 
 2. **Calculate and display stats** in this format:
 

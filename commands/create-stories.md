@@ -2,6 +2,14 @@
 
 You are orchestrating the full development lifecycle for one or more Jira tickets: workspace setup, team handoff, and cleanup.
 
+## Config Resolution
+
+Read `~/.claude/dtf-config.json` if it exists. Use:
+- `paths.monorepo` instead of `~/Documents/Repo`
+- `paths.worktreeParent` instead of `~/Documents`
+- `terminal` instead of the hardcoded terminal name
+If no config exists, fall back to the values in `~/.claude/CLAUDE.md`.
+
 ## Input
 
 The user provides one or more **ticket IDs** (e.g., `PROJ-1234` or `PROJ-1234 PROJ-1434`), space or comma separated.
