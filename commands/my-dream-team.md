@@ -152,7 +152,8 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
        - If the Chrome extension fails to connect, ask the user to: (1) open Chrome, (2) click the Claude extension icon in the toolbar, (3) log in if not already logged in, (4) wait a few seconds for the connection to establish, then say "try again".
      - Explore the codebase to determine what files/services are affected. **Start with Glob patterns for file/folder names** before grepping file contents — folder naming often differs from code naming conventions (e.g., `medicalcertificate` vs `MedicalCertificate`).
      - Determine if the ticket needs: backend-only, frontend-only, or both
-     - Determine if there are infrastructure concerns (new migrations, Docker changes, new services)
+     - **Check main for partial implementations**: Run `git diff origin/main -- <key-files>` to see if main already has partial work from previous PRs. Report any overlap to avoid duplicating existing changes.
+- Determine if there are infrastructure concerns (new migrations, Docker changes, new services)
      - **Seed data check**: If the ticket involves UI that displays specific data (files, attachments, linked records, specific entity states), verify that seed data exists in `scripts/database-init/` for testing. If not, flag it in your report: "Seed data missing for [X] — needs to be added before manual testing."
      - Report back with: (a) scope assessment, (b) which agents are needed, (c) **verified key files to modify** (see below), (d) any architectural concerns, (e) whether functional testing is needed (flag `needs_testing: true/false` — say yes for: API behavior changes, migrations, complex frontend interactions, multi-service flows; say no for: simple CRUD, styling-only changes, copy/i18n updates), (f) whether Docker service rebuild is needed (flag `needs_docker_rebuild: true/false` with which service(s) — e.g., `service-b-api`). If true, note that Kenji must rebuild and notify Ingrid before she can run API code generation.
      - **Verified file paths**: For every key file you reference in your report, verify the path exists using Read or Glob. Include the full resolved path (e.g., `apps/web/src/pages/employees/pages/employeecard/pages/medicalcertificate/components/CertificateAttachments.tsx`), not just the filename. Downstream agents will use these paths directly — wrong paths cause silent Read failures and wasted round-trips.
@@ -633,6 +634,13 @@ Tell the user the GIF filenames are in their Chrome downloads, ready to attach t
 
 ### Phase 5: Commit, Push & Initial Summary
 
+**HARD GATE — Visual verification (UI tickets only):**
+Before proceeding with ANY push, confirm that visual verification was completed. Check:
+1. Did Ingrid's completion message include visual verification results? OR
+2. Did Lena record before/after GIFs in Phase 4.75?
+
+If NEITHER happened and the ticket has UI changes: **STOP. Do NOT push.** Spawn Lena (Phase 4.75) or have Ingrid visually verify first. This gate exists because skipping visual verification has caused user-facing bugs in 2 out of 7 sessions (PROJ-1701, PROJ-1562). Runtime errors visible in the browser were shipped because nobody checked.
+
 Once PR review is approved (or all MUST FIX items are resolved), **run drift detection before pushing**:
 
 **Drift check** — Re-run the same build/type commands from the Phase 2 baseline:
@@ -722,7 +730,16 @@ The script exits early on first failure — no waiting for remaining checks. If 
 
 Only after both AI review and CI are clean:
 1. **Mark the PR as ready** with `gh pr ready <PR_NUMBER>`
-2. **Move ticket to Under granskning** (In Review):
+2. **Auto-assign reviewers** from `~/.claude/reviewers.json` based on Amara's scope assessment:
+   - Map scope to category: `frontend-only` → `frontend`, `backend-only` → `backend`, `full-stack` → `fullstack`, `infra-only` → `infra`, `data` → `data`
+   - Read the reviewers config and get the list for that category
+   - If reviewers exist for the category, assign them:
+     ```bash
+     gh pr edit <PR_NUMBER> --add-reviewer "user1,user2"
+     ```
+   - If no reviewers configured for that category, skip silently
+   - Tell the user which reviewers were assigned (or that none were configured)
+3. **Move ticket to Under granskning** (In Review):
    ```bash
    acli jira workitem transition --key "<TICKET_ID>" --status "Under granskning"
    ```

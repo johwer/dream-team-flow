@@ -140,6 +140,24 @@ Review any pull request with line-level comments — no local checkout needed:
 /review-pr 1670 --focus "src/components/**" --no-approve
 ```
 
+### PR Reviewer Auto-Assignment
+
+Configure GitHub reviewers per category. When a Dream Team PR is marked ready, reviewers are auto-assigned based on the ticket scope.
+
+```
+# Manage reviewers
+/reviewers list
+/reviewers add frontend github-user-1
+/reviewers add backend github-user-2
+/reviewers remove infra github-user-3
+```
+
+Categories: `frontend`, `backend`, `fullstack`, `infra`, `data`
+
+Config stored in `~/.claude/reviewers.json` — sanitized automatically for public repos (usernames replaced with `reviewer-1`, `reviewer-2`, etc.).
+
+When the Dream Team marks a PR ready (Phase 5.5), it maps the ticket scope to a category (`frontend-only` → `frontend`, `full-stack` → `fullstack`, etc.) and runs `gh pr edit --add-reviewer` with all configured reviewers for that category.
+
 ### Pause & Resume
 
 ```
@@ -239,6 +257,7 @@ flowchart TD
 - **Guardrail hooks** — Migration guard, lock file guard, auto-lint reminders prevent common mistakes
 - **Visual verification** — Frontend devs can verify against designs using Chrome extension
 - **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
+- **PR reviewer auto-assignment** — Pre-configure GitHub reviewers per category (frontend, backend, fullstack, infra, data); auto-assigned when PRs go ready
 - **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
 - **How to Test section** — Every PR includes exact URLs, steps, and expected results
 - **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
@@ -267,6 +286,7 @@ dream-team-flow/                  # Public repo (or company fork)
   CLAUDE.md.template              # Template → generates ~/.claude/CLAUDE.md
   dtf-config.template.json        # Template for per-user config
   company-config.example.json     # Example company config with docs
+  reviewers.json                  # PR reviewer assignments per category
   settings.json                   # Claude Code settings (hooks, env)
   commands/
     create-stories.md             # /create-stories — full lifecycle
@@ -274,6 +294,7 @@ dream-team-flow/                  # Public repo (or company fork)
     workspace-launch.md           # /workspace-launch — create worktree
     workspace-cleanup.md          # /workspace-cleanup — tear down
     review-pr.md                  # /review-pr — standalone PR review
+    reviewers.md                  # /reviewers — manage PR reviewer assignments
     acli-jira-cheatsheet.md       # Jira CLI reference
     ticket-scout.md               # Pre-sprint ticket analysis
     team-stats.md                 # Session statistics

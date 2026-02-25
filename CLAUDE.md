@@ -49,6 +49,7 @@ These commands are available globally from any project:
 - `/ticket-scout` — Pre-analyze upcoming Jira tickets before sprint planning
 
 **Team & Config:**
+- `/reviewers` — Manage pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Auto-assigned when Dream Team PRs go ready.
 - `/team-stats` — Dream Team leaderboard and history
 - `/team-review` — Analyze Dream Team learnings and propose improvements
 - `/sync-config` — Push all Claude config to GitHub (private + sanitized public repos)
