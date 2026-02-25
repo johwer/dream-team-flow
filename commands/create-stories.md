@@ -24,6 +24,16 @@ This skill should be invoked when the user says things like:
 - "Work on PROJ-1234 and PROJ-1434"
 - "Launch these stories: ..."
 
+## Flags
+
+Check if the arguments contain any of these flags. Pass them through to `/my-dream-team` when launching.
+
+- `--lite` — Pass to `/my-dream-team`. Claude decides whether to spawn agents. All other lifecycle steps (worktree, deps, PR, cleanup) still run normally.
+- `--no-worktree` — Skip Steps 4-6 (worktree creation, npm install, env copy). Launch Claude in a new terminal but `cd` to the monorepo and work on the current branch. Cleanup skips worktree removal — only kills the tmux session.
+- `--local` — Pass to `/my-dream-team`. No PR, no push.
+
+Flags can be combined: `--lite --no-worktree`, `--lite --local`, etc.
+
 ## Workflow
 
 For **each ticket ID**, run the following steps sequentially. Complete one ticket fully before starting the next.

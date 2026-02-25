@@ -60,6 +60,33 @@ Check if the arguments contain `--local`. If present:
 - After Maya's review (and Suki's testing if applicable) is clean, **stop and tell the user** that changes are ready for local review with `git diff`
 - Do NOT run retrospective or cleanup phases
 
+Check if the arguments contain `--lite`. If present:
+- **Phase 1 (Architecture)**: YOU do the analysis directly — don't spawn Amara. Read the relevant docs, explore the codebase, determine scope, key files, and conventions. Produce the same architecture report format Amara would.
+- **Phase 2 (Implementation)**: Based on complexity, decide:
+  - **Simple** (1-3 files, single area): Implement directly yourself, no agents needed
+  - **Medium** (4-8 files, single discipline): Optionally spawn 1 dev agent (Ingrid or Kenji)
+  - **Complex** (8+ files, multiple disciplines): Spawn agents as needed — use your judgement
+- **Phase 4 (Review)**: Review your own changes against conventions, or spawn Maya if the diff is large (10+ files). Always run the security checklist yourself.
+- **All other phases run normally** — this is critical, lite mode only changes WHO does the work, not WHAT gets done:
+  - **Phase 1.5**: Draft PR created
+  - **Phase 4.5**: Functional testing (if flagged)
+  - **Phase 4.75**: Visual verification hard gate (if UI changes)
+  - **Phase 5**: Commit, push, drift detection, rebase
+  - **Phase 5.5**: Full GitHub review cycle — trigger AI bot reviews (Gemini `/gemini review`), poll for AI feedback, fix any issues, poll CI checks, auto-assign human reviewers from `reviewers.json`, mark PR ready, monitor for human reviewer comments and resolve them
+  - **Phase 6**: User review loop — ask user for feedback, route fixes, iterate until "ship it"
+  - **Phase 6.5**: Summary (write it yourself instead of spawning Tane)
+  - **Phase 6.75**: Retrospective — write your own retro learnings (what worked, what didn't, proposed improvements) in the same format agents would
+  - **Phase 7**: Cleanup
+- The key principle: minimize agent overhead for small/medium tasks while keeping all quality gates, feedback loops, and process steps intact.
+
+Check if the arguments contain `--no-worktree`. If present:
+- Work in the **current directory** — do not create a worktree or branch
+- Skip workspace status file writing (Phase 7)
+- Skip "tell orchestrator to clean up" messaging
+- The user is responsible for their own branch/directory management
+- All other phases run normally
+- Can be combined with other flags (`--lite`, `--local`, `--resume`)
+
 Check if the arguments contain `--resume`. If present, **skip to Phase Resume** below instead of running the normal workflow.
 
 ### Phase Resume: Pick Up Where We Left Off

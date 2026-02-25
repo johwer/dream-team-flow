@@ -42,7 +42,7 @@ These commands are available globally from any project:
 - `/create-stories` — Full lifecycle orchestrator: takes one or more ticket IDs, sets up worktrees, launches Dream Teams, and handles cleanup when done
 - `/workspace-launch` — Create a git worktree from a Jira ticket and spin up a Dream Team session
 - `/workspace-cleanup` — Tear down a worktree, tmux session, and optionally delete the branch
-- `/my-dream-team` — Orchestrate a multi-agent team to implement a Repo feature ticket
+- `/my-dream-team` — Orchestrate a multi-agent team to implement a Repo feature ticket. Flags: `--lite` (Claude decides agent usage), `--no-worktree` (work in current dir), `--local` (no PR/push), `--resume`
 
 **Code Review & Analysis:**
 - `/review-pr` — Review a PR with line-level GitHub comments. Auto-detects PR from current branch, or specify a PR number. Fast (API-only) or full (local worktree + builds + deeper review with `--full`)

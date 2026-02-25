@@ -6,7 +6,10 @@
 ██████╔╝██║  ██║███████╗██║  ██║██║ ╚═╝ ██║       ██║   ███████╗██║  ██║██║ ╚═╝ ██║
 ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
 
-                     F   L   O   W   ·   B E T A
+                              F   L   O   W
+                                              ╔══════════╗
+                                              ║   BETA   ║
+                                              ╚══════════╝
 ```
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
@@ -125,12 +128,40 @@ Already have a branch? Run the team directly:
 /my-dream-team <paste ticket description or Jira ID>
 ```
 
+### Lite Mode (Claude decides agent usage)
+
+Claude analyzes the ticket and decides whether to spawn agents or work solo. Still does everything else: PRs, Jira updates, summaries, retro, GitHub review handling.
+
+```
+/my-dream-team --lite <ticket description>
+/create-stories PROJ-1234 --lite
+```
+
+### No Worktree (work in current directory)
+
+Skip worktree creation — work on the current branch in the current directory:
+
+```
+/my-dream-team --no-worktree <ticket description>
+/create-stories PROJ-1234 --no-worktree
+```
+
 ### Local Only (no PR, no push)
 
-Same as standalone but skips all git remote operations:
+Skip all git remote operations:
 
 ```
 /my-dream-team --local <paste ticket description>
+```
+
+### Combined Flags
+
+Flags can be mixed:
+
+```
+/my-dream-team --lite --no-worktree <ticket description>
+/my-dream-team --lite --local <ticket description>
+/create-stories PROJ-1234 --lite --no-worktree
 ```
 
 ### PR Review
@@ -194,49 +225,120 @@ The architect (Amara) dynamically decides team size and model tier based on tick
 
 ## Workflow Phases
 
+### Full Mode (default)
+
+Multi-agent team with full orchestration.
+
 ```mermaid
 flowchart TD
-    Ticket["Ticket In"]
-    Amara["Amara analyzes + sizes team"]
-    Draft["Draft PR created"]
+    Ticket["Ticket In"] --> Amara["Amara analyzes\n+ sizes team"]
+    Amara -.-> Draft["Draft PR"]
 
-    Ticket --> Amara
-    Amara -.-> Draft
-
-    subgraph Implementation["Implementation Phase (parallel)"]
+    subgraph Impl["Parallel Implementation"]
         Kenji["Kenji - Backend"]
         Ingrid["Ingrid - Frontend"]
         Diego["Diego - Infra"]
     end
 
-    Amara --> Kenji
-    Amara --> Ingrid
-    Amara --> Diego
+    Amara --> Impl
 
     Maya["Maya reviews"]
-    Kenji --> Maya
-    Ingrid --> Maya
-    Diego --> Maya
+    Impl --> Maya
+    Maya -->|"MUST FIX"| Impl
 
     Suki["Suki tests"]
-    Maya --> Suki
+    Maya -->|"Approved"| Suki
 
-    Tane1["Tane - Summary"]
-    Suki --> Tane1
+    Summary["Tane writes summary\nPR marked ready"]
+    Suki --> Summary
 
-    subgraph Review["Review Loop"]
-        AIReview["AI Bots Review"]
-        HumanReview["Human Review"]
-        AIReview --> HumanReview
+    subgraph Feedback["Feedback Cycle"]
+        AIBots["AI Bots review\nGemini + Copilot"]
+        HumanR["Human reviewers\nauto-assigned"]
+        FixIssues["Fix issues\n+ re-push"]
+        UserR{"User review"}
+        AIBots --> HumanR
+        HumanR --> UserR
+        UserR -->|"Feedback"| FixIssues
+        FixIssues --> AIBots
     end
 
-    Tane1 -->|PR ready| AIReview
+    Summary --> Feedback
 
-    UserReview{"User Review"}
-    HumanReview --> UserReview
-    UserReview -->|Ship it| Cleanup["Cleanup"]
-    UserReview -->|Feedback| Maya
+    Retro["Retrospective\nvote on improvements"]
+    UserR -->|"Ship it"| Retro
+    Retro --> Ship["Ship"]
 ```
+
+### Lite Mode (`--lite`)
+
+Claude works solo or selectively spawns agents. Same quality gates and feedback cycle.
+
+```mermaid
+flowchart TD
+    Ticket["Ticket In"] --> Analyze["Claude analyzes ticket"]
+    Analyze -.-> Draft["Draft PR"]
+    Analyze --> Decide{"Complexity?"}
+
+    Decide -->|"Simple"| Solo["Claude implements\ndirectly"]
+    Decide -->|"Medium"| One["Claude + 1 agent"]
+    Decide -->|"Complex"| Multi["Claude + agents\nas needed"]
+
+    Review["Claude reviews\nsecurity checklist"]
+    Solo --> Review
+    One --> Review
+    Multi --> Review
+
+    Summary["Summary written\nPR marked ready"]
+    Review --> Summary
+
+    subgraph Feedback["Feedback Cycle"]
+        AIBots["AI Bots review\nGemini + Copilot"]
+        HumanR["Human reviewers\nauto-assigned"]
+        FixIssues["Fix issues\n+ re-push"]
+        UserR{"User review"}
+        AIBots --> HumanR
+        HumanR --> UserR
+        UserR -->|"Feedback"| FixIssues
+        FixIssues --> AIBots
+    end
+
+    Summary --> Feedback
+
+    Retro["Retrospective\nlearnings saved"]
+    UserR -->|"Ship it"| Retro
+    Retro --> Ship["Ship"]
+```
+
+### Local Mode (`--local`)
+
+No PR, no push. Stops after review.
+
+```mermaid
+flowchart TD
+    Ticket["Ticket In"] --> Analyze["Analyze ticket"]
+    Analyze --> Implement["Implement"]
+    Implement --> Review["Code review"]
+    Review -->|"Issues"| Implement
+    Review -->|"Clean"| Done["Ready for\nlocal review\ngit diff"]
+```
+
+### Mode Comparison
+
+| Feature | Full | Lite | Local |
+|---------|:----:|:----:|:-----:|
+| Architecture analysis | Amara | Claude | Claude |
+| Implementation | Parallel agents | Claude decides | Claude decides |
+| Code review | Maya | Claude or Maya | Claude or Maya |
+| Draft PR | yes | yes | - |
+| AI bot feedback | yes | yes | - |
+| Human reviewer assignment | yes | yes | - |
+| User feedback loop | yes | yes | - |
+| Summary | Tane | Claude | - |
+| Retrospective | yes | yes | - |
+| Jira transitions | yes | yes | - |
+
+Add `--no-worktree` to any mode to skip worktree creation and work in the current directory.
 
 ---
 
@@ -245,11 +347,13 @@ flowchart TD
 - **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
 - **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
 - **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
+- **Lite mode** — `--lite` flag lets Claude decide whether to spawn agents or work solo, keeping all quality gates intact
+- **No-worktree mode** — `--no-worktree` flag to work in-place without workspace setup/cleanup
 - **Dynamic team sizing** — Architect analyzes complexity and spawns only the agents needed
 - **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
 - **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
 - **Working notes & crash recovery** — Agents write to `.dream-team/notes/` on disk; crashed agents respawn with full context
-- **Self-learning** — Agents log learnings during work; retros capture improvements across sessions
+- **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are saved, and the command file evolves automatically
 - **Pause/resume** — Close for the day, pick up tomorrow with context rebuilt from persistent notes
 - **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
 - **Merge conflict prevention** — Pulls latest main before branching, rebases before every push
