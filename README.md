@@ -6,8 +6,10 @@
 ██████╔╝██║  ██║███████╗██║  ██║██║ ╚═╝ ██║       ██║   ███████╗██║  ██║██║ ╚═╝ ██║
 ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
 
-                              F   L   O   W
+                     F   L   O   W   ·   B E T A
 ```
+
+> **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
 **A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that takes a ticket and delivers a complete implementation — architecture, code, review, testing, and PR — autonomously.**
 
