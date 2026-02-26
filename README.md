@@ -203,16 +203,6 @@ Config stored in `~/.claude/reviewers.json` — sanitized automatically for publ
 
 When the Dream Team marks a PR ready (Phase 5.5), it maps the ticket scope to a category (`frontend-only` → `frontend`, `full-stack` → `fullstack`, etc.) and runs `gh pr edit --add-reviewer` with all configured reviewers for that category.
 
-### Pause & Resume
-
-```
-# Close for the day (keeps worktree, kills tmux)
-"pause PROJ-1234"
-
-# Continue tomorrow (rebuilds context from agent notes)
-"resume PROJ-1234"
-```
-
 ---
 
 ## The Team
@@ -373,9 +363,11 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 |------|---------|-------------|
 | 1 | <kbd>/create-stories PROJ-1234</kbd> | Work on tickets — retros run automatically at session end |
 | | <kbd>/my-dream-team --lite ...</kbd> | |
-| 2 | <kbd>/team-review</kbd> | Review accumulated learnings and route them (every 5-10 sessions) |
-| 3 | <kbd>/review-pr \<PR number\></kbd> | Review the PR that `/team-review` created for shared repo changes |
-| 4 | <kbd>/sync-config</kbd> | Sync personal config changes to your config repo |
+| 2 | <kbd>pause PROJ-1234</kbd> | Close for the day — keeps worktree, kills tmux |
+| | <kbd>resume PROJ-1234</kbd> | Continue tomorrow — rebuilds context from agent notes |
+| 3 | <kbd>/team-review</kbd> | Review accumulated learnings and route them (every 5-10 sessions) |
+| 4 | <kbd>/review-pr \<PR number\></kbd> | Review the PR that `/team-review` created for shared repo changes |
+| 5 | <kbd>/sync-config</kbd> | Sync personal config changes to your config repo |
 
 ### The feedback loop
 
