@@ -367,22 +367,15 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 
 **Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
 
-### Key commands
+### ⌨️ Key commands
 
-```bash
-# 1. Work on tickets — retros run automatically at session end
-/create-stories PROJ-1234
-/my-dream-team --lite <ticket description>
-
-# 2. Review accumulated learnings and route them (every 5-10 sessions)
-/team-review
-
-# 3. Review the PR that /team-review created for shared repo changes
-/review-pr <PR number>
-
-# 4. Sync personal config changes to your config repo
-/sync-config
-```
+| Step | Command | What happens |
+|------|---------|-------------|
+| 1 | <kbd>/create-stories PROJ-1234</kbd> | Work on tickets — retros run automatically at session end |
+| | <kbd>/my-dream-team --lite ...</kbd> | |
+| 2 | <kbd>/team-review</kbd> | Review accumulated learnings and route them (every 5-10 sessions) |
+| 3 | <kbd>/review-pr \<PR number\></kbd> | Review the PR that `/team-review` created for shared repo changes |
+| 4 | <kbd>/sync-config</kbd> | Sync personal config changes to your config repo |
 
 ### The feedback loop
 
