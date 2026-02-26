@@ -75,7 +75,7 @@ Check if the arguments contain `--lite`. If present:
   - **Phase 5.5**: Full GitHub review cycle — trigger AI bot reviews (Gemini `/gemini review`), poll for AI feedback, fix any issues, poll CI checks, auto-assign human reviewers from `reviewers.json`, mark PR ready, monitor for human reviewer comments and resolve them
   - **Phase 6**: User review loop — ask user for feedback, route fixes, iterate until "ship it"
   - **Phase 6.5**: Summary (write it yourself instead of spawning Tane)
-  - **Phase 6.75**: Retrospective — write your own retro learnings (what worked, what didn't, proposed improvements) in the same format agents would
+  - **Phase 6.75**: Retrospective — write your own retro learnings using the same 4 categories with destination hints: instruction improvements (`dream-team`/`agent:<name>`/`skill:<name>`), convention discoveries (`project-claude`/`agents-md:<path>`/`repo-docs`), doc gaps (`repo-docs`/`agents-md:<path>`), process improvements (`dream-team`/`memory`). Tag each item with a suggested destination so `/team-review` can route it later.
   - **Phase 7**: Cleanup
 - The key principle: minimize agent overhead for small/medium tasks while keeping all quality gates, feedback loops, and process steps intact.
 
@@ -353,10 +353,11 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
 - **Team:** `dream-team-<TICKET_ID>`
 - **Prompt:** Tell the agent:
   - You are **Kenji**, the Backend Developer for Repo. Your teammates know you by name.
-  - Tech stack: .NET Web API, Entity Framework Core, C#
+  - Tech stack: .NET Web API, Entity Framework Core, Dapper (for heavyweight queries), C#
   - **First read the agent instructions**: `AGENTS.md` (root), `services/AGENTS.md`, and the relevant service-specific `AGENTS.md` (e.g., `services/ServiceB/AGENTS.md`) for repo-specific conventions
   - **Use Amara's conventions summary** as your primary reference. Only read the full docs (`docs/CODING_STYLE_BACKEND.md`, `docs/API_CONVENTIONS.md`, etc.) if something in the summary is unclear or you need more detail on a specific pattern.
   - Follow existing patterns in the codebase — look at similar controllers/services/repositories for reference
+  - **Dapper for heavyweight SQL**: Use Dapper instead of EF Core for complex reporting queries, bulk operations, multi-join aggregations, or any query where EF Core LINQ becomes unwieldy or has performance issues. EF Core is fine for standard CRUD and simple queries.
   - For API authentication in local dev: `bash scripts/local-api-login.sh` stores token at `/tmp/repo-local-dev-token`
   - **Testing**: Write unit tests only when you're adding new service methods with testable logic, or modifying code that already has tests. Don't write tests for thin controller wrappers or simple CRUD with no logic. If the architect's analysis says "no tests needed", skip them.
   - **Formatting**: Run `dotnet csharpier .` on your changed files before reporting completion. Fix any formatting issues — these will fail the GitHub build if left unfixed.
@@ -484,10 +485,11 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
     - **Ingrid** builds the frontend — coordinate with her on the shape of data the API returns (field names, types, grouping structure)
     - If the ticket involves both a report backend and a UI, define the response DTO shape early so Ingrid can work in parallel
   - **Query patterns:**
-    - Use EF Core LINQ for most queries — avoid raw SQL unless performance requires it
-    - Use `.AsNoTracking()` for read-only report queries
+    - Use EF Core LINQ for simple CRUD and straightforward queries
+    - **Use Dapper for heavyweight SQL**: complex reporting queries, multi-join aggregations, bulk operations, or any query where EF Core LINQ becomes unwieldy or has performance issues. Dapper gives you full SQL control with minimal overhead.
+    - Use `.AsNoTracking()` for read-only EF Core queries
     - Use projections (`.Select()`) instead of loading full entities when only a few fields are needed
-    - For complex aggregations, consider using `.GroupBy()` with projections rather than loading all records into memory
+    - For complex aggregations that stay in EF Core, consider `.GroupBy()` with projections rather than loading all records into memory
     - Always paginate large result sets
   - **Formatting**: Run `dotnet csharpier .` on your changed files before reporting completion
   - **Commit as you go**: Commit after each logical piece (e.g., after data mapper, after query service, after report generator). Use `<TICKET_ID>: <what you did>` format.
@@ -916,11 +918,12 @@ Before shutting down the team, run a retrospective to capture learnings that imp
 
    Tally votes. Improvements with majority 👍 are promoted to "team-endorsed." Include vote counts when presenting to the user. Disagreements with reasons are especially valuable — surface those.
 
-4. **Collect all responses** and synthesize them into three categories:
+4. **Collect all responses** and synthesize them into four categories, each with a **destination hint** for where the learning should eventually be applied (via `/team-review`):
 
-   - **Instruction improvements** — Concrete changes to the agent prompts in this command file (`my-dream-team.md`)
-   - **Doc gaps** — Issues with Repo repo docs that should be flagged (don't fix them now, just note them)
-   - **Process improvements** — Workflow or coordination changes (e.g., "backend should share API contracts earlier")
+   - **Instruction improvements** — Concrete changes to agent prompts or workflow steps → destination: `dream-team`, `agent:<name>`, or `skill:<name>`
+   - **Convention discoveries** — Coding patterns, tech stack rules, or architectural decisions learned during the session → destination: `project-claude`, `agents-md:<path>`, or `repo-docs`
+   - **Doc gaps** — Issues with Repo repo docs that should be flagged → destination: `repo-docs` or `agents-md:<path>`
+   - **Process improvements** — Workflow or coordination changes (e.g., "backend should share API contracts earlier") → destination: `dream-team` or `memory`
 
 5. **Check persistent learnings** — Read `your project memory directory for `dream-team-learnings.md`` (create it if it doesn't exist). Check if any previously recorded learnings are relevant or have been addressed.
 
@@ -958,16 +961,19 @@ Before shutting down the team, run a retrospective to capture learnings that imp
 
 8. **Based on user choice:**
    - If applying changes: Edit `my-dream-team.md` with the approved improvements
-   - Always append a session entry to `your project memory directory for `dream-team-learnings.md`` with:
+   - Always append a session entry to `your project memory directory for `dream-team-learnings.md`` with destination hints so `/team-review` can route them later:
      ```
      ## Session: [date] — [ticket ID]
      ### Applied
-     - [changes that were applied to the command file]
+     - [change] → `destination`
      ### Deferred
-     - [changes saved for later consideration]
+     - [change] → suggested `destination`
+     ### Convention Discoveries
+     - [pattern learned] → suggested `destination`
      ### Doc Gaps
-     - [doc issues found]
+     - [issue] → suggested `destination`
      ```
+     Destination values use the registry format: `dream-team`, `agent:<name>`, `skill:<name>`, `project-claude`, `agents-md:<path>`, `repo-docs`, `memory`.
 
 9. **Collect session metrics** before recording history:
    - **firstPassCompile**: Did `dotnet build` and `npx tsc --noEmit` pass on the first try before any fixes? (true/false)
