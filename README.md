@@ -96,22 +96,6 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ---
 
-## Workflow Phases
-
-Three modes: **Full** (multi-agent orchestration), **Lite** (Claude decides agent usage), and **Local** (no PR/push, stops after review). Each mode has a visual flowchart showing the pipeline from ticket to ship.
-
-Read more: **[Workflow Phases](docs/workflow-phases.md)** — flowcharts, mode comparison table, and flag details.
-
----
-
-## Retrospectives & Learning Router
-
-Every session ends with a team retro. Learnings are tagged with destinations and routed automatically — personal config changes are applied directly, shared repo changes go through Jira ticket + PR for team review.
-
-Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where learnings go, and the feedback loop.
-
----
-
 ## Key Features
 
 - 🚀 **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
@@ -138,6 +122,22 @@ Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where 
 - 🔎 **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
 - 📋 **How to Test section** — Every PR includes exact URLs, steps, and expected results
 - 🖥️ **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
+
+---
+
+## Workflow Phases
+
+Three modes: **Full** (multi-agent orchestration), **Lite** (Claude decides agent usage), and **Local** (no PR/push, stops after review). Each mode has a visual flowchart showing the pipeline from ticket to ship.
+
+Read more: **[Workflow Phases](docs/workflow-phases.md)** — flowcharts, mode comparison table, and flag details.
+
+---
+
+## Retrospectives & Learning Router
+
+Every session ends with a team retro. Learnings are tagged with destinations and routed automatically — personal config changes are applied directly, shared repo changes go through Jira ticket + PR for team review.
+
+Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where learnings go, and the feedback loop.
 
 ---
 
