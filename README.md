@@ -28,6 +28,7 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 |-------|-------------|
 | **[README](README.md)** | Overview, quick start, usage, and feature reference (this file) |
 | **[Setup Guide](SETUP-GUIDE.md)** | Prerequisites, installation, company config, DTF CLI reference, troubleshooting |
+| **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, `--dangerously-skip-permissions` explained |
 | **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack, terminal support |
 
@@ -218,21 +219,9 @@ When the Dream Team marks a PR ready (Phase 5.5), it maps the ticket scope to a 
 
 ## The Team
 
-| | Agent | Role | When |
-|--|-------|------|------|
-| 🏛️ | **Amara** 🇳🇬 | Tech Architect | Always — analyzes ticket, sizes team, defines contracts |
-| ⚙️ | **Kenji** 🇯🇵 | Backend Developer | When backend changes are needed |
-| 🎨 | **Ingrid** 🇸🇪 | Frontend Developer | When frontend changes are needed |
-| ⚙️ | **Ravi** 🇮🇳 | Backend Dev (pool) | When 2+ backend workstreams exist |
-| 🎨 | **Elsa** 🇩🇪 | Frontend Dev (pool) | When 2+ frontend workstreams exist |
-| 📊 | **Mei** 🇨🇳 | Data Engineer | When complex queries, reports, or data mapping needed |
-| 🐳 | **Diego** 🇲🇽 | Infrastructure Engineer | When migrations or Docker changes needed |
-| 🔍 | **Maya** 🇮🇱 | PR Reviewer | Always — security, conventions, formatting |
-| 🧪 | **Suki** 🇯🇵 | Functional Tester | Optional — when architect flags testing |
-| 👁️ | **Lena** 🇩🇪 | Visual Verifier | When UI changes need before/after GIFs |
-| 📝 | **Tane** 🇳🇿 | Summary Writer | Twice — initial for reviewers + final after approval |
+11 specialized agents — architect, backend/frontend developers, data engineer, infra, reviewer, tester, visual verifier, and summary writer. The architect analyzes each ticket and dynamically spawns only the agents needed: 2-3 for simple changes, the full team for complex multi-service work.
 
-The architect (Amara) dynamically decides team size and model tier based on ticket complexity. Simple tickets get 2-3 agents; complex multi-service work gets the full team.
+Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing logic, and agent definitions.
 
 ---
 
@@ -495,6 +484,7 @@ dream-team-flow/                  # Public repo (or company fork)
     level-2-project.json          # Project standard (shared allowlist)
     level-3-team.json             # Team enforced (managed lockdown)
   docs/
+    the-team.md                   # Agent roster, roles, team sizing
     integrations.md               # Integration reference & setup
   learnings/
     aggregated-learnings.md       # Team-curated retro learnings
