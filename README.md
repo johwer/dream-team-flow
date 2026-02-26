@@ -28,6 +28,7 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 |-------|-------------|
 | **[README](README.md)** | Overview, quick start, usage, and feature reference (this file) |
 | **[Setup Guide](SETUP-GUIDE.md)** | Prerequisites, installation, company config, DTF CLI reference, troubleshooting |
+| **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, `--dangerously-skip-permissions` explained |
 | **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack, terminal support |
@@ -357,17 +358,7 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 
 **Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
 
-### ⌨️ Key commands
-
-| Step | Command | What happens |
-|------|---------|-------------|
-| 1 | <kbd>/create-stories PROJ-1234</kbd> | Work on tickets — retros run automatically at session end |
-| | <kbd>/my-dream-team --lite ...</kbd> | |
-| 2 | <kbd>pause PROJ-1234</kbd> | Close for the day — keeps worktree, kills tmux |
-| | <kbd>resume PROJ-1234</kbd> | Continue tomorrow — rebuilds context from agent notes |
-| 3 | <kbd>/team-review</kbd> | Review accumulated learnings and route them (every 5-10 sessions) |
-| 4 | <kbd>/review-pr \<PR number\></kbd> | Review the PR that `/team-review` created for shared repo changes |
-| 5 | <kbd>/sync-config</kbd> | Sync personal config changes to your config repo |
+See **[Commands Reference](docs/commands.md)** for the full list of slash commands, flags, and typical workflow.
 
 ### The feedback loop
 
@@ -474,6 +465,7 @@ dream-team-flow/                  # Public repo (or company fork)
     level-2-project.json          # Project standard (shared allowlist)
     level-3-team.json             # Team enforced (managed lockdown)
   docs/
+    commands.md                   # All slash commands, flags, DTF CLI
     the-team.md                   # Agent roster, roles, team sizing
     integrations.md               # Integration reference & setup
   learnings/
