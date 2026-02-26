@@ -32,8 +32,6 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, `--dangerously-skip-permissions` explained |
 | **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack, terminal support |
 
-> **Key security insight:** `--dangerously-skip-permissions` only skips interactive prompts — deny rules, sandbox, and network restrictions are **always enforced**. See [SECURITY.md](SECURITY.md) for the full security model.
-
 ---
 
 ## How It Works
