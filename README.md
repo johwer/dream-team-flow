@@ -31,6 +31,7 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 | **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes with comparison table |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
+| **[Retrospectives](docs/retrospectives.md)** | Self-learning loop, learning destinations, feedback routing |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
 | **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack |
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
@@ -104,42 +105,9 @@ Read more: **[Workflow Phases](docs/workflow-phases.md)** — flowcharts, mode c
 
 ## Retrospectives & Learning Router
 
-Every Dream Team session ends with a retrospective. Agents reflect on what worked and what didn't, vote on improvements, and tag each learning with a **destination** — where it should be applied.
+Every session ends with a team retro. Learnings are tagged with destinations and routed automatically — personal config changes are applied directly, shared repo changes go through Jira ticket + PR for team review.
 
-### How it works
-
-1. **Retro runs** (Phase 6.75) — agents propose improvements tagged with destinations
-2. **Learnings accumulate** in a session log (`dream-team-learnings.md`)
-3. **`/team-review`** analyzes patterns across sessions and routes learnings
-
-### Where learnings go
-
-| Destination | Example | Apply mode |
-|-------------|---------|------------|
-| Dream Team command | "Kenji should share API contracts earlier" | Direct (personal config) |
-| Standalone agent | "Architect must check API endpoint existence" | Direct (personal config) |
-| Skill/command | "review-pr should verify API contracts" | Direct (personal config) |
-| Project CLAUDE.md | "Use Dapper for heavyweight SQL" | Ticket + PR |
-| AGENTS.md | "HCM uses soft deletes" | Ticket + PR |
-| Repo docs | "Date helper convention" | Ticket + PR |
-
-**Direct apply** — personal config files in `~/.claude/` are edited immediately and synced with `/sync-config`.
-
-**Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
-
-See **[Commands Reference](docs/commands.md)** for the full list of slash commands, flags, and typical workflow.
-
-### The feedback loop
-
-```
-Session retro → learnings tagged → /team-review routes them
-                                        ├── Personal config → direct apply
-                                        │                     └── /sync-config
-                                        └── Shared repo → Jira ticket + draft PR
-                                                          └── /review-pr → team merges
-```
-
-This means Dream Team retros improve not just the Dream Team — they improve **every Claude session** in the project. Learnings routed to `CLAUDE.md` or `AGENTS.md` are picked up by raw Claude, lite mode, subagents, and any team member who pulls the changes.
+Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where learnings go, and the feedback loop.
 
 ---
 
@@ -237,6 +205,7 @@ dream-team-flow/                  # Public repo (or company fork)
     installation.md               # Prerequisites, install, terminals
     usage.md                      # Modes, flags, PR review, reviewers
     workflow-phases.md            # Flowcharts for full, lite, local modes
+    retrospectives.md             # Self-learning loop and routing
     commands.md                   # All slash commands, flags, DTF CLI
     the-team.md                   # Agent roster, roles, team sizing
     integrations.md               # Integration reference & setup
