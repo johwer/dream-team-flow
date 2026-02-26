@@ -367,12 +367,31 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 
 **Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
 
+### Key commands
+
+```bash
+# 1. Work on tickets — retros run automatically at session end
+/create-stories PROJ-1234
+/my-dream-team --lite <ticket description>
+
+# 2. Review accumulated learnings and route them (every 5-10 sessions)
+/team-review
+
+# 3. Review the PR that /team-review created for shared repo changes
+/review-pr <PR number>
+
+# 4. Sync personal config changes to your config repo
+/sync-config
+```
+
 ### The feedback loop
 
 ```
 Session retro → learnings tagged → /team-review routes them
-                                        ├── Personal config → direct apply + /sync-config
-                                        └── Shared repo → Jira ticket + draft PR → team reviews
+                                        ├── Personal config → direct apply
+                                        │                     └── /sync-config
+                                        └── Shared repo → Jira ticket + draft PR
+                                                          └── /review-pr → team merges
 ```
 
 This means Dream Team retros improve not just the Dream Team — they improve **every Claude session** in the project. Learnings routed to `CLAUDE.md` or `AGENTS.md` are picked up by raw Claude, lite mode, subagents, and any team member who pulls the changes.
