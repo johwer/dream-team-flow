@@ -105,6 +105,21 @@ For each unaddressed learning, decide destination based on:
 
 A single learning can route to **multiple destinations** (e.g., "check API endpoints" → both `agent:architect` and `skill:review-pr`).
 
+### Apply Modes: Direct vs Ticket+PR
+
+Learnings split into two tracks based on who they affect:
+
+**Direct apply** (personal config in `~/.claude/`, only affects you):
+- `dream-team`, `agent:<name>`, `skill:<name>`, `global-claude`, `memory`
+- These are edited immediately and synced with `/sync-config`
+
+**Ticket + PR** (shared repo files, affects the whole team):
+- `project-claude`, `agents-md:<path>`, `repo-docs`
+- These are NOT written directly. Instead:
+  1. Group all repo-bound learnings into a single Jira ticket
+  2. Create a branch + PR with the proposed changes
+  3. The team reviews the PR like any other code change
+
 ### Routing Workflow
 
 1. **Scan** all "Deferred" items from `dream-team-learnings.md` that aren't struck through (`~~`). Also check items with destination hints from recent retros.
@@ -113,50 +128,94 @@ A single learning can route to **multiple destinations** (e.g., "check API endpo
 
 3. **Read each destination file** before proposing changes — understand what's already there so you add to the right section and avoid duplicates.
 
-4. **Present the routing table** to the user:
+4. **Present the routing table** to the user, with the apply mode column:
 
    ```
    ## Learning Router — Proposed Destinations
 
+   ### Direct Apply (personal config)
    | # | Learning | Source Session | Destination | File | Proposed Change |
    |---|---------|---------------|-------------|------|-----------------|
-   | 1 | Use Dapper for heavy SQL | PROJ-1359 | project-claude | CLAUDE.md | Add to Conventions section |
+   | 1 | Kenji shares contracts late | PROJ-1359 | dream-team | my-dream-team.md | Add timing instruction to Kenji prompt |
    | 2 | Check API endpoints exist | PROJ-1562 | agent:architect + skill:review-pr | architect.md, review-pr.md | Add checklist item |
-   | 3 | Kenji shares contracts late | PROJ-1359 | dream-team | my-dream-team.md | Add timing instruction to Kenji prompt |
-   | 4 | ServiceB note_comments missing | PROJ-1359 | agents-md | services/ServiceB/AGENTS.md | Add Known Issues section |
-   | 5 | Theme token colors undocumented | PROJ-1569 | memory | ticket-patterns.md | Note only, not actionable as rule |
+   | 3 | Theme token colors undocumented | PROJ-1569 | memory | ticket-patterns.md | Note only |
+
+   ### Ticket + PR (shared repo — needs team review)
+   | # | Learning | Source Session | Destination | File | Proposed Change |
+   |---|---------|---------------|-------------|------|-----------------|
+   | 4 | Use Dapper for heavy SQL | PROJ-1359 | project-claude | CLAUDE.md | Add to Conventions section |
+   | 5 | ServiceB note_comments missing | PROJ-1359 | agents-md | services/ServiceB/AGENTS.md | Add Known Issues section |
+   | 6 | Date helper convention | PROJ-1692 | repo-docs | docs/CODING_STYLE_BACKEND.md | Add date handling section |
 
    ### No Route (already addressed or no longer relevant)
    - [item] — [reason it's skipped]
    ```
 
 5. **Ask the user** to approve routing using AskUserQuestion:
-   - "Route all" — Apply all proposed changes to all destination files
+   - "Route all" — Apply direct items + create ticket/PR for repo items
    - "Let me pick" — User selects which rows to apply
    - "Save routing plan only" — Record the proposed routing in learnings file without applying
    - "Skip routing"
 
-6. **Apply** approved changes to each destination file. For each file:
+6. **Apply direct items** to personal config files. For each:
    - Read the file first
    - Find the appropriate section (or create one like `## Learned Conventions` or `## Known Issues`)
    - Add the learning concisely — match the existing style of the file
    - Don't restructure the file, just append to the right section
+   - After all direct items are applied, offer to run `/sync-config`
 
-7. **Mark applied items** in `dream-team-learnings.md`:
-   - Change `- [description]` to `- ~~[description]~~ → Applied to `[destination]` on [date]`
-   - This prevents re-proposing already-routed learnings in future reviews
+7. **Create ticket + PR for repo items**. If there are any repo-bound learnings:
+
+   a. **Create a Jira ticket** with `acli`:
+      ```bash
+      acli jira workitem create --project PLRS --type Task \
+        --summary "Apply retro learnings to repo docs and conventions" \
+        --description "<description with the table of proposed changes>"
+      ```
+      If `acli` is unavailable, tell the user the ticket details to create manually.
+
+   b. **Create a branch and PR** using `/workspace-launch` or manually:
+      ```bash
+      cd <monorepo>
+      git checkout -b retro-learnings-<date>
+      ```
+
+   c. **Apply the repo changes** to the branch:
+      - Edit each destination file (CLAUDE.md, AGENTS.md, docs/*.md)
+      - Commit with message referencing the Jira ticket
+
+   d. **Create a draft PR**:
+      ```bash
+      gh pr create --draft --title "PROJ-XXXX: Apply retro learnings to repo conventions" \
+        --body "$(cat <<'EOF'
+      ## Summary
+      Applies learnings from Dream Team retrospectives to shared repo files.
+
+      ## Changes
+      [table of changes from the routing table]
+
+      ## Source Sessions
+      [list of session IDs these learnings came from]
+      EOF
+      )"
+      ```
+
+   e. **Report** the Jira ticket ID and PR URL to the user.
+
+8. **Mark applied/ticketed items** in `dream-team-learnings.md`:
+   - Direct items: `- ~~[description]~~ → Applied to [destination] on [date]`
+   - Repo items: `- ~~[description]~~ → Ticketed as [PROJ-XXXX] / PR #[number] on [date]`
+   - This prevents re-proposing already-handled learnings in future reviews
 
 ## Actions
 
 After presenting the health report AND the routing table, ask the user:
 
-- "Apply health report changes + route learnings" — Do both: edit `my-dream-team.md` with health report fixes AND apply all routed learnings to their destination files
+- "Apply health report changes + route learnings" — Do both: edit `my-dream-team.md` with health report fixes AND run the full routing (direct apply + ticket/PR)
 - "Apply health report changes only" — Only the `my-dream-team.md` changes (legacy behavior)
-- "Route learnings only" — Skip health report changes, just apply the routed learnings
+- "Route learnings only" — Skip health report changes, just run the routing
 - "Save report" — Append the report to `dream-team-learnings.md` under a `## Team Review: [date]` heading
 - "Skip"
-
-After applying, offer to run `/sync-config` to push changes.
 
 ## Tips
 
@@ -165,3 +224,4 @@ After applying, offer to run `/sync-config` to push changes.
 - Focus on **recurring** issues, not one-off problems
 - The Learning Router is most valuable after 3+ sessions — that's when deferred learnings pile up
 - Learnings routed to `project-claude` or `agents-md` help ALL Claude sessions, not just Dream Team — this is how lite-mode and raw Claude sessions benefit from Dream Team retros
+- Repo-bound learnings go through PR review so the whole team can weigh in — this prevents one person's retro from silently changing shared conventions
