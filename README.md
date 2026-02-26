@@ -205,19 +205,19 @@ When the Dream Team marks a PR ready (Phase 5.5), it maps the ticket scope to a 
 
 ## The Team
 
-| Agent | Role | When |
-|-------|------|------|
-| **Amara** | Tech Architect | Always — analyzes ticket, sizes team, defines contracts |
-| **Kenji** | Backend Developer | When backend changes are needed |
-| **Ingrid** | Frontend Developer | When frontend changes are needed |
-| **Ravi** | Backend Dev (pool) | When 2+ backend workstreams exist |
-| **Elsa** | Frontend Dev (pool) | When 2+ frontend workstreams exist |
-| **Mei** | Data Engineer | When complex queries, reports, or data mapping needed |
-| **Diego** | Infrastructure Engineer | When migrations or Docker changes needed |
-| **Maya** | PR Reviewer | Always — security, conventions, formatting |
-| **Suki** | Functional Tester | Optional — when architect flags testing |
-| **Lena** | Visual Verifier | When UI changes need before/after GIFs |
-| **Tane** | Summary Writer | Twice — initial for reviewers + final after approval |
+| | Agent | Role | When |
+|--|-------|------|------|
+| 🏛️ | **Amara** | Tech Architect | Always — analyzes ticket, sizes team, defines contracts |
+| ⚙️ | **Kenji** | Backend Developer | When backend changes are needed |
+| 🎨 | **Ingrid** | Frontend Developer | When frontend changes are needed |
+| ⚙️ | **Ravi** | Backend Dev (pool) | When 2+ backend workstreams exist |
+| 🎨 | **Elsa** | Frontend Dev (pool) | When 2+ frontend workstreams exist |
+| 📊 | **Mei** | Data Engineer | When complex queries, reports, or data mapping needed |
+| 🐳 | **Diego** | Infrastructure Engineer | When migrations or Docker changes needed |
+| 🔍 | **Maya** | PR Reviewer | Always — security, conventions, formatting |
+| 🧪 | **Suki** | Functional Tester | Optional — when architect flags testing |
+| 👁️ | **Lena** | Visual Verifier | When UI changes need before/after GIFs |
+| 📝 | **Tane** | Summary Writer | Twice — initial for reviewers + final after approval |
 
 The architect (Amara) dynamically decides team size and model tier based on ticket complexity. Simple tickets get 2-3 agents; complex multi-service work gets the full team.
 
@@ -393,30 +393,30 @@ This means Dream Team retros improve not just the Dream Team — they improve **
 
 ## Key Features
 
-- **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
-- **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
-- **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
-- **Lite mode** — `--lite` flag lets Claude decide whether to spawn agents or work solo, keeping all quality gates intact
-- **No-worktree mode** — `--no-worktree` flag to work in-place without workspace setup/cleanup
-- **Dynamic team sizing** — Architect analyzes complexity and spawns only the agents needed
-- **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
-- **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
-- **Working notes & crash recovery** — Agents write to `.dream-team/notes/` on disk; crashed agents respawn with full context
-- **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
-- **Learning Router** — `/team-review` analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
-- **Pause/resume** — Close for the day, pick up tomorrow with context rebuilt from persistent notes
-- **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
-- **Merge conflict prevention** — Pulls latest main before branching, rebases before every push
-- **Non-destructive PR updates** — Reads current PR body before editing, preserving manually added images
-- **AI review polling** — Waits for GitHub AI bots (Gemini, Copilot) before human review
-- **CI check polling** — Monitors GitHub Actions, routes failures to the right agent
-- **Guardrail hooks** — Migration guard, lock file guard, auto-lint reminders prevent common mistakes
-- **Visual verification** — Frontend devs can verify against designs using Chrome extension
-- **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
-- **PR reviewer auto-assignment** — Pre-configure GitHub reviewers per category (frontend, backend, fullstack, infra, data); auto-assigned when PRs go ready
-- **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
-- **How to Test section** — Every PR includes exact URLs, steps, and expected results
-- **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
+- 🚀 **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
+- 🏢 **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
+- 🧠 **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
+- ⚡ **Lite mode** — `--lite` flag lets Claude decide whether to spawn agents or work solo, keeping all quality gates intact
+- 📂 **No-worktree mode** — `--no-worktree` flag to work in-place without workspace setup/cleanup
+- 📐 **Dynamic team sizing** — Architect analyzes complexity and spawns only the agents needed
+- 🔀 **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
+- 💬 **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
+- 💾 **Working notes & crash recovery** — Agents write to `.dream-team/notes/` on disk; crashed agents respawn with full context
+- 🔄 **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
+- 🗺️ **Learning Router** — `/team-review` analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
+- ⏸️ **Pause/resume** — Close for the day, pick up tomorrow with context rebuilt from persistent notes
+- 🧹 **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
+- 🔃 **Merge conflict prevention** — Pulls latest main before branching, rebases before every push
+- 🛡️ **Non-destructive PR updates** — Reads current PR body before editing, preserving manually added images
+- 🤖 **AI review polling** — Waits for GitHub AI bots (Gemini, Copilot) before human review
+- ✅ **CI check polling** — Monitors GitHub Actions, routes failures to the right agent
+- 🚧 **Guardrail hooks** — Migration guard, lock file guard, auto-lint reminders prevent common mistakes
+- 👁️ **Visual verification** — Frontend devs can verify against designs using Chrome extension
+- 🔒 **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
+- 👥 **PR reviewer auto-assignment** — Pre-configure GitHub reviewers per category (frontend, backend, fullstack, infra, data); auto-assigned when PRs go ready
+- 🔎 **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
+- 📋 **How to Test section** — Every PR includes exact URLs, steps, and expected results
+- 🖥️ **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
 
 ---
 
