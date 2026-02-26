@@ -26,12 +26,12 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 
 | Guide | Description |
 |-------|-------------|
-| **[README](README.md)** | Overview, quick start, usage, and feature reference (this file) |
-| **[Setup Guide](SETUP-GUIDE.md)** | Prerequisites, installation, company config, DTF CLI reference, troubleshooting |
+| **[Installation](docs/installation.md)** | Prerequisites, install, team/enterprise setup, supported terminals |
 | **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
-| **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, `--dangerously-skip-permissions` explained |
-| **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack, terminal support |
+| **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
+| **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack |
+| **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
 
 ---
 
@@ -58,62 +58,15 @@ Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human 
 
 ## Quick Start
 
-### Prerequisites
-
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed
-- [Homebrew](https://brew.sh) (macOS/Linux)
-- Git, Node.js (via nvm), jq
-- A terminal (10 supported — see below)
-
-### Install (one command)
-
 ```bash
-# Clone and run the installer:
 git clone https://github.com/your-username/dream-team-flow.git
 bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
-
-# Install CLI tools:
 brew install tmux jq
 ```
 
-The installer:
-1. Asks your name, GitHub username, monorepo path, and terminal preference
-2. Symlinks all commands, scripts, agents, and skills into `~/.claude/`
-3. Generates your personal `CLAUDE.md` with your settings
-4. Merges hooks into `settings.json`
+The installer symlinks all commands, agents, and scripts into `~/.claude/` and generates your config. For team installs, pass a `company-config.json` to auto-configure service names, Jira domain, and paths.
 
-### Team / Enterprise Install
-
-If your team lead shared a `company-config.json`, pass it during install to auto-configure everything:
-
-```bash
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-org/dream-team-flow \
-  --company-config ~/Downloads/company-config.json
-```
-
-This de-sanitizes all generic names (Repo, ServiceA, PROJ-) with your company's real names, sets default paths, and asks about any project-specific paths your team uses.
-
-### Update
-
-```bash
-dtf update    # Pull latest, verify symlinks, regenerate CLAUDE.md
-dtf doctor    # Health check — config, symlinks, tools
-```
-
-### Supported Terminals (10)
-
-| Terminal | macOS | Linux | Windows (WSL) |
-|----------|-------|-------|---------------|
-| Alacritty | yes | yes | yes |
-| Kitty | yes | yes | - |
-| WezTerm | yes | yes | yes |
-| Ghostty | yes | yes | - |
-| Warp | yes | yes | - |
-| Terminal.app | yes | - | - |
-| iTerm/iTerm2 | yes | - | - |
-| GNOME Terminal | - | yes | - |
-| Konsole | - | yes | - |
-| Windows Terminal | - | - | yes |
+See **[Installation](docs/installation.md)** for prerequisites, team/enterprise setup, and supported terminals.
 
 ---
 
@@ -465,6 +418,7 @@ dream-team-flow/                  # Public repo (or company fork)
     level-2-project.json          # Project standard (shared allowlist)
     level-3-team.json             # Team enforced (managed lockdown)
   docs/
+    installation.md               # Prerequisites, install, terminals
     commands.md                   # All slash commands, flags, DTF CLI
     the-team.md                   # Agent roster, roles, team sizing
     integrations.md               # Integration reference & setup
@@ -474,14 +428,6 @@ dream-team-flow/                  # Public repo (or company fork)
 ```
 
 After `dtf install`, everything is symlinked into `~/.claude/` — updates are instant via `git pull`.
-
----
-
-## Further Reading
-
-- **[Setup Guide](SETUP-GUIDE.md)** — Prerequisites, company config, DTF CLI reference, full lifecycle walkthrough, troubleshooting
-- **[Security Guide](SECURITY.md)** — Security ladder (Levels 1-3), sandbox deep dive, network proxy, permission rules, settings hierarchy, auditing
-- **[Integrations](docs/integrations.md)** — Hooks, subagents, GitHub Actions, Slack integration, terminal support
 
 ---
 
