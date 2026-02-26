@@ -30,6 +30,7 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 | **[Usage](docs/usage.md)** | Modes (full, lite, local), flags, PR review, reviewer auto-assignment |
 | **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes with comparison table |
+| **[Features](docs/features.md)** | Full feature list — team setup, orchestration, review, resilience, self-learning |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
 | **[Retrospectives](docs/retrospectives.md)** | Self-learning loop, learning destinations, feedback routing |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
@@ -96,32 +97,16 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ---
 
-## Key Features
+## Features
 
-- 🚀 **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
-- 🏢 **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
-- 🧠 **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
-- ⚡ **Lite mode** — `--lite` flag lets Claude decide whether to spawn agents or work solo, keeping all quality gates intact
-- 📂 **No-worktree mode** — `--no-worktree` flag to work in-place without workspace setup/cleanup
-- 📐 **Dynamic team sizing** — Architect analyzes complexity and spawns only the agents needed
-- 🔀 **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
-- 💬 **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
-- 💾 **Working notes & crash recovery** — Agents write to `.dream-team/notes/` on disk; crashed agents respawn with full context
-- 🔄 **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
-- 🗺️ **Learning Router** — `/team-review` analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
-- ⏸️ **Pause/resume** — Close for the day, pick up tomorrow with context rebuilt from persistent notes
-- 🧹 **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
-- 🔃 **Merge conflict prevention** — Pulls latest main before branching, rebases before every push
-- 🛡️ **Non-destructive PR updates** — Reads current PR body before editing, preserving manually added images
-- 🤖 **AI review polling** — Waits for GitHub AI bots (Gemini, Copilot) before human review
-- ✅ **CI check polling** — Monitors GitHub Actions, routes failures to the right agent
-- 🚧 **Guardrail hooks** — Migration guard, lock file guard, auto-lint reminders prevent common mistakes
-- 👁️ **Visual verification** — Frontend devs can verify against designs using Chrome extension
-- 🔒 **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
-- 👥 **PR reviewer auto-assignment** — Pre-configure GitHub reviewers per category (frontend, backend, fullstack, infra, data); auto-assigned when PRs go ready
-- 🔎 **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
-- 📋 **How to Test section** — Every PR includes exact URLs, steps, and expected results
-- 🖥️ **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
+- 📐 **Dynamic team sizing** — Architect spawns only the agents needed
+- 🔀 **Parallel implementation** — Backend and frontend work simultaneously via shared API contracts
+- 💾 **Crash recovery** — Agents persist working notes to disk; crashed agents respawn with full context
+- 🔄 **Self-learning** — Every session ends with a retro that feeds improvements back into agents and project docs
+- 🔒 **Security scanning** — Every PR gets a 6-category OWASP-aligned review
+- 🚀 **One-command setup** — `dtf install` gets new team members productive in minutes
+
+See **[Features](docs/features.md)** for the full list — team & setup, agent orchestration, code review & quality, resilience & safety, and self-learning.
 
 ---
 
