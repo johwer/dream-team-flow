@@ -342,6 +342,43 @@ Add `--no-worktree` to any mode to skip worktree creation and work in the curren
 
 ---
 
+## Retrospectives & Learning Router
+
+Every Dream Team session ends with a retrospective. Agents reflect on what worked and what didn't, vote on improvements, and tag each learning with a **destination** — where it should be applied.
+
+### How it works
+
+1. **Retro runs** (Phase 6.75) — agents propose improvements tagged with destinations
+2. **Learnings accumulate** in a session log (`dream-team-learnings.md`)
+3. **`/team-review`** analyzes patterns across sessions and routes learnings
+
+### Where learnings go
+
+| Destination | Example | Apply mode |
+|-------------|---------|------------|
+| Dream Team command | "Kenji should share API contracts earlier" | Direct (personal config) |
+| Standalone agent | "Architect must check API endpoint existence" | Direct (personal config) |
+| Skill/command | "review-pr should verify API contracts" | Direct (personal config) |
+| Project CLAUDE.md | "Use Dapper for heavyweight SQL" | Ticket + PR |
+| AGENTS.md | "HCM uses soft deletes" | Ticket + PR |
+| Repo docs | "Date helper convention" | Ticket + PR |
+
+**Direct apply** — personal config files in `~/.claude/` are edited immediately and synced with `/sync-config`.
+
+**Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
+
+### The feedback loop
+
+```
+Session retro → learnings tagged → /team-review routes them
+                                        ├── Personal config → direct apply + /sync-config
+                                        └── Shared repo → Jira ticket + draft PR → team reviews
+```
+
+This means Dream Team retros improve not just the Dream Team — they improve **every Claude session** in the project. Learnings routed to `CLAUDE.md` or `AGENTS.md` are picked up by raw Claude, lite mode, subagents, and any team member who pulls the changes.
+
+---
+
 ## Key Features
 
 - **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
@@ -353,7 +390,8 @@ Add `--no-worktree` to any mode to skip worktree creation and work in the curren
 - **Parallel implementation** — Backend and frontend work simultaneously using a shared API contract
 - **Structured agent communication** — Handoffs include files touched, ports, commands, contract deviations
 - **Working notes & crash recovery** — Agents write to `.dream-team/notes/` on disk; crashed agents respawn with full context
-- **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are saved, and the command file evolves automatically
+- **Retrospectives & self-learning** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
+- **Learning Router** — `/team-review` analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
 - **Pause/resume** — Close for the day, pick up tomorrow with context rebuilt from persistent notes
 - **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
 - **Merge conflict prevention** — Pulls latest main before branching, rebases before every push

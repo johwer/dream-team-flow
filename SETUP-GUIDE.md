@@ -25,10 +25,11 @@ Detailed setup and reference for Dream Team Flow. For quick start, see [README.m
 8. [Supported Terminals](#8-supported-terminals)
 9. [Full Lifecycle Walkthrough](#9-full-lifecycle-walkthrough)
 10. [Pause & Resume](#10-pause--resume)
-11. [Hooks & Guardrails](#11-hooks--guardrails)
-12. [Subagents](#12-subagents)
-13. [Troubleshooting](#13-troubleshooting)
-14. [File Reference](#14-file-reference)
+11. [Retrospectives & Learning Router](#11-retrospectives--learning-router)
+12. [Hooks & Guardrails](#12-hooks--guardrails)
+13. [Subagents](#13-subagents)
+14. [Troubleshooting](#14-troubleshooting)
+15. [File Reference](#15-file-reference)
 
 ---
 
@@ -418,7 +419,75 @@ Rebuilds context from agent notes in `.dream-team/notes/`, starts a fresh tmux s
 
 ---
 
-## 11. Hooks & Guardrails
+## 11. Retrospectives & Learning Router
+
+### Session Retrospectives
+
+Every Dream Team session (full and lite mode) ends with a retrospective in Phase 6.75. In full mode, all agents contribute; in lite mode, Claude self-reflects.
+
+Each learning is tagged with a **destination hint** — where it should eventually be applied:
+
+```
+- Use Dapper for heavy SQL → suggested `project-claude`
+- Kenji shares contracts too late → suggested `dream-team`
+- HCM note_comments missing in seed → suggested `agents-md:services/HCM/AGENTS.md`
+```
+
+Learnings are saved to `dream-team-learnings.md` in your project memory directory.
+
+### Running `/team-review`
+
+Periodically (every 5-10 sessions), run `/team-review` to process accumulated learnings:
+
+```
+/team-review
+```
+
+It produces:
+1. **Health Report** — team sizing patterns, recurring issues, achievement trends, overall health score
+2. **Learning Router** — a routing table showing where each deferred learning should go
+
+### Routing: Direct vs Ticket+PR
+
+The router splits learnings into two tracks:
+
+**Direct apply** (personal config in `~/.claude/`, only affects you):
+- `dream-team` — Dream Team command file prompts and phases
+- `agent:<name>` — Standalone agent definitions
+- `skill:<name>` — Skill/command files
+- `global-claude` — Global CLAUDE.md
+- `memory` — Project memory notes
+
+These are applied immediately. Run `/sync-config` to push to your config repo.
+
+**Ticket + PR** (shared repo files, affects the whole team):
+- `project-claude` — Project CLAUDE.md in the monorepo
+- `agents-md:<path>` — AGENTS.md files (root, per-service, per-app)
+- `repo-docs` — `docs/*.md` coding standards
+
+These create a Jira ticket + draft PR so the team reviews the changes before they're merged. This prevents one person's retro from silently changing shared conventions.
+
+### Example routing table
+
+```
+## Direct Apply (personal config)
+| # | Learning | Destination | File |
+|---|---------|-------------|------|
+| 1 | Check API endpoints before wiring | agent:architect | architect.md |
+| 2 | review-pr should verify API contracts | skill:review-pr | review-pr.md |
+
+## Ticket + PR (shared repo)
+| # | Learning | Destination | File |
+|---|---------|-------------|------|
+| 3 | Use Dapper for heavyweight SQL | project-claude | CLAUDE.md |
+| 4 | HCM note_comments missing | agents-md | services/HCM/AGENTS.md |
+```
+
+You approve which items to apply, and `/team-review` handles the rest — editing config files directly and creating a Jira ticket + PR for repo changes.
+
+---
+
+## 12. Hooks & Guardrails
 
 These hooks are merged into `~/.claude/settings.json` during install:
 
@@ -434,7 +503,7 @@ Hooks are non-destructive — they warn but don't block. Add more by editing `~/
 
 ---
 
-## 12. Subagents
+## 13. Subagents
 
 Standalone agents available from any project:
 
@@ -457,7 +526,7 @@ These are general-purpose standalone agents. The Dream Team (`/my-dream-team`) u
 
 ---
 
-## 13. Troubleshooting
+## 14. Troubleshooting
 
 ### `dtf: command not found`
 
@@ -508,7 +577,7 @@ dtf install <your-repo-url>
 
 ---
 
-## 14. File Reference
+## 15. File Reference
 
 ### After `dtf install`, your `~/.claude/` looks like:
 
