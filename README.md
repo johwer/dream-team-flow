@@ -22,6 +22,19 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 
 ---
 
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| **[README](README.md)** | Overview, quick start, usage, and feature reference (this file) |
+| **[Setup Guide](SETUP-GUIDE.md)** | Prerequisites, installation, company config, DTF CLI reference, troubleshooting |
+| **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, `--dangerously-skip-permissions` explained |
+| **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack, terminal support |
+
+> **Key security insight:** `--dangerously-skip-permissions` only skips interactive prompts — deny rules, sandbox, and network restrictions are **always enforced**. See [SECURITY.md](SECURITY.md) for the full security model.
+
+---
+
 ## How It Works
 
 ```
@@ -438,7 +451,7 @@ dream-team-flow/                  # Public repo (or company fork)
   .gitignore                      # Ignores dtf-config.json (personal)
   README.md                       # This file
   SETUP-GUIDE.md                  # Detailed setup reference
-  CONTRIBUTING.md                 # How to propose changes
+  SECURITY.md                     # Security ladder, sandbox, permissions guide
   CLAUDE.md.template              # Template → generates ~/.claude/CLAUDE.md
   dtf-config.template.json        # Template for per-user config
   company-config.example.json     # Example company config with docs
@@ -452,6 +465,7 @@ dream-team-flow/                  # Public repo (or company fork)
     review-pr.md                  # /review-pr — standalone PR review
     reviewers.md                  # /reviewers — manage PR reviewer assignments
     acli-jira-cheatsheet.md       # Jira CLI reference
+    security-setup.md             # Interactive security configuration
     ticket-scout.md               # Pre-sprint ticket analysis
     team-stats.md                 # Session statistics
     team-review.md                # Team performance review
@@ -476,6 +490,10 @@ dream-team-flow/                  # Public repo (or company fork)
     data-engineer.md              # Data mapping & migrations
   skills/
     mermaid-diagram/              # Mermaid diagram generation
+  security/
+    level-1-personal.json         # Personal baseline (sandbox + deny rules)
+    level-2-project.json          # Project standard (shared allowlist)
+    level-3-team.json             # Team enforced (managed lockdown)
   docs/
     integrations.md               # Integration reference & setup
   learnings/
@@ -487,14 +505,11 @@ After `dtf install`, everything is symlinked into `~/.claude/` — updates are i
 
 ---
 
-## Detailed Setup
+## Further Reading
 
-See [SETUP-GUIDE.md](SETUP-GUIDE.md) for:
-- Prerequisites and tool installation (tmux, jq, ACLI)
-- Company config creation guide
-- DTF CLI reference
-- Full lifecycle walkthrough
-- Troubleshooting
+- **[Setup Guide](SETUP-GUIDE.md)** — Prerequisites, company config, DTF CLI reference, full lifecycle walkthrough, troubleshooting
+- **[Security Guide](SECURITY.md)** — Security ladder (Levels 1-3), sandbox deep dive, network proxy, permission rules, settings hierarchy, auditing
+- **[Integrations](docs/integrations.md)** — Hooks, subagents, GitHub Actions, Slack integration, terminal support
 
 ---
 
@@ -506,8 +521,6 @@ This is an actively evolving project. Contributions are welcome:
 - **New agent types:** Add agent definitions to `agents/` for your tech stack
 - **Terminal support:** Add new terminals to `scripts/open-terminal.sh`
 - **Bug fixes & features:** Standard GitHub PR workflow
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
