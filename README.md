@@ -14,9 +14,9 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-**A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that takes a Jira ticket and delivers a complete implementation — architecture, code, review, testing, and PR — autonomously.**
+**A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that turns a Jira ticket into a complete, reviewed, merged PR — without the token bloat.**
 
-Dream Team Flow orchestrates a team of specialized AI agents from a single command. Give it a ticket and it handles everything: Jira status transitions, workspace setup, parallel implementation, security review, AI bot feedback, PR creation, and cleanup — while keeping token costs low by design.
+Most AI coding workflows get expensive fast: MCP servers, bloated tool schemas, agents that load entire codebases into context. Dream Team Flow is built the opposite way. Agents read only what they need, write decisions to disk instead of holding them in memory, and skip spawning entirely on simple tickets. You get a full team — architect, backend dev, frontend dev, security reviewer, tester — working in parallel, at a fraction of the context cost.
 
 **Built for teams.** One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, and paths — new developers are productive in minutes. Retro learnings aggregate across the team via PRs. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
 
