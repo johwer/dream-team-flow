@@ -20,6 +20,8 @@ Most AI coding workflows get expensive fast: MCP servers, bloated tool schemas, 
 
 **Built for teams.** One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, and paths — new developers are productive in minutes. Retro learnings aggregate across the team via PRs. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
 
+**Secure by default.** Ships with a three-tier permission ladder — personal sandbox, shared project standard, and team-enforced lockdown. Control exactly what agents are allowed to read, write, and execute. Every PR gets a 6-category OWASP-aligned security scan before it ever reaches a human reviewer.
+
 ---
 
 ## Documentation
