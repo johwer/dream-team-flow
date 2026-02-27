@@ -6,7 +6,7 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 
 1. **Retro runs** (Phase 6.75) — agents propose improvements tagged with destinations
 2. **Learnings accumulate** in a session log (`dream-team-learnings.md`)
-3. **`/team-review`** analyzes patterns across sessions and routes learnings
+3. **[`/team-review`](commands.md#team-review)** analyzes patterns across sessions and routes learnings
 
 ## Where learnings go
 
@@ -19,9 +19,9 @@ Every Dream Team session ends with a retrospective. Agents reflect on what worke
 | AGENTS.md | "HCM uses soft deletes" | Ticket + PR |
 | Repo docs | "Date helper convention" | Ticket + PR |
 
-**Direct apply** — personal config files in `~/.claude/` are edited immediately and synced with `/sync-config`.
+**Direct apply** — personal config files in `~/.claude/` are edited immediately and synced with [`/sync-config`](commands.md#sync-config).
 
-**Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, `/team-review` creates a Jira ticket and a draft PR so the team can review the changes.
+**Ticket + PR** — shared repo files that affect the whole team are never written directly. Instead, [`/team-review`](commands.md#team-review) creates a Jira ticket and a draft PR so the team can review the changes.
 
 See **[Commands Reference](commands.md)** for the full list of slash commands, flags, and typical workflow.
 
