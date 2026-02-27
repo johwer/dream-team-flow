@@ -84,24 +84,65 @@ After the health report, route deferred learnings to the right destination files
 | `dream-team` | Dream Team command | `~/.claude/commands/my-dream-team.md` | Agent prompts, phases, process |
 | `agent:<name>` | Standalone agent | `~/.claude/agents/<name>.md` | Agent behavior outside Dream Team |
 | `skill:<name>` | Skill/command | `~/.claude/commands/<name>.md` | Skill-specific checklist or workflow |
-| `project-claude` | Project CLAUDE.md | `<monorepo>/CLAUDE.md` | Every Claude session in this repo |
-| `agents-md:<path>` | Repo AGENTS.md | `<monorepo>/<path>` (e.g., `services/ServiceB/AGENTS.md`, `apps/web/AGENTS.md`) | Area-specific conventions |
+| `project-claude` | Project CLAUDE.md | `<monorepo>/CLAUDE.md` | Monorepo quick-start info only (NOT conventions — use repo-docs for those) |
+| `agents-md:<path>` | Repo AGENTS.md | `<monorepo>/<path>` | Agent-specific operational gotchas only (commands, auth, db names, ports) |
 | `global-claude` | Global CLAUDE.md | `~/.claude/CLAUDE.md` | Every Claude session everywhere |
-| `repo-docs` | Repo docs | `docs/<file>.md` | Team-wide coding standards |
+| `repo-docs` | Repo docs | `docs/<file>.md` | Team-wide coding standards and conventions |
 | `memory` | Memory file | Project memory directory | Notes for future reference only |
 
-### Classification Rules
+### Repo File Decision Tree (Repo)
 
-For each unaddressed learning, decide destination based on:
+**Always read the target file before proposing a change.** Use this decision tree to pick the right file — wrong placement has happened before (learnings routed to `AGENTS.md` that belonged in style guide docs).
 
-- **Agent coordination, communication, timing, prompting** → `dream-team`
-- **Universal coding convention** (applies regardless of who codes — date helpers, Dapper, enum patterns) → `project-claude`
-- **Service-specific gotcha** (e.g., "ServiceB uses soft deletes", "ServiceC seed data quirk") → `agents-md:services/<svc>/AGENTS.md`
-- **Frontend-specific pattern** (component conventions, RTK Query tips, theme tokens) → `agents-md:apps/web/AGENTS.md`
-- **Standalone agent should always do X** (e.g., "architect must check API endpoints") → `agent:<name>`
-- **Skill checklist or workflow improvement** (e.g., "review-pr should verify API contracts") → `skill:<name>`
-- **Repo-wide standard the human team should know** (naming, architecture decisions) → `repo-docs`
-- **General knowledge, not actionable as a rule** → `memory`
+**Is it a convention/pattern a developer should follow when writing code?**
+- Frontend component pattern, React hook usage, routing, lazy-loading, TypeScript → `repo-docs:docs/CODING_STYLE_FRONTEND.md`
+- Tailwind classes, color tokens, breakpoints, twMerge, CVA → `repo-docs:docs/TAILWIND_CONVENTIONS.md`
+- Backend C# pattern, domain modelling, EF Core, enum design, DI, error handling → `repo-docs:docs/CODING_STYLE_BACKEND.md`
+- API endpoint conventions, response shape, versioning, auth attributes → `repo-docs:docs/API_CONVENTIONS.md`
+- i18n, translation keys, TranslationService workflow, defaultValue pattern → `repo-docs:docs/INTERNATIONALIZATION.md`
+- Route URL paths, page name → full URL mapping → `repo-docs:docs/APP_SITEMAP.md`
+- Frontend component library patterns (CVA, Radix, design tokens) → `repo-docs:docs/FRONTEND_COMPONENTS.md`
+- Backend testing patterns, unit/integration test conventions → `repo-docs:docs/TESTING_GUIDELINES_BACKEND.md`
+
+**Is it a service-specific operational gotcha** (not a coding convention — something you need to *run* or *operate*)?
+- Database names for psql, service ports, Docker quirks, seed data gaps for a specific service → `agents-md:services/<SVC>/AGENTS.md` (e.g. `services/ServiceB/AGENTS.md`)
+- Cross-service operational gotchas (auth script, local dev login, worktree ServiceC swap) → `agents-md:services/AGENTS.md`
+- Frontend agent commands, quick-ref for running/building the web app → `agents-md:apps/web/AGENTS.md`
+
+> ⚠️ **`apps/web/AGENTS.md` and `services/AGENTS.md` are NOT for coding conventions.** They are for quick-reference commands and agent-specific operational gotchas. If you catch yourself writing "use X pattern instead of Y" in an AGENTS.md, it belongs in a style guide doc instead.
+
+**Is it monorepo-wide infrastructure/structure info** (project layout, docker compose, quick-start)?
+→ `project-claude` (`CLAUDE.md` at repo root or `services/CLAUDE.md`)
+
+> ⚠️ **`CLAUDE.md` is NOT for coding conventions either.** It's a quick-start reference for the repo structure and how to run things. Conventions go in `docs/`.
+
+**Does it affect Dream Team agent behavior** (prompts, phases, coordination)?
+→ `dream-team`
+
+**Does it affect a standalone agent** (architect, backend-dev, etc.) outside Dream Team?
+→ `agent:<name>`
+
+**Is it general knowledge** not actionable as a shared rule?
+→ `memory`
+
+### Classification Rules (summary)
+
+| Learning type | Correct destination |
+|--------------|---------------------|
+| Agent coordination, timing, prompting, phases | `dream-team` |
+| Frontend coding pattern or convention | `repo-docs:docs/CODING_STYLE_FRONTEND.md` |
+| Tailwind/styling convention | `repo-docs:docs/TAILWIND_CONVENTIONS.md` |
+| Backend coding pattern or convention | `repo-docs:docs/CODING_STYLE_BACKEND.md` |
+| API design convention | `repo-docs:docs/API_CONVENTIONS.md` |
+| i18n / translation workflow | `repo-docs:docs/INTERNATIONALIZATION.md` |
+| Route URL reference | `repo-docs:docs/APP_SITEMAP.md` |
+| Service-specific operational gotcha | `agents-md:services/<SVC>/AGENTS.md` |
+| Cross-service operational gotcha | `agents-md:services/AGENTS.md` |
+| Frontend agent commands/quick-ref | `agents-md:apps/web/AGENTS.md` |
+| Monorepo structure/quick-start | `project-claude` |
+| Standalone agent behavior (outside Dream Team) | `agent:<name>` |
+| Skill workflow improvement | `skill:<name>` |
+| General knowledge, no actionable rule | `memory` |
 
 A single learning can route to **multiple destinations** (e.g., "check API endpoints" → both `agent:architect` and `skill:review-pr`).
 
@@ -124,9 +165,9 @@ Learnings split into two tracks based on who they affect:
 
 1. **Scan** all "Deferred" items from `dream-team-learnings.md` that aren't struck through (`~~`). Also check items with destination hints from recent retros.
 
-2. **Classify** each using the rules above. If the retro already tagged a destination hint, use it as a starting point but verify it's correct.
+2. **Classify** each using the Repo File Decision Tree above. If the retro already tagged a destination hint, use it as a **starting point only** — verify it's correct using the decision tree. Retro destination hints are often wrong (e.g., coding conventions tagged as `agents-md:apps/web/AGENTS.md` when they belong in `docs/CODING_STYLE_FRONTEND.md`).
 
-3. **Read each destination file** before proposing changes — understand what's already there so you add to the right section and avoid duplicates.
+3. **Read each destination file** before proposing changes — understand what's already there so you add to the right section and avoid duplicates. Pay attention to the file's purpose: if it's a style guide, add to a relevant existing section. If it's an AGENTS.md, only add operational/command content — never coding conventions.
 
 4. **Present the routing table** to the user, with the apply mode column:
 
@@ -138,14 +179,15 @@ Learnings split into two tracks based on who they affect:
    |---|---------|---------------|-------------|------|-----------------|
    | 1 | Kenji shares contracts late | PROJ-1359 | dream-team | my-dream-team.md | Add timing instruction to Kenji prompt |
    | 2 | Check API endpoints exist | PROJ-1562 | agent:architect + skill:review-pr | architect.md, review-pr.md | Add checklist item |
-   | 3 | Theme token colors undocumented | PROJ-1569 | memory | ticket-patterns.md | Note only |
+   | 3 | Theme token colors unreliable | PROJ-1569 | memory | ticket-patterns.md | Note only — convention goes to repo-docs |
 
    ### Ticket + PR (shared repo — needs team review)
    | # | Learning | Source Session | Destination | File | Proposed Change |
    |---|---------|---------------|-------------|------|-----------------|
-   | 4 | Use Dapper for heavy SQL | PROJ-1359 | project-claude | CLAUDE.md | Add to Conventions section |
-   | 5 | ServiceB note_comments missing | PROJ-1359 | agents-md | services/ServiceB/AGENTS.md | Add Known Issues section |
-   | 6 | Date helper convention | PROJ-1692 | repo-docs | docs/CODING_STYLE_BACKEND.md | Add date handling section |
+   | 4 | Use Dapper for heavy SQL | PROJ-1359 | repo-docs | docs/CODING_STYLE_BACKEND.md | Add to DB / query section |
+   | 5 | ServiceB soft-delete quirk | PROJ-1359 | agents-md:services/ServiceB | services/ServiceB/AGENTS.md | Add Known Issues section |
+   | 6 | Date helper convention | PROJ-1692 | repo-docs | docs/CODING_STYLE_FRONTEND.md | Add date parsing section |
+   | 7 | Theme token colors unreliable | PROJ-1569 | repo-docs | docs/TAILWIND_CONVENTIONS.md | Add warning next to token listing |
 
    ### No Route (already addressed or no longer relevant)
    - [item] — [reason it's skipped]
@@ -168,11 +210,11 @@ Learnings split into two tracks based on who they affect:
 
    a. **Create a Jira ticket** with `acli`:
       ```bash
-      acli jira workitem create --project PLRS --type Task \
+      acli jira workitem create --project PLRS --type Uppgift \
         --summary "Apply retro learnings to repo docs and conventions" \
         --description "<description with the table of proposed changes>"
       ```
-      If `acli` is unavailable, tell the user the ticket details to create manually.
+      Check allowed issue types first if the create fails: `acli jira workitem create --help` or try `Task`, `Uppgift`, or `Story` depending on your project's config. If `acli` is unavailable, tell the user the ticket details to create manually.
 
    b. **Create a branch and PR** using `/workspace-launch` or manually:
       ```bash

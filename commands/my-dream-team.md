@@ -184,9 +184,11 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
      - **Seed data check**: If the ticket involves UI that displays specific data (files, attachments, linked records, specific entity states), verify that seed data exists in `scripts/database-init/` for testing. If not, flag it in your report: "Seed data missing for [X] — needs to be added before manual testing."
      - Report back with: (a) scope assessment, (b) which agents are needed, (c) **verified key files to modify** (see below), (d) any architectural concerns, (e) whether functional testing is needed (flag `needs_testing: true/false` — say yes for: API behavior changes, migrations, complex frontend interactions, multi-service flows; say no for: simple CRUD, styling-only changes, copy/i18n updates), (f) whether Docker service rebuild is needed (flag `needs_docker_rebuild: true/false` with which service(s) — e.g., `service-b-api`). If true, note that Kenji must rebuild and notify Ingrid before she can run API code generation.
      - **Verified file paths**: For every key file you reference in your report, verify the path exists using Read or Glob. Include the full resolved path (e.g., `apps/web/src/pages/employees/pages/employeecard/pages/medicalcertificate/components/CertificateAttachments.tsx`), not just the filename. Downstream agents will use these paths directly — wrong paths cause silent Read failures and wasted round-trips.
-     - **If both backend and frontend are needed**, define the API contract upfront: endpoint paths, HTTP methods, request/response DTOs with field names and types. This allows frontend and backend to work in parallel — Ingrid builds components against the contract while Kenji implements the API. When `needs_docker_rebuild: true`, Ingrid should use manual types from the contract first, then swap to generated types after Kenji's Docker service is ready.
+     - **If both backend and frontend are needed**, define the API contract upfront: endpoint paths, HTTP methods, request/response DTOs with field names and types, **and sample JSON payloads** (not just field lists — exact shapes including nested objects and arrays). This allows frontend and backend to work in parallel — Ingrid builds components against the contract while Kenji implements the API. When `needs_docker_rebuild: true`, Ingrid should use manual types from the contract first, then swap to generated types after Kenji's Docker service is ready.
+     - **Known UI/UX patterns**: Before evaluating approaches, check if the codebase already has an established pattern for the ticket's UI problem. Run a quick Glob/Grep for relevant component names (e.g., `RoutingTabMenu`, `TabMenu`, `Modal`, `Drawer`). If an established pattern exists, default to extending it rather than evaluating alternatives — document it in your report as "use existing `XComponent` pattern" and skip the alternatives analysis.
      - **Conventions summary**: Instead of having each agent read all docs independently, include a concise summary of the relevant conventions for each agent in your report. Bullet-point the key rules they must follow (naming, patterns, folder structure, etc.) so they don't waste context re-reading entire docs.
      - **Conventions checklist for PR reviewer**: Prepare a short checklist of the specific conventions that apply to this ticket's changes. The PR reviewer will use this instead of re-reading all convention docs.
+     - **Verified route paths**: For each affected page, include the full URL path as it appears in `AppRoutes.tsx` (e.g., `/<customerId>/administration/access-management/organization`). These are passed directly to Ingrid (visual verification), Suki (functional testing), and Tane (How to Test section). Wrong paths cause testers to hit "Not yet implemented" pages.
      - **Team sizing decision**: Decide how many devs to spawn per discipline:
        - **Default**: 1 backend dev (Kenji), 1 frontend dev (Ingrid)
        - **Spawn a second backend dev (Ravi)** only if: there are 2+ independent backend workstreams (e.g., two separate services), OR the backend scope is large enough that one agent's context window would be exhausted
@@ -194,6 +196,7 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
        - **Spawn the data engineer (Mei)** when the ticket involves: complex database queries, report generation, data aggregation/service-e, data mapping between models, or features in the Reports & ServiceE / Analytics Dashboard area. Mei handles the data layer (query services, data mappers, report generators) while Kenji focuses on API endpoints/controllers. If the backend work is primarily data-heavy (mostly queries and transformations), spawn Mei instead of a second backend dev — not both.
        - **Bias toward fewer agents.** Each extra agent costs coordination overhead and token budget. Only add one if the work is genuinely parallelizable (not just large). When in doubt, use one dev.
        - **Check team sizing history**: Read `your project memory directory (see Config Resolution above) for `dream-team-history.json`` (if it exists). If past sessions with similar ticket types used extra devs, check whether it helped (fewer review rounds) or hurt (coordination issues in journal highlights). Calibrate accordingly.
+       - **Full-stack tickets with 15+ files**: Consider recommending `--lite` mode to the team lead — coordination overhead from multiple agents can exceed the parallelism benefit on large tickets, and context exhaustion mid-session is a known risk.
      - **Model tier decision**: For each dev agent, recommend a model tier based on task complexity:
        - **`opus`** — Complex architectural work, multi-service coordination, tricky edge cases, domain model changes. Use for: Amara (always), Diego.
        - **`sonnet`** — Default for ALL dev agents (Kenji, Ingrid, Ravi, Elsa). Standard implementation, CRUD, component work, i18n, config changes.
@@ -363,10 +366,11 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - **Formatting**: Run `dotnet csharpier .` on your changed files before reporting completion. Fix any formatting issues — these will fail the GitHub build if left unfixed.
   - **Context management**: Follow the Context Management Protocol (see below). Create your notes file at `.dream-team/notes/kenji.md`.
   - **Communication**: Follow the Communication Protocol (see below). Your contacts: `ingrid` (frontend), `diego` (infra), `amara` (architect). Be proactive — when you complete an API endpoint, message `ingrid` immediately with details and any contract deviations.
-  - **Docker service rebuild**: If your changes modify an API that frontend needs for code generation, rebuild the service after completing your work: `./scripts/worktree-service.sh up <service>`. Wait for it to be healthy (check `./scripts/worktree-service.sh logs <service>`), then message `ingrid` with: (1) which service is up, (2) the worktree port from `.env` (e.g., `ServiceB_API_PORT=17405`), (3) "you can now run `VITE_ServiceB_API_PORT=17405 npm run generate:api:service-b`". Don't leave this for Ingrid to figure out.
+  - **Docker service rebuild**: If your changes modify an API that frontend needs for code generation, rebuild the service after completing your work: `./scripts/worktree-service.sh up <service>`. Wait for it to be healthy (check `./scripts/worktree-service.sh logs <service>`), then message `ingrid` with: (1) which service is up, (2) the worktree port from `.env` (e.g., `ServiceB_API_PORT=17405`), (3) "you can now run `VITE_ServiceB_API_PORT=17405 npm run generate:api:service-b`". Don't leave this for Ingrid to figure out. **After Docker changes, verify the Vite proxy**: Check `apps/web/vite.config.ts` (or `.env.local`) to confirm the proxy target matches the current (rebuilt) service port — not a stale port from a previous worktree or Docker run. A mismatched proxy causes silent 403 errors that look like auth failures.
   - If the architect provided an API contract, implement it exactly. If you need to deviate, message the team lead and `ingrid`.
   - **Ambiguous requirements**: If the ticket doesn't clearly specify behavior, message the team lead. Do NOT guess — wrong guesses waste more context than asking.
   - **Completion protocol**: When done, use the **Completion → Team Lead** template from the Communication Protocol. Also send a **Dev → Dev handoff** to Ingrid (or a **Dev → Tester handoff** to Suki if testing is needed). Always include `git diff --name-only` output in your `files_touched`.
+  - **Journal gate**: Before sending your completion message, you MUST have written at least one entry in your journal at `.dream-team/journal/kenji.md`. If the file is empty or missing, write at least one entry now — use one of these categories: `instruction-gap`, `tool-failure`, `convention-gap`, `codebase-surprise`, `assumption-wrong`, or `positive`. Your completion will not be accepted without at least one journal entry.
   - **Commit as you go**: Don't wait until everything is done. Commit after each logical piece of work (e.g., after adding an endpoint, after completing a service method). Use `<TICKET_ID>: <what you did>` format. This keeps changes small and reduces conflict risk.
   - **Scope**: Only work on what the architect assigned you. Do not refactor unrelated code.
   - Include the specific backend tasks from the architect's analysis and key files to modify
@@ -396,8 +400,9 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
     Fix any issues — these will fail the GitHub build if left unfixed.
   - **Visual verification via Chrome plugin (MANDATORY for UI changes)**: If the ticket involves UI changes, you MUST verify your work visually in Chrome before reporting completion. This is not optional — it catches z-index, overlay, and layout issues that unit tests miss. **Use the Chrome Browser Queue** (see protocol below) to coordinate access:
     1. **Get Chrome access**: Run `bash ~/.claude/scripts/chrome-queue.sh join <TICKET_ID> ingrid` then `bash ~/.claude/scripts/chrome-queue.sh my-turn <TICKET_ID>`. If not your turn, skip visual verification (note it in completion message).
-    2. **Start the Vite dev server** if not already running: `cd apps/web && npm start` — note the port from terminal output (configured via `VITE_DEV_PORT` in `.env.local`, dynamic per worktree)
-    3. **Figure out the path**: Check the router config (`apps/web/src/routes/`) to find the URL for the page you changed. If the page requires authentication, check `.env.local` or mock data for test credentials, or look at seed/fixture files for login info.
+    2. **Start the Vite dev server** if not already running: `cd apps/web && npm start` — note the port from terminal output (configured via `VITE_DEV_PORT` in `.env.local`, dynamic per worktree). **Port 3000 is reserved for visual verification** — if another worktree is using port 3000, its Vite server must move to a higher port (3001+) before you start yours.
+    2b. **Verify you're on the right dev server**: Run `lsof -i :<port> | grep node` and confirm the process path contains your worktree directory (e.g., `/Documents/PROJ-1801/`), not another open worktree. Testing against the wrong server means testing old code silently.
+    3. **Figure out the path**: Use the verified route paths from Amara's architecture report. If not provided, check the router config (`apps/web/src/routes/`). If the page requires authentication, check `.env.local` or mock data for test credentials.
     4. **Open the page in Chrome** using the Chrome plugin to navigate to `http://localhost:<port>/<path>`
     5. **Record an "AFTER" GIF** showing the fixed behavior:
        - Start GIF recording: `gif_creator action=start_recording`
@@ -417,6 +422,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - **API code generation**: Don't run `npm run generate:api:<service>` until Kenji messages you that the Docker service is up and gives you the port. He'll message you with the exact command. If you need the generated types to continue, build your components against the API contract first (manual types), then swap to generated types once Kenji's service is ready. **Current limitation**: Docker services run on static ports, so only one workspace can run a given service at a time — don't try to start your own Docker service.
   - **Ambiguous requirements**: If the ticket doesn't clearly specify UI behavior, message the team lead. Do NOT guess — wrong guesses waste more context than asking.
   - **Completion protocol**: When done, use the **Completion → Team Lead** template from the Communication Protocol. If testing is needed, also send a **Dev → Tester handoff** to Suki with what to test and edge cases. Always include `git diff --name-only` output in your `files_touched`. **TranslationService reminder**: If you used `t()` with `defaultValue` for new translation keys, note in your completion message that TranslationService keys need to be created by the team lead.
+  - **Journal gate**: Before sending your completion message, you MUST have written at least one entry in your journal at `.dream-team/journal/ingrid.md`. If the file is empty or missing, write at least one entry now — use one of these categories: `instruction-gap`, `tool-failure`, `convention-gap`, `codebase-surprise`, `assumption-wrong`, or `positive`. Your completion will not be accepted without at least one journal entry.
   - **Permission vs mode gating**: When removing UI gating (e.g., making a button always visible), distinguish between (a) mode-based gating (edit vs view mode) and (b) permission-based gating (user authorization via `useActionAuthorization`). Always preserve permission checks (`can({ userActions: [...] })`) unless explicitly told to remove them. Only remove mode-based conditions.
   - **TSDoc on new components**: Add a brief TSDoc comment to every new component and hook you create. Focus on *intent*, not types — TypeScript already covers the types. Example:
     ```tsx
@@ -433,6 +439,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - Include the specific frontend tasks from the architect's analysis and key files to modify
   - Include the architect's conventions summary relevant to your work
   - **Date parsing**: Never use raw `new Date()` on date-only strings (timezone-unsafe). Use existing helpers: `getDateWithoutTzConversion`, `isAfterToday`, `isBeforeToday` from `utils/date`.
+  - **Text color for placeholder/empty state**: Avoid `text-tertiary-text` and `text-secondary-text` — their rendered colors are unreliable (one is yellow, one is invisible on white). Use `text-gray-500` as the safe default for placeholder, empty state, and descriptive text.
 
 **If a second backend developer is needed** (Amara recommended Ravi), spawn:
 - **Name:** `ravi`
@@ -442,7 +449,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
 - **Prompt:** Tell the agent:
   - You are **Ravi**, a Backend Developer for Repo. You are working alongside **Kenji** on this ticket. Your teammates know you by name.
   - [Include the same tech stack, agent instructions, formatting, and tooling bullets as Kenji's prompt above]
-  - **Coordination with Kenji**: You and Kenji are splitting backend work. Message `kenji` directly for shared concerns (DTOs, service interfaces, shared utilities). Avoid working on the same files — if overlap is needed, coordinate who edits what.
+  - **Coordination with Kenji**: You and Kenji are splitting backend work. Message `kenji` directly for shared concerns (DTOs, service interfaces, shared utilities). Avoid working on the same files — if overlap is needed, coordinate who edits what. **File-level ownership**: At the start of your work, agree with Kenji on which files each of you owns exclusively. Document this in your notes file. Do not edit a file that Kenji owns without messaging him first.
   - **Context management**: Follow the Context Management Protocol (see below). Create your notes file at `.dream-team/notes/ravi.md`.
   - **Communication**: Follow the Communication Protocol (see below). Your contacts: `kenji` (backend partner), `ingrid` (frontend), `diego` (infra), `amara` (architect).
   - Include only Ravi's specific tasks from Amara's split (not all backend tasks)
@@ -539,6 +546,7 @@ Once implementation agents complete their work, spawn:
 - **Prompt:** Tell the agent:
   - You are **Maya**, the PR Reviewer for Repo. Your teammates know you by name.
   - Review ALL changes made in this session using `git diff` and `git status`
+  - **Actual changed files** (from `git diff --name-only origin/main`): [include output of `git diff --name-only origin/main` here at spawn time — run it before writing the prompt]. Use these exact paths when opening files — do not rely on shorthand paths from the summary.
   - **Use the conventions checklist from tech-architect** instead of re-reading all docs from scratch. The architect has already prepared a focused checklist for this ticket's changes. Only read the full docs if something in the checklist is ambiguous. **Important:** The architect's report includes verified full file paths for all key files — use these directly instead of searching.
   - Check for: convention violations against the architect's checklist, missing i18n, broken patterns, unused imports, proper error handling
   - **Security scan** (run through each category explicitly):
@@ -573,6 +581,7 @@ After Maya's code review is approved (all MUST FIX items resolved), spawn:
   - You are **Suki**, the Functional Tester for Repo. Your teammates know you by name.
   - Your job is to validate that the implementation actually works — not just that the code looks right (Maya already did that).
   - **Read the ticket requirements** and Amara's architecture analysis to understand expected behavior
+  - **Verified page routes** (from Amara's architecture report — use these exact URLs, do not infer from page names): [include the full URL paths per affected page here at spawn time, e.g. `/<customerId>/administration/access-management/organization/<tab>`]. Wrong paths will hit "Not yet implemented" pages — always use these over guessing.
   - **Test scope from architect:** Include the specific areas the architect flagged for testing
   - **Backend testing** (if backend changes were made):
     - Use the worktree Docker service to rebuild and test: `./scripts/worktree-service.sh up <service>`
@@ -668,7 +677,13 @@ Before proceeding with ANY push, confirm that visual verification was completed.
 1. Did Ingrid's completion message include visual verification results? OR
 2. Did Lena record before/after GIFs in Phase 4.75?
 
-If NEITHER happened and the ticket has UI changes: **STOP. Do NOT push.** Spawn Lena (Phase 4.75) or have Ingrid visually verify first. This gate exists because skipping visual verification has caused user-facing bugs in 2 out of 7 sessions (PROJ-1701, PROJ-1562). Runtime errors visible in the browser were shipped because nobody checked.
+**A verbal report of "verified in browser" is NOT sufficient.** The "after" GIF file must exist on disk — run:
+```bash
+ls ~/Downloads/<TICKET_ID>-after.gif
+```
+If this command fails, visual verification has not been completed. Do NOT push.
+
+If NEITHER the GIF file exists NOR Ingrid's completion message documented visual verification: **STOP. Do NOT push.** Spawn Lena (Phase 4.75) first. This gate exists because skipping visual verification has caused user-facing bugs in 2 out of 7 sessions (PROJ-1701, PROJ-1562). Runtime errors visible in the browser were shipped because nobody checked.
 
 Once PR review is approved (or all MUST FIX items are resolved), **run drift detection before pushing**:
 
@@ -892,6 +907,8 @@ _Step-by-step instructions for manually verifying this change._
 After receiving Tane's summary, **update the PR description using the read-then-edit approach** (see Important Rules). Merge Tane's content into the existing PR body — update the `## Summary`, `## How to Test`, etc. sections but **preserve** any user-added images, screenshots, and the `## Progress` checkboxes.
 
 ### Phase 6.75: Agent Retrospectives & Self-Improvement
+
+> ⚠️ **CRITICAL ORDER**: This phase MUST run BEFORE Phase 7 (agent shutdown). If context is running low, deprioritize Phase 5.5/6 completion tasks and run this first — once agents shut down and `.dream-team/` files are gone, retrospective data is lost forever. This has happened twice (PROJ-1693, PROJ-1359) and was the single biggest data loss in Dream Team history.
 
 Before shutting down the team, run a retrospective to capture learnings that improve future sessions.
 
