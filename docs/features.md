@@ -18,7 +18,7 @@
 ## Code Review & Quality
 
 - 🔒 **Security scanning** — Every PR gets a 6-category OWASP-aligned security review
-- 🔎 **Standalone PR review** — Review any PR with `/review-pr`, no local checkout needed
+- 🔎 **Standalone PR review** — Review any PR with [`/review-pr`](commands.md#review-pr), no local checkout needed
 - 👥 **PR reviewer auto-assignment** — Pre-configure GitHub reviewers per category (frontend, backend, fullstack, infra, data); auto-assigned when PRs go ready
 - 🤖 **AI review polling** — Waits for GitHub AI bots (Gemini, Copilot) before human review
 - ✅ **CI check polling** — Monitors GitHub Actions, routes failures to the right agent
@@ -37,4 +37,4 @@
 ## Self-Learning
 
 - 🔄 **Retrospectives** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
-- 🗺️ **Learning Router** — `/team-review` analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
+- 🗺️ **Learning Router** — [`/team-review`](commands.md#team-review) analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review

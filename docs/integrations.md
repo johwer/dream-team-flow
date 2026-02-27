@@ -183,9 +183,9 @@ Use the architect subagent to analyze what files need changing for this feature
 **Location:** `~/.claude/commands/review-pr.md`
 
 Three ways to invoke:
-- `/review-pr` — Auto-detects PR from current branch (fast mode)
-- `/review-pr <PR>` — Fast: GitHub API only
-- `/review-pr <PR> --full` — Full: local worktree at `.claude/worktrees/` + builds + deeper review
+- [`/review-pr`](commands.md#review-pr) — Auto-detects PR from current branch (fast mode)
+- [`/review-pr`](commands.md#review-pr) `<PR>` — Fast: GitHub API only
+- [`/review-pr`](commands.md#review-pr) `<PR> --full` — Full: local worktree at `.claude/worktrees/` + builds + deeper review
 
 See the command file for full workflow details.
 

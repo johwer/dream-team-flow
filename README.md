@@ -46,7 +46,7 @@ Dream Team Flow is a set of Claude Code custom commands, scripts, and specialize
 Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human Review → Ship
 ```
 
-1. **You say:** `/create-stories PROJ-1234`
+1. **You say:** [`/create-stories`](docs/commands.md#create-stories) `PROJ-1234`
 2. **Dream Team does:**
    - Fetches the Jira ticket
    - Creates a git worktree and branch
