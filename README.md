@@ -133,7 +133,7 @@ Built for monorepos with:
 - **Backend:** .NET Web API, Entity Framework Core, C#
 - **Infrastructure:** Docker Compose, EF Core Migrations
 
-The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions in `commands/my-dream-team.md` to match your stack.
+The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions in [`commands/my-dream-team.md`](commands/my-dream-team.md) to match your stack.
 
 ---
 
