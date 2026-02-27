@@ -14,11 +14,11 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-**A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that takes a ticket and delivers a complete implementation — architecture, code, review, testing, and PR — autonomously.**
+**A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that takes a Jira ticket and delivers a complete implementation — architecture, code, review, testing, and PR — autonomously.**
 
-Dream Team Flow is a set of Claude Code custom commands, scripts, and specialized agents that orchestrate a team of AI developers. Give it a Jira ticket, and it handles everything: workspace setup, architecture analysis, parallel implementation, code review, testing, PR creation, and cleanup.
+Dream Team Flow orchestrates a team of specialized AI agents from a single command. Give it a ticket and it handles everything: Jira status transitions, workspace setup, parallel implementation, security review, AI bot feedback, PR creation, and cleanup — while keeping token costs low by design.
 
-**Built for teams.** One command to install, one command to update. Share a company config with your team to auto-configure service names, Jira domain, paths, and conventions — new developers are productive in minutes. Retro learnings aggregate across the team via PRs. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
+**Built for teams.** One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, and paths — new developers are productive in minutes. Retro learnings aggregate across the team via PRs. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
 
 ---
 
@@ -48,16 +48,16 @@ Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human 
 
 1. **You say:** [`/create-stories`](docs/commands.md#create-stories) `PROJ-1234`
 2. **Dream Team does:**
-   - Fetches the Jira ticket
+   - Moves ticket to In Progress in Jira
    - Creates a git worktree and branch
-   - Installs dependencies
    - Opens a terminal with a Claude Code session
-   - Spawns a team of specialized agents
-   - Implements the feature in parallel
-   - Reviews the code for security and conventions
-   - Creates a draft PR with structured description
-   - Waits for your feedback
-   - Cleans up when done
+   - Spawns only the agents the ticket actually needs
+   - Implements backend and frontend in parallel using a shared API contract
+   - Creates a draft PR so the team can follow progress from the start
+   - Reviews the code for security (OWASP) and conventions
+   - Polls AI bots (Gemini, Copilot) and waits for CI before requesting human review
+   - Waits for your feedback, then marks the PR ready
+   - Moves ticket to Done and cleans up
 
 ---
 
@@ -99,22 +99,29 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ## Features
 
-- 📐 **Dynamic team sizing** — Architect spawns only the agents needed
-- 🔀 **Parallel implementation** — Backend and frontend work simultaneously via shared API contracts
-- 💾 **Crash recovery** — Agents persist working notes to disk; crashed agents respawn with full context
-- 🔄 **Self-learning** — Every session ends with a retro that feeds improvements back into agents and project docs
-- 🔒 **Security scanning** — Every PR gets a 6-category OWASP-aligned review
-- 🚀 **One-command setup** — `dtf install` gets new team members productive in minutes
+- 📐 **Dynamic team sizing** — Architect spawns only the agents the ticket needs — no wasted capacity
+- 🔀 **Parallel implementation** — Backend and frontend work simultaneously via a shared API contract
+- 📋 **Draft PR from the start** — Created after architecture analysis so the team can track progress on GitHub
+- 💾 **Crash recovery** — Agents write working notes to disk; crashed agents respawn with full context from their notes file
+- 🔄 **Self-learning** — Every session ends with a retro that feeds improvements back into agent prompts and project docs
+- 👁️ **Visual verification** — Frontend agents record before/after GIFs via Chrome for UI changes
+- 🔒 **Security-first** — Every PR gets a 6-category OWASP-aligned security scan before it's ever marked ready
 
-See **[Features](docs/features.md)** for the full list — team & setup, agent orchestration, code review & quality, resilience & safety, and self-learning.
+See **[Features](docs/features.md)** for the full list — team setup, orchestration, review, resilience, and self-learning.
 
 ---
 
-## Workflow Phases
+## Token-Efficient by Design
 
-Three modes: **Full** (multi-agent orchestration), **Lite** (Claude decides agent usage), and **Local** (no PR/push, stops after review). Each mode has a visual flowchart showing the pipeline from ticket to ship.
+Most AI coding setups grow expensive fast — MCP servers, large tool schemas, and bloated context windows add up quickly. Dream Team Flow is built differently:
 
-Read more: **[Workflow Phases](docs/workflow-phases.md)** — flowcharts, mode comparison table, and flag details.
+- **No MCP servers** — agents use plain file reads and CLI tools instead of context-heavy server integrations
+- **Disk-based memory** — agents write decisions and findings to `.dream-team/notes/` on disk and read them back when needed, rather than keeping everything in the context window
+- **Targeted reads** — agents use Grep to find what they need rather than loading entire files or docs
+- **Lite mode** — for smaller tickets, Claude skips agent spawning entirely and works solo, with no team coordination overhead
+- **Dynamic team sizing** — the architect only spawns agents the ticket actually needs; extra agents are never started
+
+The result: multi-agent sessions that stay lean even on large tickets.
 
 ---
 
@@ -134,6 +141,16 @@ Built for monorepos with:
 - **Infrastructure:** Docker Compose, EF Core Migrations
 
 The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions in [`commands/my-dream-team.md`](commands/my-dream-team.md) to match your stack.
+
+---
+
+## Security
+
+Every PR goes through a 6-category OWASP-aligned security scan — injection, auth/authz, data exposure, path traversal, hardcoded secrets, and insecure defaults — before it's ever marked ready for human review.
+
+Dream Team Flow itself ships with a three-tier security ladder: personal sandbox defaults, shared project standards, and team-enforced lockdown. Configure once, enforce across your team.
+
+See **[Security Guide](SECURITY.md)** — sandbox configuration, network isolation, deny rules, and bypass mode.
 
 ---
 
