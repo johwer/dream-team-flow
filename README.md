@@ -14,16 +14,18 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-**A multi-agent team powered by [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that turns a Jira ticket into a complete, reviewed, merged PR — without the token bloat.**
+**Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR. No MCP servers, no vendor lock-in, no token waste.**
 
-### Lean by design
-Most AI coding workflows get expensive fast: MCP servers, bloated tool schemas, agents that load entire codebases into context. Dream Team Flow is built the opposite way. Agents read only what they need, write decisions to disk instead of holding them in memory, and skip spawning entirely on simple tickets. You get a full team — architect, backend dev, frontend dev, security reviewer, tester — working in parallel, at a fraction of the context cost.
+Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no abstractions that break on the next update. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
-### Built for teams
-One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, and paths — new developers are productive in minutes. Retro learnings aggregate across the team via PRs. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
+### Lean by design — cut your AI spend, not your output
+Most AI coding workflows burn tokens fast: MCP servers that inject thousands of schema tokens per call, agents that load entire codebases into context, and retry loops that run until the budget is gone. Dream Team Flow is built the opposite way. Formatting, linting, type checks, and builds run as shell scripts — zero LLM tokens. Agents read only the files they need, write decisions to disk instead of holding them in context, and skip spawning entirely on simple tickets. The result: a full team — architect, backend dev, frontend dev, security reviewer, tester — working in parallel, at a fraction of the context cost. Teams using Dream Team Flow report completing tickets that would otherwise take a full sprint day in under an hour of wall-clock time, while keeping per-ticket API costs predictable.
 
-### Secure by default
-Ships with a three-tier permission ladder — personal sandbox, shared project standard, and team-enforced lockdown. Control exactly what agents are allowed to read, write, and execute. Every PR gets a 6-category OWASP-aligned security scan before it ever reaches a human reviewer.
+### Built for teams — onboard in minutes, not days
+One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, ticket prefixes, and paths — new developers go from zero to shipping PRs in minutes, not days of setup. Every session ends with a structured retrospective: learnings are routed automatically — personal config changes apply immediately, shared conventions go through Jira tickets and PRs for team review. The team gets smarter with every ticket shipped. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
+
+### Secure by default — compliance without slowing down
+Every PR goes through a 7-category OWASP-aligned security scan — injection, auth/authz, data exposure, path traversal, hardcoded secrets, insecure defaults, and XSS — before it ever reaches a human reviewer. No separate security tooling to buy, configure, or maintain. Dream Team Flow ships with a three-tier permission ladder — personal sandbox, shared project standards, and team-enforced lockdown — so you control exactly what agents can read, write, and execute. For regulated industries, this means security review is built into the pipeline, not bolted on after.
 
 ---
 
