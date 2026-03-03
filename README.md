@@ -14,9 +14,11 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-**Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR. No MCP servers, no vendor lock-in, no token waste.**
+**Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR.**
 
-Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no abstractions that break on the next update. When Claude Code ships a new feature, Dream Team Flow uses it directly.
+Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after.
+
+Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
 ### Parallel everything — 4x story output or more
 Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract defined upfront by the architect. The orchestrator pre-analyzes all tickets in parallel before any session starts, so agents begin with full context from minute one. The bottleneck stops being "how fast can one developer code" and becomes "how many tickets can your team review." A single developer using Dream Team Flow can sustain the story output of a 4-person team — or more — because the work happens concurrently, not sequentially.
