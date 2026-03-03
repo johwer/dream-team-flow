@@ -27,6 +27,81 @@ Ships with a three-tier permission ladder — personal sandbox, shared project s
 
 ---
 
+## How It Works
+
+```
+Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human Review → Ship
+```
+
+1. **You say:** [`/create-stories`](docs/commands.md#create-stories) `PROJ-1234 PROJ-1235`
+2. **Dream Team does:**
+   - Fetches all tickets from Jira and **pre-analyzes them in parallel** (scope, complexity, key files, conventions)
+   - Presents a recommendations table — you choose Dream Team, Lite, or Just Worktree per ticket
+   - Creates git worktrees, installs deps, writes pre-hydrated context files
+   - Opens terminals with Claude Code sessions that start with full context
+   - Spawns only the agents each ticket actually needs
+   - Implements backend and frontend in parallel using a shared API contract
+   - Creates a draft PR so the team can follow progress from the start
+   - Runs a deterministic quality gate script (formatting, linting, type checks) before every push
+   - Reviews the code for security (OWASP) and conventions
+   - Polls AI bots (Gemini, Copilot) and CI — fixes issues with a 2-round cap (escalates to user after)
+   - PR stays **draft** until you explicitly confirm — then marks ready and assigns reviewers
+   - Moves ticket to Done and cleans up
+
+---
+
+## Features
+
+- **Parallel context pre-hydration** — All tickets analyzed in parallel before sessions start — agents begin with full context instead of exploring from scratch
+- **Dynamic team sizing** — Architect spawns only the agents the ticket needs — no wasted capacity
+- **Parallel implementation** — Backend and frontend work simultaneously via a shared API contract
+- **Deterministic quality gates** — Formatting, linting, and builds run as a shell script before every push — no LLM tokens burned on mechanical checks
+- **Draft PR from the start** — Created after architecture analysis; stays draft until user explicitly confirms
+- **CI iteration cap** — 2 fix rounds max, then escalate to user — no infinite retry loops
+- **Crash recovery** — Agents write working notes to disk; crashed agents respawn with full context from their notes file
+- **Self-learning** — Every session ends with a retro that feeds improvements back into agent prompts and project docs
+- **Visual verification** — Frontend agents record before/after GIFs via Chrome for UI changes
+- **Security-first** — Every PR gets a 6-category OWASP-aligned security scan before it's ever marked ready
+
+See **[Features](docs/features.md)** for the full list — team setup, orchestration, review, resilience, and self-learning.
+
+---
+
+## Token-Efficient by Design
+
+Most AI coding setups grow expensive fast — MCP servers, large tool schemas, and bloated context windows add up quickly. Dream Team Flow is built differently:
+
+- **No MCP servers** — agents use plain file reads and CLI tools instead of context-heavy server integrations
+- **Pre-hydrated context** — `/create-stories` pre-analyzes tickets in parallel before launching sessions; agents start with scope, key files, and conventions already determined — no wasted exploration tokens
+- **Deterministic nodes** — formatting, linting, type checks, and builds run as shell scripts (`quality-gate.sh`), not as LLM-reasoned steps
+- **Disk-based memory** — agents write decisions and findings to `.dream-team/notes/` on disk and read them back when needed, rather than keeping everything in the context window
+- **Targeted reads** — agents use Grep to find what they need rather than loading entire files or docs
+- **Lite mode** — for smaller tickets, Claude skips agent spawning entirely and works solo, with no team coordination overhead
+- **CI iteration cap** — 2 fix rounds max before escalating to user, preventing infinite token-burning retry loops
+- **Dynamic team sizing** — the architect only spawns agents the ticket actually needs; extra agents are never started
+
+The result: multi-agent sessions that stay lean even on large tickets.
+
+---
+
+## Retrospectives & Learning Router
+
+Every session ends with a team retro. Learnings are tagged with destinations and routed automatically — personal config changes are applied directly, shared repo changes go through Jira ticket + PR for team review.
+
+Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where learnings go, and the feedback loop.
+
+---
+
+## Security
+
+Every PR goes through a 6-category OWASP-aligned security scan — injection, auth/authz, data exposure, path traversal, hardcoded secrets, and insecure defaults — before it's ever marked ready for human review.
+
+Dream Team Flow itself ships with a three-tier security ladder: personal sandbox defaults, shared project standards, and team-enforced lockdown. Configure once, enforce across your team.
+
+See **[Security Guide](SECURITY.md)** — sandbox configuration, network isolation, deny rules, and bypass mode.
+
+---
+
 ## Documentation
 
 | Guide | Description |
@@ -42,27 +117,6 @@ Ships with a three-tier permission ladder — personal sandbox, shared project s
 | **[Project Structure](docs/project-structure.md)** | Annotated file tree — commands, agents, scripts, security, docs |
 | **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack |
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
-
----
-
-## How It Works
-
-```
-Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human Review → Ship
-```
-
-1. **You say:** [`/create-stories`](docs/commands.md#create-stories) `PROJ-1234`
-2. **Dream Team does:**
-   - Moves ticket to In Progress in Jira
-   - Creates a git worktree and branch
-   - Opens a terminal with a Claude Code session
-   - Spawns only the agents the ticket actually needs
-   - Implements backend and frontend in parallel using a shared API contract
-   - Creates a draft PR so the team can follow progress from the start
-   - Reviews the code for security (OWASP) and conventions
-   - Polls AI bots (Gemini, Copilot) and waits for CI before requesting human review
-   - Waits for your feedback, then marks the PR ready
-   - Moves ticket to Done and cleans up
 
 ---
 
@@ -102,42 +156,6 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ---
 
-## Features
-
-- 📐 **Dynamic team sizing** — Architect spawns only the agents the ticket needs — no wasted capacity
-- 🔀 **Parallel implementation** — Backend and frontend work simultaneously via a shared API contract
-- 📋 **Draft PR from the start** — Created after architecture analysis so the team can track progress on GitHub
-- 💾 **Crash recovery** — Agents write working notes to disk; crashed agents respawn with full context from their notes file
-- 🔄 **Self-learning** — Every session ends with a retro that feeds improvements back into agent prompts and project docs
-- 👁️ **Visual verification** — Frontend agents record before/after GIFs via Chrome for UI changes
-- 🔒 **Security-first** — Every PR gets a 6-category OWASP-aligned security scan before it's ever marked ready
-
-See **[Features](docs/features.md)** for the full list — team setup, orchestration, review, resilience, and self-learning.
-
----
-
-## Token-Efficient by Design
-
-Most AI coding setups grow expensive fast — MCP servers, large tool schemas, and bloated context windows add up quickly. Dream Team Flow is built differently:
-
-- **No MCP servers** — agents use plain file reads and CLI tools instead of context-heavy server integrations
-- **Disk-based memory** — agents write decisions and findings to `.dream-team/notes/` on disk and read them back when needed, rather than keeping everything in the context window
-- **Targeted reads** — agents use Grep to find what they need rather than loading entire files or docs
-- **Lite mode** — for smaller tickets, Claude skips agent spawning entirely and works solo, with no team coordination overhead
-- **Dynamic team sizing** — the architect only spawns agents the ticket actually needs; extra agents are never started
-
-The result: multi-agent sessions that stay lean even on large tickets.
-
----
-
-## Retrospectives & Learning Router
-
-Every session ends with a team retro. Learnings are tagged with destinations and routed automatically — personal config changes are applied directly, shared repo changes go through Jira ticket + PR for team review.
-
-Read more: **[Retrospectives](docs/retrospectives.md)** — how it works, where learnings go, and the feedback loop.
-
----
-
 ## Tech Stack
 
 Built for monorepos with:
@@ -146,16 +164,6 @@ Built for monorepos with:
 - **Infrastructure:** Docker Compose, EF Core Migrations
 
 The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions in [`commands/my-dream-team.md`](commands/my-dream-team.md) to match your stack.
-
----
-
-## Security
-
-Every PR goes through a 6-category OWASP-aligned security scan — injection, auth/authz, data exposure, path traversal, hardcoded secrets, and insecure defaults — before it's ever marked ready for human review.
-
-Dream Team Flow itself ships with a three-tier security ladder: personal sandbox defaults, shared project standards, and team-enforced lockdown. Configure once, enforce across your team.
-
-See **[Security Guide](SECURITY.md)** — sandbox configuration, network isolation, deny rules, and bypass mode.
 
 ---
 

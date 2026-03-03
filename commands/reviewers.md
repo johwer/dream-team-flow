@@ -67,7 +67,7 @@ Read `~/.claude/reviewers.json` and display all categories with their reviewers:
 
 ## How It's Used
 
-The Dream Team (`/my-dream-team`) reads this config in Phase 5.5 when marking a PR as ready. It maps the ticket's scope to a category:
+The Dream Team (`/my-dream-team`) reads this config in **Phase 6** when the user explicitly confirms the PR is ready. Reviewers are **never auto-assigned** — the user must say "Done — assign reviewers & ship it" first. It maps the ticket's scope to a category:
 
 - `frontend-only` → `frontend`
 - `backend-only` → `backend`
@@ -75,7 +75,9 @@ The Dream Team (`/my-dream-team`) reads this config in Phase 5.5 when marking a 
 - `infra-only` → `infra`
 - `data` → `data`
 
-Then auto-assigns all reviewers in that category via `gh pr edit --add-reviewer`.
+Then assigns all reviewers in that category via `gh pr edit --add-reviewer`.
+
+See `~/.claude/docs/dev-workflow-checklist.md` Section 4 for the full PR lifecycle.
 
 ## Sanitization
 

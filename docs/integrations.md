@@ -121,6 +121,8 @@ After Dream Team sessions, retro learnings stay local per user. When ready to sh
 | Migration guard | PostToolUse (Edit/Write) | Warns when editing files in `migrations/` directories |
 | Lock file guard | PostToolUse (Edit/Write) | Warns when editing `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock` |
 | Auto-lint reminder | PostToolUse (Edit/Write) | Reminds to run CSharpier (.cs) or ESLint (.ts/.tsx) before committing |
+| Teammate idle gate | TeammateIdle | Prevents dev agents from going idle without notes, journal, and clean formatting |
+| Task completed gate | TaskCompleted | Prevents dev agents from marking tasks complete without notes, journal, "For Next Phase", code changes, and passing type checks |
 
 To add more hooks, edit `~/.claude/settings.json` or run `/hooks` interactively.
 
@@ -189,13 +191,30 @@ Three ways to invoke:
 
 See the command file for full workflow details.
 
+### Pre-Push Quality Gate
+
+**Status:** Active
+**Location:** `~/.claude/scripts/quality-gate.sh`
+
+Deterministic pre-push script that runs formatting, linting, type checks, and builds without burning LLM tokens. Called by the team lead before `git push`:
+
+```bash
+bash ~/.claude/scripts/quality-gate.sh <worktree-path> [--backend] [--frontend] [--all]
+```
+
+- Auto-detects backend/frontend from changed files if no flags given
+- Auto-fixes formatting (CSharpier for C#, Prettier + ESLint for TypeScript)
+- Runs `dotnet build` (backend) and `tsc --noEmit` (frontend)
+- Exits 0 if all checks pass, 1 if any fail
+- Referenced in `~/.claude/docs/dev-workflow-checklist.md` Section 5
+
 ### CI & AI Review Polling
 
 **Status:** Active
 **Location:** `~/.claude/scripts/poll-ci-checks.sh`, `~/.claude/scripts/poll-ai-reviews.sh`
 
-Used by the Dream Team in Phase 5 (after PR push) to wait for CI and AI bot reviews before proceeding:
-- **poll-ci-checks.sh** — Polls GitHub Actions check runs until all pass, any fail, or timeout. Early exits on first failure. Logs timing to `~/.claude/logs/ci-check-times.csv`.
+Used by the Dream Team in Phase 5.5 (after PR push) to wait for CI and AI bot reviews before proceeding:
+- **poll-ci-checks.sh** — Polls GitHub Actions check runs until all pass, any fail, or timeout. Early exits on first failure. Logs timing to `~/.claude/logs/ci-check-times.csv`. **CI iteration cap: 2 rounds max** — after 2 failed fix attempts, escalate to user instead of retrying.
 - **poll-ai-reviews.sh** — Polls for AI bot review comments (Gemini, Copilot, CodeRabbit, etc.) until found or timeout. Logs timing to `~/.claude/logs/ai-review-times.csv`.
 
 Both scripts are standalone and can be used outside Dream Team:
@@ -284,15 +303,15 @@ From https://code.claude.com/docs/en/best-practices:
 
 | Practice | How we use it |
 |----------|--------------|
-| **Give Claude verification** | Dream Team Phase 2 baseline + Phase 5 drift check |
-| **Explore first, plan, then code** | Phase 1 (architect) → Phase 2 (implementation) |
+| **Give Claude verification** | Dream Team Phase 2 baseline + Phase 5 drift check + `quality-gate.sh` |
+| **Explore first, plan, then code** | Phase 1 (architect) → Phase 2 (implementation). Pre-hydrated context from `/create-stories` accelerates Phase 1. |
 | **Provide specific context** | CLAUDE.md, AGENTS.md files, conventions docs |
 | **Use CLI tools** | `gh`, `acli jira`, `docker compose` |
 | **Context management** | Agent notes in `.dream-team/notes/`, `/compact` |
 | **Writer/Reviewer pattern** | Maya reviews after Kenji/Ingrid implement |
 | **Subagent investigation** | Architect subagent explores before devs code |
 | **Headless mode** | `claude -p` used in sync-config, CI workflows |
-| **Hooks for guardrails** | Tool usage logging, desktop notifications, migration guard, lock file guard, lint reminders |
+| **Hooks for guardrails** | Tool usage logging, desktop notifications, migration guard, lock file guard, lint reminders, teammate idle gate, task completed gate |
 
 ---
 
@@ -301,6 +320,9 @@ From https://code.claude.com/docs/en/best-practices:
 | Integration | Files |
 |-------------|-------|
 | DTF CLI | `~/.claude/scripts/dtf.sh`, `~/.claude/scripts/dtf-env.sh` |
+| Quality gate | `~/.claude/scripts/quality-gate.sh` |
+| Teammate idle gate | `~/.claude/scripts/teammate-idle-gate.sh` |
+| Task completed gate | `~/.claude/scripts/task-completed-gate.sh` |
 | DTF Config (personal) | `~/.claude/dtf-config.json` |
 | DTF Config (template) | `<workflow-repo>/dtf-config.template.json` |
 | Company Config (example) | `<workflow-repo>/company-config.example.json` |

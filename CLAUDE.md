@@ -51,7 +51,8 @@ These commands are available globally from any project:
 **Team & Config:**
 - `/reviewers` — Manage pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Auto-assigned when Dream Team PRs go ready.
 - `/team-stats` — Dream Team leaderboard and history
-- `/team-review` — Analyze Dream Team learnings and propose improvements
+- `/retro-proposals` — Analyze Dream Team learnings and route improvements to destination files
+- `/pr-insights` — Surface review patterns from scraped PR data and propose convention changes
 - `/sync-config` — Push all Claude config to GitHub (private + sanitized public repos)
 - `/acli-jira-cheatsheet` — Reference for ACLI Jira CLI commands
 
@@ -77,6 +78,8 @@ Active hooks in `~/.claude/settings.json`:
 - **Migration guard** — Warns when editing files in `migrations/` directories
 - **Lock file guard** — Warns when editing lock files (package-lock.json, pnpm-lock.yaml, yarn.lock)
 - **Auto-lint reminder** — Reminds to run CSharpier (.cs) or ESLint (.ts/.tsx) before committing
+- **Teammate idle gate** — Prevents dev agents from going idle without notes, journal, and clean formatting (TeammateIdle hook)
+- **Task completed gate** — Prevents dev agents from marking tasks complete without notes, journal, code changes, and passing type checks (TaskCompleted hook)
 
 ## Integrations
 
@@ -96,6 +99,16 @@ See `~/.claude/docs/integrations.md` for full details including prerequisites an
   ```bash
   open -a "Google Chrome" "<ATTACHMENT_URL>"
   ```
+
+## Pre-PR Quality Gates
+
+Before pushing code or creating PRs, follow the shared checklist: `~/.claude/docs/dev-workflow-checklist.md`
+Covers: visual verification, i18n/TranslationService, PR lifecycle, review comment resolution, formatting, CI iteration cap (2 rounds max).
+
+**Deterministic quality gate script** — run before every push to handle formatting/linting/builds without burning LLM tokens:
+```bash
+bash ~/.claude/scripts/quality-gate.sh <worktree-path>
+```
 
 ## Workspace Preferences
 

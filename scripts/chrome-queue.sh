@@ -160,6 +160,14 @@ cmd_my_turn() {
 cmd_done() {
   local ticket="$1"
 
+  # Kill Vite on port 3000 before releasing the queue — ensures next workspace can bind
+  local vite_pid
+  vite_pid=$(lsof -t -i:3000 2>/dev/null || true)
+  if [ -n "$vite_pid" ]; then
+    kill "$vite_pid" 2>/dev/null || true
+    echo "PORT: Killed process on port 3000 (pid $vite_pid)"
+  fi
+
   acquire_file_lock
 
   local tmp

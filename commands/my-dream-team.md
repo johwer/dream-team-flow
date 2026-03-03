@@ -72,12 +72,14 @@ Check if the arguments contain `--lite`. If present:
   - **Phase 4.5**: Functional testing (if flagged)
   - **Phase 4.75**: Visual verification hard gate (if UI changes)
   - **Phase 5**: Commit, push, drift detection, rebase
-  - **Phase 5.5**: Full GitHub review cycle — trigger AI bot reviews (Gemini `/gemini review`), poll for AI feedback, fix any issues, poll CI checks, auto-assign human reviewers from `reviewers.json`, mark PR ready, monitor for human reviewer comments and resolve them
+  - **Phase 5.5**: Full GitHub review cycle — trigger AI bot reviews (Gemini `/gemini review`), poll for AI feedback, fix any issues, poll CI checks, mark PR ready only after user confirms, then assign reviewers from `reviewers.json`
   - **Phase 6**: User review loop — ask user for feedback, route fixes, iterate until "ship it"
   - **Phase 6.5**: Summary (write it yourself instead of spawning Tane)
-  - **Phase 6.75**: Retrospective — write your own retro learnings using the same 4 categories with destination hints: instruction improvements (`dream-team`/`agent:<name>`/`skill:<name>`), convention discoveries (`project-claude`/`agents-md:<path>`/`repo-docs`), doc gaps (`repo-docs`/`agents-md:<path>`), process improvements (`dream-team`/`memory`). Tag each item with a suggested destination so [`/team-review`](commands.md#team-review) can route it later.
-  - **Phase 7**: Cleanup
+  - **Phase 4.75 (Visual verification)**: Use the **Chrome Browser Queue** (`~/.claude/scripts/chrome-queue.sh`) to coordinate Chrome access — only one workspace at a time. Screenshots always use **port 3000** (the Chrome plugin connects there). Start Vite with `VITE_DEV_PORT=3000 npm start` to override the worktree's default port. Full workflow: join queue → check turn → start Vite on 3000 → `gif_creator` → export → verify file on disk → stop Vite → release Chrome.
+  - **Phase 6.75**: Retrospective — write your own retro learnings using the same 4 categories with destination hints: instruction improvements (`dream-team`/`agent:<name>`/`skill:<name>`), convention discoveries (`project-claude`/`agents-md:<path>`/`repo-docs`), doc gaps (`repo-docs`/`agents-md:<path>`), process improvements (`dream-team`/`memory`). Tag each item with a suggested destination so [`/retro-proposals`](commands.md#team-review) can route it later.
+  - **Phase 7**: Cleanup — runs the **Completion Gate** first (see `dev-workflow-checklist.md` Section 7): all PR comments resolved, screenshots on disk, retro done, CI green, PR description complete. Then posts a **Jira completion comment** with PR link + summary, @mentioning the ticket creator if different from assignee. Then transitions ticket to Klart.
 - The key principle: minimize agent overhead for small/medium tasks while keeping all quality gates, feedback loops, and process steps intact.
+- **Shared quality gates**: Before reporting completion or pushing, follow ALL sections in `~/.claude/docs/dev-workflow-checklist.md`. These gates apply in both Dream Team and lite mode.
 
 Check if the arguments contain `--no-worktree`. If present:
 - Work in the **current directory** — do not create a worktree or branch
@@ -151,14 +153,20 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
 
 1. **Determine ticket ID** from the input or current directory (e.g., `PROJ-1234`). This is used for the team name.
 
-2. **Move ticket to Pågående** (In Progress) in Jira:
+2. **Check for pre-hydrated context**: Look for `.dream-team/context.md` in the current worktree directory. If it exists, this ticket was pre-analyzed by `/create-stories` during parallel pre-hydration.
+   ```bash
+   cat .dream-team/context.md 2>/dev/null
+   ```
+   If the file exists and contains a valid analysis, **use it instead of spawning Amara for exploration**. Skip to step 5b below. This saves significant startup time — the scope, key files, conventions, and team recommendations are already determined.
+
+3. **Move ticket to Pågående** (In Progress) in Jira:
    ```bash
    acli jira workitem transition --key "<TICKET_ID>" --status "Pågående"
    ```
 
-3. **Create the team** using TeamCreate with name `dream-team-<TICKET_ID>` (e.g., `dream-team-PROJ-1234`). This ensures multiple worktrees can run teams simultaneously without collision.
+4. **Create the team** using TeamCreate with name `dream-team-<TICKET_ID>` (e.g., `dream-team-PROJ-1234`). This ensures multiple worktrees can run teams simultaneously without collision.
 
-4. **Create these tasks** using TaskCreate:
+5. **Create these tasks** using TaskCreate:
    - "Analyze ticket and determine scope" (for Amara) — set `owner: amara` immediately
    - "Final summary report" (for Tane — blocked by all other tasks) — set `owner: tane` immediately
    - See **Task ownership rules** in Phase 2 for full details.
@@ -172,7 +180,7 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
      - You are **Amara**, the Tech Architect for the Repo monorepo. Your teammates know you by name.
      - The monorepo has: `apps/web/` (React/Vite/TypeScript/Tailwind frontend), `services/` (.NET microservices: ServiceA, ServiceB, ServiceC, ServiceD, ServiceE), `shared/` (shared .NET libs), `docs/` (conventions)
      - Read only the docs relevant to the ticket scope in `docs/` — if it's frontend-only, skip backend docs; if backend-only, skip frontend docs. Available docs: SERVICE_ARCHITECTURE.md, CODING_STYLE_BACKEND.md, CODING_STYLE_FRONTEND.md, FRONTEND_COMPONENTS.md, API_CONVENTIONS.md
-     - **i18n architecture note**: This project loads translations from S3/TranslationService at runtime — there are no local JSON translation files. When tickets say "hardcode in JSON files," the correct approach is `t(key, { defaultValue: "..." })`. Do NOT search for local JSON translation files — they don't exist.
+     - **i18n architecture note**: This project loads translations from S3/TranslationService at runtime — there are no local JSON translation files. When tickets say "hardcode in JSON files," the correct approach is bare `t("key")`. Do NOT use `defaultValue`. Do NOT search for local JSON translation files — they don't exist.
      - Analyze the ticket/story provided
      - **Check for Jira attachments**: If the ticket mentions attached images, screenshots, or design references, use the Chrome Browser Queue (see protocol below) to get Chrome access, then browse `https://your-company.atlassian.net/browse/<TICKET_ID>` to view attachments. Images are the source of truth over text descriptions if they conflict. Include key visual details (colors, layout, shapes) in your architecture report so dev agents have the specs.
        - **Chrome queue**: Run `bash ~/.claude/scripts/chrome-queue.sh join <TICKET_ID> amara` then `bash ~/.claude/scripts/chrome-queue.sh my-turn <TICKET_ID>`. If exit 0, use Chrome. When done, run `bash ~/.claude/scripts/chrome-queue.sh done <TICKET_ID>`. If not your turn, work from text specs instead.
@@ -207,7 +215,13 @@ This phase runs instead of the normal Phase 1-7 workflow when `--resume` is dete
      - Stay available to help troubleshoot issues other agents encounter
      - Include the full ticket text in the prompt
 
-5. **Wait for Amara's analysis** before proceeding.
+5a. **Wait for Amara's analysis** before proceeding (normal path — when no pre-hydrated context exists).
+
+5b. **Pre-hydrated fast path** (when `.dream-team/context.md` exists from Step 2):
+   - Read the context file — it contains: scope, complexity, key files, conventions summary, API contract, team recommendations, and flags.
+   - **Still spawn Amara**, but with a much shorter prompt: "You are **Amara**. Pre-hydrated context is available at `.dream-team/context.md` — read it. Your job is to **validate and refine** the pre-analysis, not redo it. Verify that key file paths still exist, check for any recent changes on main that affect the plan, and produce your architecture report. If the pre-hydrated context is accurate, you can reuse it directly — just add any missing details (API contract specifics, edge cases, conventions Amara-level details). This should take ~30% of the time of a full analysis."
+   - Amara still produces the full architecture report format — but gets there faster by building on the pre-hydrated context rather than starting from scratch.
+   - Continue to Phase 1.5 as normal.
 
 ### Phase 1.5: Create Draft PR
 
@@ -388,7 +402,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - **Use Amara's conventions summary** as your primary reference. Only read the full docs (`docs/CODING_STYLE_FRONTEND.md`, `docs/FRONTEND_COMPONENTS.md`, etc.) if something in the summary is unclear or you need more detail on a specific pattern.
   - Follow existing component patterns — check similar pages/components for reference
   - For RTK Query API generation: use `npm run generate:api:<service>` (requires backend service running), NOT `npx @rtk-query/codegen-openapi` directly
-  - Add i18n keys for any user-facing text — the TranslationService API key is in `apps/web/.env.local` under `TRANSLATION_SERVICE_API_KEY`. Create keys in TranslationService via the API (see `docs/INTERNATIONALIZATION.md`). Do NOT attempt to sync translations to S3 — that is handled automatically by CI/CD
+  - **i18n — HARD GATE**: See `~/.claude/docs/dev-workflow-checklist.md` Section 2. You MUST create all new keys in TranslationService via the API before reporting completion. Use bare `t("key")` only — never `defaultValue`. Before using `common_*` keys, grep the codebase to verify exact key name and casing. The TranslationService API key is in `apps/web/.env.local` under `TRANSLATION_SERVICE_API_KEY`. See `docs/INTERNATIONALIZATION.md` for the full API workflow. Do NOT attempt to sync translations to S3 — that is handled automatically by CI/CD. Completion is blocked until all TranslationService API calls succeed.
   - **Testing**: Frontend tests are optional. Only write them if the architect specifically requests it or you're modifying code that already has tests. Don't create test files for new components by default.
   - **React skills**: You have access to these skills — use them when relevant:
     - `reactjs/react.dev:react-expert` — Look up React API usage, caveats, and best practices when unsure about a React feature
@@ -400,7 +414,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
     Fix any issues — these will fail the GitHub build if left unfixed.
   - **Visual verification via Chrome plugin (MANDATORY for UI changes)**: If the ticket involves UI changes, you MUST verify your work visually in Chrome before reporting completion. This is not optional — it catches z-index, overlay, and layout issues that unit tests miss. **Use the Chrome Browser Queue** (see protocol below) to coordinate access:
     1. **Get Chrome access**: Run `bash ~/.claude/scripts/chrome-queue.sh join <TICKET_ID> ingrid` then `bash ~/.claude/scripts/chrome-queue.sh my-turn <TICKET_ID>`. If not your turn, skip visual verification (note it in completion message).
-    2. **Start the Vite dev server** if not already running: `cd apps/web && npm start` — note the port from terminal output (configured via `VITE_DEV_PORT` in `.env.local`, dynamic per worktree). **Port 3000 is reserved for visual verification** — if another worktree is using port 3000, its Vite server must move to a higher port (3001+) before you start yours.
+    2. **Start the Vite dev server on port 3000** for visual verification: `VITE_DEV_PORT=3000 npm start` (override the worktree's default `31xx` port). The Chrome plugin connects to port 3000, and the Chrome Browser Queue ensures only one workspace uses it at a time. When you're done, stop Vite and release the queue so the next workspace can use port 3000.
     2b. **Verify you're on the right dev server**: Run `lsof -i :<port> | grep node` and confirm the process path contains your worktree directory (e.g., `/Documents/PROJ-1801/`), not another open worktree. Testing against the wrong server means testing old code silently.
     3. **Figure out the path**: Use the verified route paths from Amara's architecture report. If not provided, check the router config (`apps/web/src/routes/`). If the page requires authentication, check `.env.local` or mock data for test credentials.
     4. **Open the page in Chrome** using the Chrome plugin to navigate to `http://localhost:<port>/<path>`
@@ -421,7 +435,7 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - If the architect provided an API contract, build your RTK Query types and components against it. You don't need to wait for backend — work in parallel.
   - **API code generation**: Don't run `npm run generate:api:<service>` until Kenji messages you that the Docker service is up and gives you the port. He'll message you with the exact command. If you need the generated types to continue, build your components against the API contract first (manual types), then swap to generated types once Kenji's service is ready. **Current limitation**: Docker services run on static ports, so only one workspace can run a given service at a time — don't try to start your own Docker service.
   - **Ambiguous requirements**: If the ticket doesn't clearly specify UI behavior, message the team lead. Do NOT guess — wrong guesses waste more context than asking.
-  - **Completion protocol**: When done, use the **Completion → Team Lead** template from the Communication Protocol. If testing is needed, also send a **Dev → Tester handoff** to Suki with what to test and edge cases. Always include `git diff --name-only` output in your `files_touched`. **TranslationService reminder**: If you used `t()` with `defaultValue` for new translation keys, note in your completion message that TranslationService keys need to be created by the team lead.
+  - **Completion protocol**: When done, use the **Completion → Team Lead** template from the Communication Protocol. If testing is needed, also send a **Dev → Tester handoff** to Suki with what to test and edge cases. Always include `git diff --name-only` output in your `files_touched`.
   - **Journal gate**: Before sending your completion message, you MUST have written at least one entry in your journal at `.dream-team/journal/ingrid.md`. If the file is empty or missing, write at least one entry now — use one of these categories: `instruction-gap`, `tool-failure`, `convention-gap`, `codebase-surprise`, `assumption-wrong`, or `positive`. Your completion will not be accepted without at least one journal entry.
   - **Permission vs mode gating**: When removing UI gating (e.g., making a button always visible), distinguish between (a) mode-based gating (edit vs view mode) and (b) permission-based gating (user authorization via `useActionAuthorization`). Always preserve permission checks (`can({ userActions: [...] })`) unless explicitly told to remove them. Only remove mode-based conditions.
   - **TSDoc on new components**: Add a brief TSDoc comment to every new component and hook you create. Focus on *intent*, not types — TypeScript already covers the types. Example:
@@ -508,13 +522,43 @@ Based on the tech-architect's scope assessment, spawn the needed agents. **Use t
   - Include the specific data tasks from the architect's analysis and key files to modify
   - Include the architect's conventions summary relevant to your work
 
-**Create tasks** for each spawned agent and assign them immediately with `owner` set. Also create any later-phase tasks (testing for Suki, review for Maya) with their owner pre-set to prevent other agents from claiming them. Use `addBlockedBy` to enforce ordering.
+**Create granular tasks** — Break each agent's work into **5-6 small, specific tasks** instead of 1-2 big ones. Small tasks give better progress visibility, enable the TaskCompleted hook to enforce quality gates at each checkpoint, and help with error recovery (if an agent crashes, you know exactly what's done).
+
+**Task granularity guidelines:**
+
+For **backend dev (Kenji/Ravi)**, create tasks like:
+1. "Set up service layer and DTOs for [feature]"
+2. "Implement [endpoint A] with validation"
+3. "Implement [endpoint B] with validation"
+4. "Add EF Core migration for [schema change]"
+5. "Run CSharpier and fix formatting"
+6. "Write completion notes and handoff to Ingrid"
+
+For **frontend dev (Ingrid/Elsa)**, create tasks like:
+1. "Create [Component] with layout and styling"
+2. "Add RTK Query endpoints for [feature]"
+3. "Wire up data fetching and state management"
+4. "Add i18n keys and create in TranslationService"
+5. "Run Prettier/ESLint/tsc and fix errors"
+6. "Visual verification in Chrome and record after GIF"
+
+For **data engineer (Mei)**, create tasks like:
+1. "Create data mapper for [entity]"
+2. "Implement query service for [feature]"
+3. "Add aggregation/report logic"
+4. "Optimize queries and add indexes"
+5. "Run CSharpier and verify build"
+6. "Write completion notes and handoff"
+
+Assign all tasks to the agent with `owner` set immediately. Use `addBlockedBy` to chain tasks that depend on each other (e.g., migration before endpoint, endpoint before frontend wiring). Also create later-phase tasks (testing for Suki, review for Maya) with their owner pre-set to prevent other agents from claiming them.
 
 **Task ownership rules** — critical for multi-agent coordination:
 - Every task MUST have an `owner` set at creation time. No unowned tasks.
 - Agents must ONLY work on tasks owned by them. Do not claim another agent's implementation task.
 - If the user explicitly requests an agent (e.g., "use Suki for testing"), that agent MUST be spawned — do not skip them even if another agent could do the work.
 - Suki's testing tasks must be `blockedBy` all dev agent tasks (Kenji, Ingrid, etc.). Suki cannot start until devs report done.
+- **TaskCompleted hook enforced**: The `task-completed-gate.sh` hook runs on every task completion. Dev agents cannot mark implementation tasks complete without: notes file, journal entry, "For Next Phase" filled in, code changes on disk, and passing type checks. This is automatic — agents don't need to remember, the system enforces it.
+- **TeammateIdle hook enforced**: Dev agents cannot go idle without notes file, journal entries, and clean formatting. If they try to idle prematurely, the hook sends them back to finish quality gates.
 - **Idle agents can help**: If an agent finishes early and is free, they can assist with shared coordination — e.g., running `chrome-queue.sh heartbeat` for a teammate using Chrome, or other lightweight support. They should message the team lead to ask what they can help with.
 
 ### Phase 3: Monitor & Coordinate
@@ -717,6 +761,14 @@ If there are conflicts, resolve them (keep both additions for routes/tabs — th
 - **Before marking PR ready**: Final rebase to ensure clean merge.
 - If rebase has conflicts, resolve them. For known conflict magnets (routes, tabs), keep both additions. If conflicts look complex, ask the user.
 
+**Run the deterministic quality gate** before committing. This script handles formatting, linting, type checks, and builds — no LLM reasoning needed:
+
+```bash
+bash ~/.claude/scripts/quality-gate.sh <worktree-path>
+```
+
+The script auto-detects which checks to run (backend/frontend) based on changed files. It auto-fixes formatting (CSharpier, Prettier) and reports any remaining failures. If it exits non-zero, fix the reported issues before proceeding.
+
 Then **commit, push, and generate the initial PR summary**:
 
 1. **Commit changes in logical chunks** rather than one big commit:
@@ -758,9 +810,20 @@ If it times out, proceed — bots may be slow or not configured.
    - Categorize as MUST FIX (security, bugs, broken patterns) vs SUGGESTION (style, nice-to-have)
    - Route MUST FIX items to the relevant dev agents
    - Wait for fixes, commit, and push
+3. **Resolve all review conversations** — After addressing each comment (reply + code fix), resolve the conversation thread via the GraphQL API. Replying without resolving leaves conversations visibly open on GitHub:
+   ```bash
+   # Get thread IDs
+   gh api graphql -f query='{ repository(owner: "<OWNER>", name: "<REPO>") { pullRequest(number: <PR_NUMBER>) { reviewThreads(first: 20) { nodes { id isResolved comments(first: 1) { nodes { body author { login } } } } } } }' --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id'
+   # Resolve each unresolved thread
+   gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<THREAD_ID>"}) { thread { isResolved } } }'
+   ```
+4. **HARD GATE**: Before proceeding to Step C, verify zero unresolved threads remain. Re-run the GraphQL query and confirm the count is 0. See `~/.claude/docs/dev-workflow-checklist.md` Section 3.
 
 **Step C: Poll CI checks** (after all code changes are done)
 
+**CI iteration cap: 2 rounds max.** Diminishing returns beyond that — if the LLM can't fix a CI failure in 2 attempts, it probably can't fix it at all.
+
+**Round 1:**
 ```bash
 bash ~/.claude/scripts/poll-ci-checks.sh <OWNER>/<REPO> <PR_NUMBER> 10 30
 ```
@@ -768,40 +831,54 @@ The script exits early on first failure — no waiting for remaining checks. If 
 - **CSharpier format check** → Kenji/Ravi run `dotnet csharpier .` and commit
 - **.NET build/test** → Kenji/Ravi fix compilation or test failures
 - **Web app build** → Ingrid/Elsa fix TypeScript or build errors
-- After fixes, commit, push, and **re-poll CI** until green.
+- After fixes, commit, push, and re-poll CI.
 
-**Step D: Mark PR ready & move ticket to review**
+**Round 2 (if Round 1 fix didn't resolve CI):**
+- Re-poll CI. If it fails again with the **same or a new error**, **stop and escalate to the user**.
+- Do NOT attempt a third fix round. Report:
+  - Which CI check failed
+  - What was tried in Round 1 and Round 2
+  - The error output
+  - Ask the user how to proceed (manual fix, skip CI, or abandon)
+
+**If CI is green** after Round 1 or Round 2, proceed to Step D.
+
+**Step D: Notify user — PR stays as DRAFT**
 
 Only after both AI review and CI are clean:
-1. **Mark the PR as ready** with `gh pr ready <PR_NUMBER>`
-2. **Auto-assign reviewers** from `~/.claude/reviewers.json` based on Amara's scope assessment:
-   - Map scope to category: `frontend-only` → `frontend`, `backend-only` → `backend`, `full-stack` → `fullstack`, `infra-only` → `infra`, `data` → `data`
-   - Read the reviewers config and get the list for that category
-   - If reviewers exist for the category, assign them:
-     ```bash
-     gh pr edit <PR_NUMBER> --add-reviewer "user1,user2"
-     ```
-   - If no reviewers configured for that category, skip silently
-   - Tell the user which reviewers were assigned (or that none were configured)
+1. **Do NOT mark the PR as ready yet.** The PR stays as a draft until the user explicitly confirms in Phase 6.
+2. **Do NOT assign human reviewers.** Reviewers are only assigned after user says "Done — assign reviewers & ship it" in Phase 6.
 3. **Move ticket to Under granskning** (In Review):
    ```bash
    acli jira workitem transition --key "<TICKET_ID>" --status "Under granskning"
    ```
-5. **Human reviewers review next** — After AI bot feedback is addressed, notify the user that the PR is ready for human review
-6. **Monitor for human reviewer comments** — The user may relay feedback from colleagues, or you can check:
-   ```bash
-   gh api repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/reviews --jq '.[] | select(.user.type != "Bot") | "Reviewer: \(.user.login) | State: \(.state)\nBody: \(.body)\n"'
-   ```
+4. **Notify the user** that AI review and CI are clean, and the PR is ready for their review. The PR is still a draft — it will be marked ready and reviewers assigned once they confirm.
+5. See `~/.claude/docs/dev-workflow-checklist.md` Section 4 for the full PR lifecycle.
 
 ### Phase 6: User Review Loop
 
-After the GitHub review cycle, enter a feedback loop with the user:
+After AI review and CI are clean, enter a feedback loop with the user:
 
-1. Present the current PR status to the user (AI review done, human review status)
+1. Present the current PR status to the user (AI review done, CI green, no human reviewers assigned yet)
 2. Ask the user for feedback using AskUserQuestion:
    - **"How does the implementation look?"**
-   - Options: "Done — ship it" / "I have feedback" / "Let me test first"
-3. **If "Done — ship it":** Proceed to Phase 6.5 (Final Summary), then Phase 7 (Cleanup)
+   - Options: "Done — assign reviewers & ship it" / "I have feedback" / "Let me test first"
+3. **If "Done — assign reviewers & ship it":**
+   - **Mark the PR as ready**: `gh pr ready <PR_NUMBER>`
+   - **Now assign reviewers** from `~/.claude/reviewers.json` based on Amara's scope assessment:
+     - Map scope to category: `frontend-only` → `frontend`, `backend-only` → `backend`, `full-stack` → `fullstack`, `infra-only` → `infra`, `data` → `data`
+     - Read the reviewers config and get the list for that category
+     - If reviewers exist for the category, assign them:
+       ```bash
+       gh pr edit <PR_NUMBER> --add-reviewer "user1,user2"
+       ```
+     - If no reviewers configured for that category, skip silently
+     - Tell the user which reviewers were assigned (or that none were configured)
+   - **Monitor for human reviewer comments** — The user may relay feedback from colleagues, or you can check:
+     ```bash
+     gh api repos/<OWNER>/<REPO>/pulls/<PR_NUMBER>/reviews --jq '.[] | select(.user.type != "Bot") | "Reviewer: \(.user.login) | State: \(.state)\nBody: \(.body)\n"'
+     ```
+   - Proceed to Phase 6.5 (Final Summary), then Phase 7 (Cleanup)
 4. **If "I have feedback":** Ask the user to describe what needs to change, then:
    - Route the feedback to **Maya** (PR reviewer) for assessment
    - Maya categorizes each item and identifies which agent(s) should handle it
@@ -935,7 +1012,7 @@ Before shutting down the team, run a retrospective to capture learnings that imp
 
    Tally votes. Improvements with majority 👍 are promoted to "team-endorsed." Include vote counts when presenting to the user. Disagreements with reasons are especially valuable — surface those.
 
-4. **Collect all responses** and synthesize them into four categories, each with a **destination hint** for where the learning should eventually be applied (via [`/team-review`](commands.md#team-review)):
+4. **Collect all responses** and synthesize them into four categories, each with a **destination hint** for where the learning should eventually be applied (via [`/retro-proposals`](commands.md#team-review)):
 
    - **Instruction improvements** — Concrete changes to agent prompts or workflow steps → destination: `dream-team`, `agent:<name>`, or `skill:<name>`
    - **Convention discoveries** — Coding patterns, tech stack rules, or architectural decisions learned during the session → destination: `project-claude`, `agents-md:<path>`, or `repo-docs`
@@ -978,7 +1055,7 @@ Before shutting down the team, run a retrospective to capture learnings that imp
 
 8. **Based on user choice:**
    - If applying changes: Edit `my-dream-team.md` with the approved improvements
-   - Always append a session entry to `your project memory directory for `dream-team-learnings.md`` with destination hints so [`/team-review`](commands.md#team-review) can route them later:
+   - Always append a session entry to `your project memory directory for `dream-team-learnings.md`` with destination hints so [`/retro-proposals`](commands.md#team-review) can route them later:
      ```
      ## Session: [date] — [ticket ID]
      ### Applied
@@ -1062,15 +1139,39 @@ Only triggered when the user confirms they are done:
 
 **IMPORTANT:** Run Phase 6.75 (retrospective) BEFORE this phase. The retrospective needs `.dream-team/` files (journals, notes) which get deleted here.
 
-1. **Move ticket to Done** in Jira:
+1. **Run the Completion Checklist** — See `~/.claude/docs/dev-workflow-checklist.md` Section 7 (Completion Gate). This is a **HARD GATE** — every item must be confirmed before proceeding. The checklist covers: PR review comments resolved, screenshots on disk, retro completed, Jira comment posted.
+
+2. **Move ticket to Done** in Jira:
    ```bash
    acli jira workitem transition --key "<TICKET_ID>" --status "Klart"
    ```
-2. **Present the final summary** to the user
-3. **Shut down all agents** gracefully using shutdown_request messages
-4. **Delete the team** (`dream-team-<TICKET_ID>`) with TeamDelete
-5. **Determine the ticket ID** from the current working directory (the folder name under `~/Documents/`, e.g., `PROJ-1657`)
-6. **Self-cleanup** — clean up dream-team working files, then tell the user the session is complete. Do NOT merge the PR or delete branches — the user handles merging manually.
+
+3. **Post a completion comment to Jira** — Summarize what was done and link the PR. Tag the ticket creator if they're different from the assignee:
+   ```bash
+   # Get ticket creator
+   CREATOR=$(acli jira workitem view "<TICKET_ID>" --json --fields "creator" 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin)['fields']['creator']['displayName'])" 2>/dev/null || echo "")
+   CREATOR_ID=$(acli jira workitem view "<TICKET_ID>" --json --fields "creator" 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin)['fields']['creator']['accountId'])" 2>/dev/null || echo "")
+
+   # Build the comment body — include PR link, brief summary, and @mention creator
+   # Use Atlassian mention format: [~accountId:ACCOUNT_ID]
+   acli jira workitem comment create --key "<TICKET_ID>" --body "Implementation complete. PR: <PR_URL>
+
+   Summary: <1-2 sentence description of what was implemented>
+
+   [~accountId:$CREATOR_ID] — ready for your review."
+   ```
+
+   **Rules:**
+   - Always include the PR URL
+   - Keep the summary to 1-2 sentences (what was done, not how)
+   - Only @mention the creator if they are NOT the same as the assignee (avoid self-pinging)
+   - If acli comment fails, note it in your completion message but don't block on it
+
+4. **Present the final summary** to the user
+5. **Shut down all agents** gracefully using shutdown_request messages
+6. **Delete the team** (`dream-team-<TICKET_ID>`) with TeamDelete
+7. **Determine the ticket ID** from the current working directory (the folder name under `~/Documents/`, e.g., `PROJ-1657`)
+8. **Self-cleanup** — clean up dream-team working files, then tell the user the session is complete. Do NOT merge the PR or delete branches — the user handles merging manually.
 
 ```bash
 # Get ticket ID from current directory
@@ -1080,7 +1181,7 @@ TICKET_ID=$(basename "$PWD")
 # by /workspace-cleanup when the worktree is removed. Keep notes/journals intact.
 ```
 
-7. **Write a workspace status file** so the orchestrator session knows this workspace is done and ready for cleanup after merge:
+9. **Write a workspace status file** so the orchestrator session knows this workspace is done and ready for cleanup after merge:
 
 ```bash
 TICKET_ID=$(basename "$PWD")
@@ -1097,7 +1198,7 @@ cat > ~/.claude/workspace-status/$TICKET_ID.json << EOF
 EOF
 ```
 
-8. **Tell the user** the implementation is done and the PR is ready for their manual review and merge. Remind them that the orchestrator session will handle worktree/branch cleanup when they say "it's merged" or "clean up <TICKET_ID>".
+10. **Tell the user** the implementation is done and the PR is ready for their manual review and merge. Remind them that the orchestrator session will handle worktree/branch cleanup when they say "it's merged" or "clean up <TICKET_ID>".
 
 **IMPORTANT:** Do NOT run [`/workspace-cleanup`](commands.md#workspace-cleanup) or remove the worktree/branch. The workspace cannot clean itself up because it's running inside its own worktree. The orchestrator session (from [`/create-stories`](commands.md#create-stories)) handles all cleanup.
 

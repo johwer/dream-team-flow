@@ -54,7 +54,7 @@ If the ticket has attachments (design mockups, specs, etc.):
    ```bash
    open -a "Google Chrome" "<ATTACHMENT_URL>"
    ```
-3. Tell the user where Chrome will download the files (typically `~/Downloads/`)
+3. Tell the user where Chrome will download the files (`~/Downloads/` — shown as "Hämtade filer" on Swedish macOS)
 4. Ask the user to confirm once downloads are complete
 5. Read any downloaded images/PDFs to understand the full ticket context
 

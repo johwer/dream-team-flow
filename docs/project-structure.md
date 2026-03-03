@@ -31,15 +31,19 @@ dream-team-flow/                  # Public repo (or company fork)
     resume-workspace.sh           # Resume paused workspace
     pause-workspace.sh            # Pause workspace for the day
     poll-ai-reviews.sh            # Poll for AI bot reviews
-    poll-ci-checks.sh             # Poll GitHub Actions
+    poll-ci-checks.sh             # Poll GitHub Actions (2-round CI cap)
+    quality-gate.sh               # Deterministic pre-push checks (format, lint, build)
     chrome-queue.sh               # Chrome browser queue
     migration-guard.sh            # Hook: warns on migration edits
     lockfile-guard.sh             # Hook: warns on lock file edits
     auto-lint-notify.sh           # Hook: lint reminders for .cs/.ts/.tsx
+    teammate-idle-gate.sh         # Hook: TeammateIdle — enforces quality gates before idle
+    task-completed-gate.sh        # Hook: TaskCompleted — enforces quality gates before task completion
+    worktree-port-overlay.sh      # Worktree port isolation overlay (temporary until feature merges)
   agents/
     architect.md                  # Architecture analysis subagent
     backend-dev.md                # .NET backend implementation
-    frontend-dev.md               # React/TypeScript frontend
+    frontend-dev.md               # React/TypeScript frontend (includes Chrome queue + screenshot workflow)
     pr-reviewer.md                # Code review subagent
     data-engineer.md              # Data mapping & migrations
   skills/

@@ -6,8 +6,8 @@ All slash commands available in Dream Team Flow.
 
 | Command | Description |
 |---------|-------------|
-| `/create-stories PROJ-1234` | Full lifecycle — Jira fetch, worktree, team launch, PR, cleanup |
-| `/create-stories PROJ-1234 PROJ-1235` | Multiple tickets in parallel |
+| `/create-stories PROJ-1234` | Full lifecycle — Jira fetch, parallel pre-hydration, per-ticket mode choice, worktree, team launch, PR, cleanup |
+| `/create-stories PROJ-1234 PROJ-1235` | Multiple tickets — all pre-analyzed in parallel, then launched sequentially |
 | `/my-dream-team <ticket>` | Standalone team — run on an existing branch |
 | `/workspace-launch PROJ-1234` | Create a git worktree and start a Dream Team session |
 | `/workspace-cleanup PROJ-1234` | Tear down worktree, tmux session, optionally delete branch |
@@ -53,7 +53,7 @@ Flags can be combined:
 
 Categories: `frontend`, `backend`, `fullstack`, `infra`, `data`
 
-When the Dream Team marks a PR ready, it maps the ticket scope to a category and auto-assigns the configured reviewers.
+PRs stay as **drafts** until the user explicitly confirms. When the user says "ship it", the PR is marked ready and reviewers are auto-assigned based on the ticket scope category.
 
 ## Analysis & Learning
 

@@ -14,7 +14,7 @@ Orchestrates a multi-agent team to implement a Repo feature ticket end-to-end �
 
 ## /create-stories {#create-stories}
 
-Full lifecycle orchestrator. Takes one or more Jira ticket IDs, sets up worktrees, launches Dream Teams in parallel, and handles cleanup when each story is merged.
+Full lifecycle orchestrator with **parallel pre-hydration**. Takes one or more Jira ticket IDs, fetches and analyzes all tickets in parallel (scope, complexity, key files, conventions), then presents a recommendations table. The user chooses per ticket: **Dream Team** (Opus + agents), **Lite** (Sonnet solo, same quality gates), or **Just worktree** (no Claude session). Pre-hydrated context is written to `.dream-team/context.md` in each worktree so Dream Team/Lite sessions skip redundant exploration. Handles cleanup when each story is merged.
 
 ---
 
@@ -38,9 +38,21 @@ Reviews a pull request with line-level GitHub comments. Auto-detects the PR from
 
 ---
 
-## /team-review {#team-review}
+## /retro-proposals {#retro-proposals}
 
-Analyzes Dream Team learnings stored in `dream-team-learnings.md` across sessions and proposes concrete improvements — to agent prompts, workflow phases, conventions, and documentation.
+Analyzes Dream Team retro learnings across sessions, produces a health report, and routes improvements to destination files — agent prompts, repo docs, or personal config. Part of the [Learning System](../docs/learning-system.md).
+
+---
+
+## /scrape-pr-history {#scrape-pr-history}
+
+Extracts structured review findings from merged PRs using parallel agents (waves of 30). Stores categorized findings (category, severity, resolution) in `pr-learnings.json`. Part of the [Learning System](../docs/learning-system.md).
+
+---
+
+## /pr-insights {#pr-insights}
+
+Surfaces recurring review patterns from scraped PR data. Compares human vs AI reviewer effectiveness, identifies common code quality issues, and proposes convention improvements. Part of the [Learning System](../docs/learning-system.md).
 
 ---
 
@@ -58,7 +70,7 @@ Pre-analyzes upcoming Jira tickets before sprint planning. Flags ambiguous requi
 
 ## /reviewers {#reviewers}
 
-Manages pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Reviewers are auto-assigned when a Dream Team PR is marked ready.
+Manages pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Reviewers are assigned only after the user confirms in Phase 6 — never auto-assigned.
 
 ---
 

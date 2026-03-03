@@ -36,42 +36,152 @@ Flags can be combined: `--lite --no-worktree`, `--lite --local`, etc.
 
 ## Workflow
 
-For **each ticket ID**, run the following steps sequentially. Complete one ticket fully before starting the next.
+The workflow has two phases: **parallel pre-hydration** (all tickets at once) and **sequential launch** (one at a time). This saves significant startup time — Amara doesn't need to re-explore files that were already analyzed.
 
-### Step 1: Fetch Ticket from Jira
+---
 
-```bash
-acli jira workitem view <TICKET_ID>
+### Step 0: Clean Up Stale Worktrees
+
+Before creating new workspaces, check if any existing worktrees have merged/closed PRs that can be cleaned up. This prevents worktree buildup over time.
+
+1. **List existing worktrees and check PR status:**
+   ```bash
+   cd ~/Documents/Repo && git worktree list
+   ```
+   For each worktree (excluding main), check its PR status:
+   ```bash
+   gh pr list --head <BRANCH> --state all --json number,state,mergedAt,title
+   ```
+
+2. **If any worktrees have MERGED or CLOSED PRs**, present them to the user:
+   ```
+   ## Stale Worktrees Found
+
+   | Worktree | PR | Status |
+   |----------|----|--------|
+   | PROJ-1234 | #1700 | MERGED |
+   | PROJ-1235 | #1701 | CLOSED |
+   ```
+   Ask the user with AskUserQuestion which ones to clean up. **Always ask** — some may need to be kept (e.g., reverted PRs with code that a new ticket references).
+
+3. **For each confirmed cleanup**, run from the main repo (NOT from inside the worktree):
+   ```bash
+   cd ~/Documents/Repo && git worktree remove ~/Documents/<TICKET_ID> --force
+   rm -rf ~/Documents/<TICKET_ID>
+   git branch -D <TICKET_ID>
+   git worktree prune
+   rm -f ~/.claude/workspace-status/<TICKET_ID>.json
+   ```
+
+4. **If no stale worktrees**, skip silently and proceed.
+
+5. **Also kill any orphan tmux sessions** that don't have a matching worktree:
+   ```bash
+   tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^PROJ-'
+   ```
+   For each session without a matching worktree, kill it:
+   ```bash
+   tmux kill-session -t <SESSION_NAME> 2>/dev/null || true
+   ```
+
+---
+
+### Phase A: Parallel Pre-Hydration (All Tickets)
+
+#### Step 1: Fetch ALL Tickets from Jira (Parallel)
+
+Fetch all tickets in parallel using the Agent tool (one agent per ticket, subagent_type `Explore`, model `haiku`):
+
+```
+For each ticket ID, spawn an explore agent:
+  "Fetch Jira ticket <TICKET_ID>: run `acli jira workitem view <TICKET_ID>` and return the full output including summary, description, acceptance criteria, and attachment URLs."
 ```
 
-Extract: ticket ID, summary/title, full description, acceptance criteria, attachment names/URLs.
+If any ACLI call fails, note it — you'll ask the user for those ticket details in Step 4.
 
-If ACLI fails, ask the user for the ticket details.
+#### Step 2: Handle Attachments
 
-### Step 2: Handle Attachments
+After all tickets are fetched, check which have attachments. For any tickets with attachments:
 
-If the ticket has attachments:
 1. Open each in Chrome for authenticated download:
    ```bash
    open -a "Google Chrome" "<ATTACHMENT_URL>"
    ```
-2. Tell the user where Chrome will download the files (typically `~/Downloads/`)
+2. Tell the user where Chrome will download the files (`~/Downloads/` — shown as "Hämtade filer" on Swedish macOS)
 3. Ask the user to confirm once downloads are complete
 4. Read any downloaded images/PDFs to understand context
 
-### Step 3: Confirm with User
+#### Step 3: Pre-Hydrate ALL Contexts (Parallel)
 
-Present the extracted ticket info and ask the user to confirm before proceeding.
+Spawn **parallel explore agents** (one per ticket, subagent_type `Explore`, model `sonnet`) to analyze each ticket against the codebase. Each agent receives the ticket info from Step 1 and runs a lightweight version of Amara's Phase 1 analysis:
 
-### Step 4: Pull Latest Main & Create Git Worktree
+```
+For each ticket, spawn an explore agent with this prompt:
 
-**Always pull latest main before creating a worktree** to minimize merge conflicts later:
+"You are pre-analyzing ticket <TICKET_ID> for the Repo monorepo at ~/Documents/Repo.
+
+Ticket: <FULL_TICKET_TEXT_FROM_STEP_1>
+
+Analyze the codebase to determine:
+1. **Scope**: backend-only, frontend-only, or full-stack
+2. **Complexity**: small (1-3 files), medium (4-8 files), large (8+ files)
+3. **Key files**: List the main files that will need modification (verify paths exist with Glob)
+4. **Affected services**: Which services/areas of the codebase are involved
+5. **Dependencies**: Does this ticket depend on or conflict with common hot files (AppRoutes.tsx, EmployeeCardTabs.tsx)?
+6. **Existing patterns**: Are there existing components/patterns that should be reused?
+7. **Conventions summary**: Key conventions from docs/ that apply to this ticket's scope
+8. **API contract** (if full-stack): Endpoint paths, methods, request/response shapes
+9. **Seed data**: Does seed data exist in scripts/database-init/ for the entities involved?
+10. **Needs testing**: Does this need functional testing? (yes for: API changes, migrations, complex UI interactions)
+11. **Needs Docker rebuild**: Which service(s) need rebuilding?
+12. **Recommended mode**: Based on complexity and scope, recommend: Dream Team (medium/large, multi-discipline), Lite (small/medium, single discipline), or Just worktree (trivial or blocked)
+13. **Recommended team**: Which agents are needed and at what model tier
+
+Return your analysis as a structured report."
+```
+
+#### Step 4: Present Recommendations Table
+
+After all pre-hydration agents return, present a summary table to the user:
+
+```
+## Ticket Analysis
+
+| Ticket | Summary | Scope | Complexity | Recommended | Key Files |
+|--------|---------|-------|------------|-------------|-----------|
+| PROJ-1234 | Add mobile number field | full-stack | medium | Dream Team | EmployeeContact.tsx, ServiceB/ContactController.cs |
+| PROJ-1235 | Fix date picker styling | frontend-only | small | Lite | DatePicker.tsx |
+| PROJ-1236 | Update seed data | backend-only | small | Just worktree | database-init/seed.sql |
+```
+
+For any tickets where ACLI failed in Step 1, note "Ticket fetch failed — need details from you" in the table.
+
+#### Step 5: User Confirms Per Ticket
+
+Ask the user to confirm the launch mode for each ticket using AskUserQuestion. Present one question per ticket (up to 4 at a time):
+
+- **"How should we work on \<TICKET_ID\> (\<SUMMARY\>)? Recommended: \<MODE\>"**
+  - "Dream Team" — Full orchestration with Opus architect + agents. Best for medium/large tickets.
+  - "Lite" — Sonnet solo session, spawns agents only if needed. Same quality gates, lower cost. Best for small/medium tickets.
+  - "Just worktree" — Create worktree only, no Claude session launched. User works on it manually or resumes later.
+
+Save each choice for Phase B.
+
+---
+
+### Phase B: Sequential Launch (One Ticket at a Time)
+
+For each ticket, run Steps 6-8 sequentially. Complete one ticket fully before starting the next.
+
+#### Step 6: Pull Latest Main & Create Git Worktree
+
+**Pull latest main once** before the first worktree (not per ticket):
 
 ```bash
 cd ~/Documents/Repo && git checkout main && git pull origin main
 ```
 
-Then create the worktree:
+Then for each ticket, create the worktree:
 
 ```bash
 cd ~/Documents/Repo && git worktree add ~/Documents/<TICKET_ID> -b <TICKET_ID>
@@ -82,40 +192,103 @@ If the branch already exists:
 cd ~/Documents/Repo && git worktree add ~/Documents/<TICKET_ID> <TICKET_ID>
 ```
 
-### Step 5: Install Dependencies
+#### Step 7: Install Dependencies & Copy Environment
 
 ```bash
 cd ~/Documents/<TICKET_ID>/apps/web && source ~/.nvm/nvm.sh && nvm use && npm i
-```
-
-### Step 6: Copy Environment File
-
-```bash
 cp ~/Documents/Repo/apps/web/.env.local ~/Documents/<TICKET_ID>/apps/web/.env.local
 ```
 
-### Step 7: Launch Claude in a New Terminal Window
+#### Step 8: Write Pre-Hydrated Context File
 
-This uses the self-contained launcher script at `~/.claude/scripts/launch-workspace.sh` which handles everything: cd, unset CLAUDECODE, start tmux, launch Claude, send the dream team command, and attach.
+Write the pre-hydration results from Step 3 to `.dream-team/context.md` in the worktree. This file is consumed by `/my-dream-team` to skip redundant exploration.
 
-**Check the user's terminal preference** in `~/.claude/CLAUDE.md` under "Workspace Preferences" for the configured terminal app. Then open a new window running the launcher script:
+```bash
+mkdir -p ~/Documents/<TICKET_ID>/.dream-team
+```
 
+Then write the file using the Write tool at `~/Documents/<TICKET_ID>/.dream-team/context.md` with this format:
+
+```markdown
+# Pre-Hydrated Context for <TICKET_ID>
+
+Generated by /create-stories parallel pre-hydration.
+
+## Ticket
+<Full ticket text from Jira — summary, description, acceptance criteria>
+
+## Scope
+<backend-only | frontend-only | full-stack>
+
+## Complexity
+<small | medium | large>
+
+## Key Files
+- `<verified/path/to/file1.tsx>` — <what needs to change>
+- `<verified/path/to/file2.cs>` — <what needs to change>
+
+## Affected Services
+- <service name> — <what's affected>
+
+## Existing Patterns
+- <pattern name>: `<path/to/example>` — <how to reuse>
+
+## Conventions Summary
+<Bullet points of key conventions from docs/ relevant to this ticket's scope>
+
+## API Contract (if full-stack)
+### <METHOD> <endpoint>
+Request: <shape>
+Response: <shape>
+
+## Seed Data
+<Available | Missing for X — needs to be added>
+
+## Flags
+- needs_testing: <true | false>
+- needs_docker_rebuild: <true | false> (<service names>)
+
+## Recommended Team
+- <Agent>: <model> — <one-line justification>
+
+## Hot File Conflicts
+<List any hot files (AppRoutes.tsx, etc.) that this ticket touches>
+
+## Attachment Notes
+<Summary of what was seen in any downloaded attachments, or "No attachments">
+```
+
+#### Step 9: Launch Based on User's Choice (from Step 5)
+
+**Check the user's terminal preference** in `~/.claude/CLAUDE.md` under "Workspace Preferences" for the configured terminal app.
+
+**If "Dream Team"** (full orchestration):
 ```bash
 bash ~/.claude/scripts/open-terminal.sh "<TERMINAL_APP>" "bash ~/.claude/scripts/launch-workspace.sh '<TICKET_ID>' '/my-dream-team <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>'"
 ```
+
+**If "Lite"** (Sonnet solo, same quality gates):
+```bash
+bash ~/.claude/scripts/open-terminal.sh "<TERMINAL_APP>" "bash ~/.claude/scripts/launch-workspace.sh '<TICKET_ID>' '/my-dream-team --lite <TICKET_SUMMARY>: <CONCISE_DESCRIPTION>'"
+```
+
+**If "Just worktree"** (no Claude session):
+- Skip this step entirely. The worktree is already created from Steps 6-7.
+- Tell the user the worktree is ready at `~/Documents/<TICKET_ID>` and they can start working manually or resume later with "resume \<TICKET_ID\>".
 
 Replace `<TERMINAL_APP>` with the configured app (Alacritty, Terminal, iTerm, Warp, Kitty, WezTerm, or Ghostty).
 
 **Important:** Escape any special characters (quotes, parentheses) in the ticket text. Keep the description concise.
 
-### Step 8: Repeat for Next Ticket
+#### Step 10: Repeat for Next Ticket
 
-If there are more tickets, go back to Step 1 for the next ticket.
+If there are more tickets, go back to Step 6 for the next ticket.
 
-### Step 9: Summary
+#### Step 11: Summary
 
 After all tickets are launched, present a summary:
 - List all created workspaces with their ticket IDs and tmux session names
+- Show which mode each ticket is running in (Dream Team / Lite / Just worktree)
 - Remind the user they can attach to any session: `tmux attach -t <TICKET_ID>`
 - Remind the user to run `/workspace-cleanup <TICKET_ID>` when done with each story (or they can say "clean up PROJ-1234" and you will handle it)
 
@@ -231,5 +404,5 @@ When the user says "clean up all done workspaces" or similar:
 - tmux sessions are always named `<TICKET_ID>`
 - If anything fails, stop and report — do not continue blindly
 - Never use curl/wget for Jira attachments — always use Chrome
-- Process tickets sequentially, not in parallel
+- **Phase A** (pre-hydration) runs in parallel across all tickets — Phase B (worktree creation + launch) runs sequentially one ticket at a time
 - When sending ticket text via tmux send-keys, keep it concise if the description is very long — include the essential description and acceptance criteria

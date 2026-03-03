@@ -16,7 +16,8 @@ These commands are available globally from any project:
 
 **Team & Config:**
 - `/team-stats` — Dream Team leaderboard and history
-- `/team-review` — Analyze Dream Team learnings and propose improvements
+- `/retro-proposals` — Analyze Dream Team learnings and route improvements to destination files
+- `/pr-insights` — Surface review patterns from scraped PR data and propose convention changes
 - `/sync-config` — Push all Claude config to GitHub
 - `/acli-jira-cheatsheet` — Reference for ACLI Jira CLI commands
 

@@ -58,6 +58,41 @@ Flags can be mixed:
 /create-stories PROJ-1234 --lite --no-worktree
 ```
 
+## Worktree Port Isolation
+
+When running multiple worktrees simultaneously, each needs unique ports to avoid collisions. Dream Team Flow handles this automatically via `/create-stories`, but you can also apply it manually:
+
+```bash
+bash ~/.claude/scripts/worktree-port-overlay.sh PROJ-1234
+```
+
+**What it does:**
+1. Copies port infrastructure files from the feature branch into the worktree
+2. Runs `allocate-ports.sh` to derive unique ports from the ticket number
+3. Marks all overlay files as invisible to git (never appears in PRs)
+
+**Port scheme:**
+- Vite dev server: `31xx` (e.g., ticket 1234 → slot 47 → port 3147)
+- API services: base `10000 + (slot * 100)`, then +1 per service
+
+**Generated files** (all git-invisible):
+- `.env` — Docker Compose port mappings
+- `.env.local` — Vite proxy port overrides (appended to existing)
+- `docker-compose.worktree.yml` — Worktree API services with `-wt` suffix
+- `scripts/allocate-ports.sh`, `worktree-service.sh`, `generate-api.sh`
+
+**Running worktree API services:**
+```bash
+./scripts/worktree-service.sh up hcm-api     # Start a service
+./scripts/worktree-service.sh logs hcm-api    # Tail logs
+./scripts/worktree-service.sh down            # Stop all
+./scripts/worktree-service.sh status          # Show ports and health
+```
+
+Services connect to the main stack's infrastructure (postgres, redis, rabbitmq) while running your worktree's code on separate ports.
+
+**Note:** This currently uses an overlay script that copies files from an unmerged feature branch. Once that branch merges to main, the overlay is no longer needed — `allocate-ports.sh` and the env-var-aware vite config will be available directly.
+
 ## PR Review
 
 Review any pull request with line-level comments — no local checkout needed:
@@ -83,6 +118,6 @@ Categories: `frontend`, `backend`, `fullstack`, `infra`, `data`
 
 Config stored in `~/.claude/reviewers.json` — sanitized automatically for public repos (usernames replaced with `reviewer-1`, `reviewer-2`, etc.).
 
-When the Dream Team marks a PR ready (Phase 5.5), it maps the ticket scope to a category (`frontend-only` → `frontend`, `full-stack` → `fullstack`, etc.) and runs `gh pr edit --add-reviewer` with all configured reviewers for that category.
+PRs stay as **drafts** through AI review and CI checks. When the user explicitly confirms ("Done — assign reviewers & ship it"), the PR is marked ready and reviewers are auto-assigned. The Dream Team maps the ticket scope to a category (`frontend-only` → `frontend`, `full-stack` → `fullstack`, etc.) and runs `gh pr edit --add-reviewer` with all configured reviewers for that category. Reviewers are **never** auto-assigned before user confirmation.
 
 See also: **[Commands Reference](commands.md)** for the full list of slash commands, flags, and DTF CLI.
