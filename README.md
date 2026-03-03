@@ -85,6 +85,8 @@ Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human 
    - PR stays **draft** until you explicitly confirm — then marks ready and assigns reviewers
    - Moves ticket to Done and cleans up
 
+See **[Workflow Phases](docs/workflow-phases.md)** for detailed flowcharts of full, lite, and local modes.
+
 ---
 
 ## Features
