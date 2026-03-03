@@ -66,7 +66,7 @@ Check if the arguments contain `--lite`. If present:
   - **Simple** (1-3 files, single area): Implement directly yourself, no agents needed
   - **Medium** (4-8 files, single discipline): Optionally spawn 1 dev agent (Ingrid or Kenji)
   - **Complex** (8+ files, multiple disciplines): Spawn agents as needed — use your judgement
-- **Phase 4 (Review)**: Review your own changes against conventions, or spawn Maya if the diff is large (10+ files). Always run the security checklist yourself.
+- **Phase 4 (Review)**: Review your own changes against conventions, or spawn Maya if the diff is large (10+ files). Always run the **Security Scan** (Section 6 of `dev-workflow-checklist.md`) — detect backend/frontend from `git diff --name-only origin/main` and run the applicable categories.
 - **All other phases run normally** — this is critical, lite mode only changes WHO does the work, not WHAT gets done:
   - **Phase 1.5**: Draft PR created
   - **Phase 4.5**: Functional testing (if flagged)
