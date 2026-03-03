@@ -20,47 +20,29 @@ Run tickets in parallel with isolated worktrees and Docker — multiply your tea
 
 Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
-### Parallel everything — 4x story output or more
+### [Parallel everything — 4x story output or more](docs/parallel.md)
 
-Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts.
+Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract. Pause overnight, resume the next day from disk — zero token cost between sessions.
 
-Backend and frontend agents work in parallel within each ticket via a shared API contract defined upfront by the architect. The orchestrator pre-analyzes all tickets in parallel before any session starts, so agents begin with full context from minute one.
+A single developer can sustain the story output of a 4-person team — or more — because the work happens concurrently, not sequentially.
 
-Pause a workspace overnight (zero token cost), resume the next day with full context rebuilt from disk — multi-day tickets don't break the flow. A Chrome browser queue coordinates visual sign-off across parallel worktrees so multiple tickets can verify without conflicts. Known hot files are checked against `origin/main` before every push — merge conflicts caught early, not during review.
+### [Lean by design — cut your AI spend, not your output](docs/token-efficiency.md)
 
-The bottleneck stops being "how fast can one developer code" and becomes "how many tickets can your team review." A single developer can sustain the story output of a 4-person team — or more — because the work happens concurrently, not sequentially.
+Each ticket is routed to the right mode — full team, lite, or just a worktree — so trivial tickets cost zero and only complex ones get the full team. Formatting, linting, and builds run as shell scripts — zero LLM tokens. Structured handoff templates eliminate agent back-and-forth. Deadlock detection catches stuck agents at 10 minutes. CI fixes capped at 2 rounds.
 
-### Lean by design — cut your AI spend, not your output
+Per-ticket API costs stay predictable regardless of complexity.
 
-Most AI coding workflows burn tokens fast: MCP servers that inject thousands of schema tokens per call, agents that load entire codebases into context, and retry loops that run until the budget is gone. Dream Team Flow is built the opposite way.
+### [Built for teams — onboard in minutes, not days](docs/built-for-teams.md)
 
-Each ticket is analyzed and routed to the right mode — full multi-agent team, lite, or just a worktree — so trivial tickets cost zero AI spend and only complex ones get the full team. Right-sizing per ticket is the single biggest lever for controlling costs.
+One command to install, one command to update. `company-config.json` auto-configures service names, Jira domain, and paths — new developers ship PRs in minutes, not days. Updates deep-merge without breaking personal config. `/ticket-scout` flags vague requirements before sprint starts. i18n ships with all languages from day one.
 
-Formatting, linting, type checks, and builds run as shell scripts — zero LLM tokens. Agents use structured handoff templates (files touched, contract deviations, exact next steps) instead of free-text messages, eliminating 3-5 rounds of back-and-forth per handoff.
+Every session ends with a retro that feeds improvements back into prompts and docs. The team gets smarter with every ticket shipped.
 
-Deadlock detection catches stuck agents at 10 minutes — no more silently burning tokens on idle sessions. CI fixes are capped at 2 rounds, then escalated. Per-ticket API costs stay predictable regardless of ticket complexity.
+### [Secure by default — compliance without slowing down](SECURITY.md)
 
-### Built for teams — onboard in minutes, not days
+Every PR gets a 7-category OWASP security scan before it reaches a human reviewer. Schema changes require Mermaid diagrams and explicit human approval — agents cannot autonomously change your data model. Quality hooks physically prevent agents from skipping steps.
 
-One command to install, one command to update. Share a `company-config.json` to auto-configure service names, Jira domain, ticket prefixes, and paths — new developers go from zero to shipping PRs in minutes, not days of setup.
-
-`dtf update` deep-merges new hooks and commands with each developer's personal config — team-wide rollouts without breaking anyone's setup.
-
-`/ticket-scout` pre-analyzes upcoming tickets before sprint planning, flagging vague requirements and missing acceptance criteria before any development time is spent — a calibration loop from completed tickets improves estimates over time.
-
-i18n is automated: new UI text ships with all supported languages from day one via Lokalise API calls, with a hard gate that blocks the PR until every key is created.
-
-Every session ends with a structured retrospective: learnings are routed automatically — personal config changes apply immediately, shared conventions go through Jira tickets and PRs for team review. The team gets smarter with every ticket shipped. Works on macOS, Linux, and Windows (WSL) with 10 supported terminals.
-
-### Secure by default — compliance without slowing down
-
-Every PR goes through a 7-category OWASP-aligned security scan — injection, auth/authz, data exposure, path traversal, hardcoded secrets, insecure defaults, and XSS — before it ever reaches a human reviewer. No separate security tooling to buy, configure, or maintain.
-
-When any agent needs to change the database schema, work stops — the architect produces multiple options with Mermaid ER diagrams, posts them to the PR, and waits for explicit human approval. Agents cannot autonomously change your data model.
-
-`TaskCompleted` and `TeammateIdle` hooks physically prevent agents from marking tasks done or going idle without notes, journal entries, code changes, and passing type checks — quality enforcement is mechanical, not voluntary.
-
-Dream Team Flow ships with a three-tier permission ladder — personal sandbox, shared project standards, and team-enforced lockdown — so you control exactly what agents can read, write, and execute. For regulated industries, this means security review and change governance are built into the pipeline, not bolted on after.
+Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. For regulated industries, security review and change governance are built into the pipeline, not bolted on after.
 
 ---
 
@@ -114,6 +96,8 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 | **[Usage](docs/usage.md)** | Modes (full, lite, local), flags, PR review, reviewer auto-assignment |
 | **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes with comparison table |
+| **[Parallel Everything](docs/parallel.md)** | Cross-ticket parallelism, Docker isolation, pause/resume, Chrome queue, merge pre-check |
+| **[Built for Teams](docs/built-for-teams.md)** | Install, update, company config, ticket scout, i18n automation, self-learning retros |
 | **[Features](docs/features.md)** | Full feature list — team setup, orchestration, review, resilience, self-learning |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
 | **[Retrospectives](docs/retrospectives.md)** | Self-learning loop, learning destinations, feedback routing |
