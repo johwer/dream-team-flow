@@ -10,17 +10,23 @@ Living document tracking Claude Code platform features, how DTF relates to them,
 
 ### Multi-Agent Orchestration
 
-| Aspect | DTF (current) | Native Agent Teams |
-|--------|--------------|-------------------|
-| **How it works** | `/my-dream-team` spawns agents in separate tmux sessions, each in a worktree. Team lead coordinates via file-based messaging (`.dream-team/`) | Built-in `TeamCreate`/`SendMessage`/`TaskCreate` tools. Shared task list, direct messaging, split panes |
-| **Communication** | File-based (journal, context.md, notes) | Native mailbox system, automatic message delivery |
-| **Task tracking** | Manual via team lead prompt | Built-in task list with states (pending/in-progress/completed), dependencies, file-locking for claims |
-| **Display** | Separate tmux windows (Alacritty) | In-process (Shift+Down to cycle) or split panes (tmux/iTerm2) |
-| **Plan approval** | Architect reviews before devs start (prompt-based) | Native plan approval — teammate works read-only until lead approves |
-| **Hooks** | `TeammateIdle` and `TaskCompleted` hooks (already using) | Same hooks, plus `SubagentStart`/`SubagentStop` |
-| **Status** | Agent Teams is **experimental**, disabled by default | DTF is stable and battle-tested |
+DTF has two modes: **full mode** (multi-agent with tmux sessions) and **`--lite` mode** (team lead does most work itself, spawns agents only when needed). Native Agent Teams overlaps with both.
 
-**Decision:** Keep DTF orchestration for now. Agent Teams is experimental with known limitations (no session resumption, task status lag, one team per session). DTF's file-based approach is more resilient and supports features Agent Teams doesn't (retros, journal, learnings, achievement tracking). **Revisit when Agent Teams exits experimental.**
+| Aspect | DTF full mode | DTF `--lite` mode | Native Agent Teams |
+|--------|--------------|-------------------|-------------------|
+| **How it works** | `/my-dream-team` spawns named agents in separate tmux sessions, each in a worktree. Team lead coordinates via file-based messaging (`.dream-team/`) | Team lead does architecture + implementation directly. Spawns 0-2 agents based on complexity (simple: 0, medium: 1, complex: as needed) | Built-in `TeamCreate`/`SendMessage`/`TaskCreate` tools. Shared task list, direct messaging, split panes |
+| **When to use** | Complex tickets (8+ files, multi-discipline, cross-service) | Simple/medium tickets (1-8 files, single discipline). Also recommended for 15+ file tickets where coordination overhead exceeds parallelism benefit | Experimental — not used by DTF |
+| **Communication** | File-based (journal, context.md, notes) | Direct — lead has full context, no messaging needed | Native mailbox system, automatic message delivery |
+| **Task tracking** | Manual via team lead prompt | Lead tracks in own context | Built-in task list with states, dependencies, file-locking for claims |
+| **Quality gates** | Same gates in both modes — `dev-workflow-checklist.md` applies identically | Same gates | No built-in quality gates |
+| **Retros & learnings** | Full retro (Phase 6.75) with all agents contributing | Lead writes own retro using same 4 categories + destination hints | No equivalent |
+| **Plan approval** | Architect reviews before devs start (prompt-based) | Lead produces architecture report itself | Native plan approval — teammate works read-only until lead approves |
+| **Hooks** | `TeammateIdle` and `TaskCompleted` hooks (already using) | Same hooks when agents are spawned | Same hooks, plus `SubagentStart`/`SubagentStop` |
+| **Status** | DTF is stable and battle-tested | Used in production for most tickets | Agent Teams is **experimental**, disabled by default |
+
+**Key insight:** `--lite` is NOT Agent Teams — it's the same DTF orchestration with the team lead doing more work itself. The phases, quality gates, retros, and process are identical. Only WHO does the work changes (lead vs spawned agents). This is the mode most similar to what Agent Teams offers, but with DTF's full lifecycle on top.
+
+**Decision:** Keep DTF orchestration for now. Agent Teams is experimental with known limitations (no session resumption, task status lag, one team per session). DTF's `--lite` mode already covers the "fewer agents, less overhead" use case that Agent Teams targets, while keeping retros, journal, learnings, achievement tracking, and quality gates. **Revisit when Agent Teams exits experimental.**
 
 **Future:** When Agent Teams stabilizes, evaluate migrating Dream Team to use native task list and messaging while keeping DTF's higher-level workflows (retros, quality gates, Jira integration).
 
