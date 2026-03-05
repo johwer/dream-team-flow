@@ -79,7 +79,18 @@ Reference: `docs/INTERNATIONALIZATION.md`
 
 ## Section 3: PR Review Comment Resolution — HARD GATE
 
-After fixing issues raised in PR reviews (AI bot or human), conversations MUST be resolved.
+### Triage — Before Acting on a Comment
+
+Not every comment requires a code change. Evaluate before implementing:
+
+1. **Is the reviewer correct?** Check the code — they may lack context you have
+2. **Is it a question or a change request?** Questions need answers, not code changes
+3. **Is it an AI bot?** Copilot/Gemini suggestions are often wrong — verify independently
+4. **Would the change introduce risk?** (e.g., squashing migrations already deployed to staging/prod)
+5. **Does it contradict repo conventions?** Push back with a reference to the relevant doc
+
+**If you disagree:** reply with your reasoning and let the reviewer respond. Do not resolve — leave the thread open for discussion.
+**If you agree:** implement the fix, then reply and resolve.
 
 ### After Every Fix Commit
 
@@ -128,7 +139,23 @@ Before proceeding to the next step (CI polling, marking ready, etc.):
 
 ---
 
-## Section 5: Pre-Push Quality Gates
+## Section 5: Testing — Empty State & API Actions
+
+### Empty State Tests
+
+When writing tests for endpoints or UI that read/write data, always include a test case for **empty state** (no existing records). If the endpoint creates or updates, test both:
+- Entity exists → update
+- Entity **doesn't exist** → create or handle gracefully (not 400/500)
+
+This applies to both backend unit tests and frontend integration points.
+
+### API Action Verification
+
+If you added or changed an API integration, **verify the action** — not just the page render. Click the button that triggers the API call (save, delete, submit) and confirm it succeeds. Screenshot should show the **result of the action**, not just the form.
+
+---
+
+## Section 6: Pre-Push Quality Gates
 
 Before the first `git push` on any branch:
 
@@ -187,7 +214,7 @@ git rebase origin/main
 
 ---
 
-## Section 6: Security Scan — HARD GATE
+## Section 7: Security Scan — HARD GATE
 
 Applies to every PR before marking ready. The scan scope is determined by which file types were changed.
 
@@ -228,7 +255,7 @@ Run the applicable categories based on changed file types:
 
 ---
 
-## Section 7: File Management
+## Section 8: File Management
 
 ### Download Location
 
@@ -252,7 +279,7 @@ Run the applicable categories based on changed file types:
 
 ---
 
-## Section 8: Completion Gate — HARD GATE
+## Section 9: Completion Gate — HARD GATE
 
 Before transitioning a ticket to Done (Phase 7), **every item below must be confirmed**. This is the final quality gate — do NOT skip any item.
 

@@ -87,6 +87,44 @@ Improvements split into two tracks:
 - **Direct apply** (personal config): Applied immediately to `~/.claude/` files
 - **Ticket + PR** (shared repo): Grouped into a Jira ticket and PR for team review
 
+## Knowledge Layers — What Agents Actually See
+
+Not all documentation is automatically loaded. Understanding what agents see on startup prevents knowledge loss and duplication.
+
+### Auto-loaded (always visible to agents):
+| Source | Scope | When loaded |
+|--------|-------|-------------|
+| `~/.claude/CLAUDE.md` | Global config, commands, integrations | Every session |
+| `MEMORY.md` (auto-memory) | Project-scoped knowledge | Every session in project |
+| `CLAUDE.md` in working directory | Repo/worktree conventions | Every session in that directory |
+
+### NOT auto-loaded (agent must explicitly read):
+| Source | Content |
+|--------|---------|
+| `~/.claude/docs/dev-workflow-checklist.md` | Hard gates, quality checks, PR resolution |
+| `~/.claude/docs/learning-system.md` | This file |
+| `visual-testing.md`, `repo-navigation.md` | Detailed operational guides in memory folder |
+| `docs/*.md` in repo | Coding style, API conventions, testing guidelines |
+
+### The duplication problem
+
+Agents that don't see the checklist will rediscover its content and save it to MEMORY.md, creating duplicates. Removing duplicates from MEMORY.md causes agents to lose knowledge they need.
+
+### Solution: MEMORY.md as cheat sheet
+
+MEMORY.md serves two roles:
+1. **Cheat sheet** — Essential one-liners that summarize key rules from the checklist and repo docs. Agents see these on startup without reading anything else.
+2. **Index** — Links to detailed references (`visual-testing.md`, `dev-workflow-checklist.md`, repo docs) for when agents need the full picture.
+
+Rules for MEMORY.md content:
+- **Do** keep essential operational one-liners (i18n, PR workflow, pre-push gates)
+- **Do** mark them as summaries so agents don't expand them into full paragraphs
+- **Do** link to the detailed source for each topic
+- **Don't** duplicate full procedures — keep it to one line per topic
+- **Don't** remove a one-liner just because the detail exists elsewhere — agents may never read "elsewhere"
+
+This accepts controlled overlap between MEMORY.md and the checklist. The checklist is the source of truth; MEMORY.md is the delivery mechanism.
+
 ## Privacy & Anonymization
 
 The learning system stores reviewer names (GitHub logins) in `pr-learnings.json` for accurate analysis. When sharing results externally:

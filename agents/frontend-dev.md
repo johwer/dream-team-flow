@@ -25,15 +25,24 @@ Visual verification (MANDATORY for UI changes):
   bash ~/.claude/scripts/chrome-queue.sh done <TICKET_ID>               # Release when done
   ```
   If not your turn, skip visual verification and note it in your completion message.
-- **Screenshot port**: Always use **port 3000** for visual verification — the Chrome plugin connects to port 3000. Start Vite with: `VITE_DEV_PORT=3000 npm start` (overrides the worktree's default `31xx` port). The queue ensures only one workspace uses port 3000 at a time.
-- **Screenshot workflow**:
-  1. Start Vite on port 3000: `cd apps/web && VITE_DEV_PORT=3000 npm start`
-  2. Navigate Chrome to `https://localhost:3000/...`
-  3. Record GIF: `gif_creator action=start_recording` → take screenshots → `gif_creator action=stop_recording`
-  4. Export: `gif_creator action=export filename="<TICKET_ID>-after.gif" download=true`
-  5. Verify file exists: `ls ~/Downloads/<TICKET_ID>-after.gif`
+- **Screenshot workflow** (AppleScript — no `--chrome` flag needed):
+  1. Start Vite on your worktree port: `cd apps/web && npm start` (uses VITE_DEV_PORT from .env.local)
+  2. Navigate Chrome via AppleScript:
+     ```bash
+     osascript -e 'tell application "Google Chrome" to set URL of active tab of first window to "https://localhost:<PORT>/..."'
+     ```
+  3. Wait for page load, then screenshot:
+     ```bash
+     sleep 3 && screencapture -x /tmp/<TICKET_ID>-screenshot.png
+     ```
+  4. Read the screenshot with the Read tool to verify visually
+  5. For interactions (click, scroll), use AppleScript + JavaScript:
+     ```bash
+     osascript -e 'tell application "Google Chrome" to execute javascript "document.querySelector(\"button\").click()" in active tab of first window'
+     ```
   6. Release Chrome: `bash ~/.claude/scripts/chrome-queue.sh done <TICKET_ID>`
-- Compare with design mockups or Jira attachments if available
+- **If screencapture fails** (Screen Recording permission not granted): tell the team lead that visual verification needs `--chrome`. The team lead can restart this session with `claude --dangerously-skip-permissions --chrome` to enable the Chrome plugin for screenshots.
+- Compare with design mockups or Jira attachments if available (download with `bash ~/.claude/scripts/jira-download-attachments.sh <TICKET_ID>`)
 
 Context management:
 - Create notes at `.dream-team/notes/<your-name>.md` when working in a team

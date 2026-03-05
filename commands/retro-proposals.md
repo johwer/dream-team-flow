@@ -1,5 +1,7 @@
 # Retro Proposals — Analyze Learnings & Route Improvements
 
+ultrathink — this task requires deep reasoning to correctly classify learnings and route them to the right destination without duplicates.
+
 Analyze accumulated Dream Team session data (retro learnings, history, journals) to identify patterns, flag problems, and propose concrete improvements. Routes learnings to the correct destination files — agent prompts, repo docs, or personal config.
 
 > **Renamed from `/team-review`.** This command is part of the [Learning System](../docs/learning-system.md) alongside `/scrape-pr-history` and `/pr-insights`.

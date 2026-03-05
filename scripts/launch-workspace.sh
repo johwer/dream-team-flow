@@ -19,7 +19,7 @@ unset CLAUDECODE
 
 # Start tmux detached, send claude, wait, send dream team command, then attach
 tmux new-session -d -s "$TICKET_ID"
-tmux send-keys -t "$TICKET_ID" "claude --dangerously-skip-permissions --chrome" Enter
+tmux send-keys -t "$TICKET_ID" "claude --dangerously-skip-permissions" Enter
 
 echo "Waiting for Claude to start..."
 sleep 8

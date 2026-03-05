@@ -94,9 +94,12 @@ See `~/.claude/docs/integrations.md` for full details including prerequisites an
 ## Jira Integration
 
 - Use `acli jira workitem` commands to interact with Jira (see `/acli-jira-cheatsheet` for full reference)
-- Jira attachments require browser authentication — use `open` or AppleScript with Chrome to download them, as `curl`/`wget` will get 401 Unauthorized
-- To open a Jira attachment URL in Chrome for authenticated download:
+- **Jira attachments** — download via API (preferred) or Chrome (fallback):
   ```bash
+  # API download (uses ACLI OAuth token from keychain — no Chrome needed)
+  bash ~/.claude/scripts/jira-download-attachments.sh <TICKET_ID> [OUTPUT_DIR]
+
+  # Fallback: open in Chrome for authenticated download
   open -a "Google Chrome" "<ATTACHMENT_URL>"
   ```
 

@@ -42,6 +42,22 @@ dtf update    # Pull latest, verify symlinks, regenerate CLAUDE.md
 dtf doctor    # Health check — config, symlinks, tools
 ```
 
+## macOS Permissions
+
+For visual verification (screenshots from agents), your terminal app needs **Screen Recording** permission:
+
+1. **System Settings → Privacy & Security → Screen Recording**
+2. Add your terminal app (e.g., Alacritty) — click **+** if not listed
+3. Toggle it **on**
+4. **Restart the terminal** for the change to take effect
+
+You can open the settings pane directly:
+```bash
+open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
+```
+
+Without this, agents can navigate Chrome and click elements via AppleScript, but cannot take screenshots for visual verification.
+
 ## Supported Terminals (10)
 
 | Terminal | macOS | Linux | Windows (WSL) |

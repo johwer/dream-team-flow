@@ -101,15 +101,26 @@ If any ACLI call fails, note it — you'll ask the user for those ticket details
 
 #### Step 2: Handle Attachments
 
-After all tickets are fetched, check which have attachments. For any tickets with attachments:
+After all tickets are fetched, download attachments for any tickets that have them.
 
-1. Open each in Chrome for authenticated download:
-   ```bash
-   open -a "Google Chrome" "<ATTACHMENT_URL>"
-   ```
-2. Tell the user where Chrome will download the files (`~/Downloads/` — shown as "Hämtade filer" on Swedish macOS)
-3. Ask the user to confirm once downloads are complete
-4. Read any downloaded images/PDFs to understand context
+**Default method — API download (no Chrome needed):**
+```bash
+bash ~/.claude/scripts/jira-download-attachments.sh <TICKET_ID> [OUTPUT_DIR]
+```
+
+Downloads to `~/Downloads/<TICKET_ID>/` by default. Returns file paths on stdout, `NO_ATTACHMENTS` if none. Uses the ACLI OAuth token from macOS keychain to download via the public Atlassian API.
+
+For each ticket with attachments:
+1. Run the download script
+2. Read the downloaded images/PDFs using the Read tool to understand context
+3. Include findings in the pre-hydrated context file (Step 8)
+
+**Fallback — Chrome (only if API download fails):**
+If the script exits with code 2 (token or API failure), fall back to opening attachments in Chrome:
+```bash
+open -a "Google Chrome" "<ATTACHMENT_URL>"
+```
+Then ask the user to confirm once downloads are complete.
 
 #### Step 3: Pre-Hydrate ALL Contexts (Parallel)
 
@@ -403,6 +414,6 @@ When the user says "clean up all done workspaces" or similar:
 - Worktrees are always at `~/Documents/<TICKET_ID>`
 - tmux sessions are always named `<TICKET_ID>`
 - If anything fails, stop and report — do not continue blindly
-- Never use curl/wget for Jira attachments — always use Chrome
+- For Jira attachments, use `~/.claude/scripts/jira-download-attachments.sh` (API download via ACLI OAuth token). Falls back to Chrome if API fails.
 - **Phase A** (pre-hydration) runs in parallel across all tickets — Phase B (worktree creation + launch) runs sequentially one ticket at a time
 - When sending ticket text via tmux send-keys, keep it concise if the description is very long — include the essential description and acceptance criteria

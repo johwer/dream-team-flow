@@ -1,5 +1,7 @@
 # Ticket Scout — Pre-Analyze Upcoming Work
 
+ultrathink — this task requires deep reasoning to catch ambiguity, scope risks, and missing requirements.
+
 Scan upcoming Jira tickets, pre-analyze them, and write observations so the Dream Team starts each ticket with better context.
 
 $ARGUMENTS
