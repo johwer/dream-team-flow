@@ -103,10 +103,28 @@ The queue is purely file-based (`~/.claude/chrome/queue.txt`) — no external de
 | **Extended context** | Not used | `sonnet[1m]` — 1M token context for long sessions |
 | **Subagent model override** | Per-agent in frontmatter | `CLAUDE_CODE_SUBAGENT_MODEL` env var for global override |
 
-**Decision:** Added `ultrathink` to `/ticket-scout` and `/retro-proposals` (2026-03-05). Consider `opusplan` for architect — Opus for planning phase, Sonnet for implementation guidance. Test `sonnet[1m]` for long Dream Team sessions that hit compaction.
+**Decision:** Added `ultrathink` to `/ticket-scout` and `/retro-proposals` (2026-03-05).
+
+#### Why not `opusplan`?
+
+`opusplan` uses Opus for planning and auto-switches to Sonnet for execution. DTF doesn't need this because **the Opus/Sonnet split already exists at the agent level**:
+
+- **Architect** (`model: opus`) — pure planning: reads code, analyzes scope, produces architecture reports. There's no execution phase where it writes code, so switching to Sonnet mid-session would only downgrade analysis quality during file reads.
+- **Dev agents** (`model: sonnet`) — pure execution: implement the plan the architect produced. Already on the cheaper, faster model.
+- **Skills** (`ultrathink`) — per-turn deep reasoning, more precise than `opusplan`'s per-session model switch. Only activates when the prompt contains the keyword.
+
+DTF's multi-agent architecture *is* opusplan — Opus plans, Sonnet executes — just implemented as separate agents instead of a model alias. The model alias would only help in a single-agent session that does both planning and coding, which is what `--lite` mode does. But even there, the team lead needs Opus-level reasoning throughout (review triage, retro analysis, quality gate decisions), not just during initial planning.
+
+| Candidate | Verdict | Reason |
+|-----------|---------|--------|
+| Architect agent | Skip | All planning, no execution phase to downgrade to Sonnet |
+| `/ticket-scout` | Skip | All analysis — `ultrathink` already handles deep reasoning per-turn |
+| `/retro-proposals` | Skip | All analysis — same as ticket-scout |
+| `/create-stories` | Skip | Lightweight orchestration (shell commands, worktree setup) — no heavy planning |
+| `--lite` team lead | Skip | Needs nuanced decisions throughout, not just during planning phase |
 
 **Action items:**
-- [ ] Test `opusplan` for architect agent
+- [x] ~~Test `opusplan` for architect agent~~ — Skipped: architect is pure planning, Sonnet downgrade would hurt. DTF's agent architecture already splits Opus (planning) and Sonnet (execution)
 - [ ] Test `sonnet[1m]` for Dream Team lead session
 - [ ] Document when to use which model in this file
 
@@ -193,7 +211,7 @@ The queue is purely file-based (`~/.claude/chrome/queue.txt`) — no external de
 
 ### P1 — Do Next
 3. **Skill `context: fork`** — Add to `/ticket-scout` and `/retro-proposals` to avoid context pollution.
-4. **`opusplan` for architect** — Test Opus planning + Sonnet execution split.
+4. ~~**`opusplan` for architect**~~ — Skipped. DTF's agent architecture already splits Opus (planning) / Sonnet (execution). See Model Configuration section.
 5. **Subagent `skills` preloading** — Inject coding conventions into dev agents.
 
 ### P2 — Evaluate Later
