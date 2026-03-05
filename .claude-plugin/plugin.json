@@ -1,0 +1,5 @@
+{
+  "name": "dream-team",
+  "description": "Multi-agent development workflow framework — orchestrates teams of Claude agents with quality gates, retros, and Jira integration",
+  "version": "1.0.0"
+}
