@@ -2,19 +2,42 @@
 
 ## Prerequisites
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed (v1.0.33+ for plugin support)
 - [Homebrew](https://brew.sh) (macOS/Linux)
 - Git, Node.js (via nvm), jq
 - A supported terminal (see below)
 
-## Install (one command)
+## Install Methods
+
+Dream Team Flow supports three install methods. Choose based on your setup:
+
+| Method | Best for | What you get |
+|--------|---------|-------------|
+| **Plugin only** | Quick start, trying it out | Commands, agents, scripts via Claude Code plugin system |
+| **DTF CLI only** | Legacy installs, no plugin support | Symlinks everything into `~/.claude/`, generates config |
+| **Plugin + DTF CLI** | Teams (recommended) | Plugin for commands/agents, DTF CLI for company config |
+
+### Method 1: Plugin Install
+
+Install the marketplace and toolkit directly in Claude Code:
 
 ```bash
-# Clone and run the installer:
+# Team (private — unsanitized, ready to use)
+/plugin marketplace add your-username/marketplace-private
+/plugin install claude-toolkit@marketplace-private
+
+# Community (public — sanitized, needs company config to de-sanitize)
+/plugin marketplace add your-username/marketplace
+/plugin install claude-toolkit@marketplace
+```
+
+This gives you all commands (`/create-stories`, `/my-dream-team`, `/review-pr`, etc.), agents, scripts, and docs via Claude Code's built-in plugin system with auto-updates.
+
+### Method 2: DTF CLI Install
+
+```bash
 git clone https://github.com/your-username/dream-team-flow.git
 bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
-
-# Install CLI tools:
 brew install tmux jq
 ```
 
@@ -24,9 +47,27 @@ The installer:
 3. Generates your personal `CLAUDE.md` with your settings
 4. Merges hooks into `settings.json`
 
+### Method 3: Plugin + DTF CLI (recommended for teams)
+
+Use the plugin for the toolkit and the DTF CLI for company-specific setup:
+
+```bash
+# 1. Install plugin (commands, agents, scripts)
+/plugin marketplace add your-username/marketplace-private
+/plugin install claude-toolkit@marketplace-private
+
+# 2. Run DTF CLI for company config (Jira domain, service names, personal config)
+git clone https://github.com/your-username/dream-team-flow.git
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+  --company-config company-config.json
+
+# 3. Install CLI tools
+brew install tmux jq
+```
+
 ## Team / Enterprise Install
 
-If your team lead shared a `company-config.json`, pass it during install to auto-configure everything:
+If your team lead shared a `company-config.json`, pass it during DTF CLI install:
 
 ```bash
 bash dream-team-flow/scripts/dtf.sh install https://github.com/your-org/dream-team-flow \
@@ -35,8 +76,36 @@ bash dream-team-flow/scripts/dtf.sh install https://github.com/your-org/dream-te
 
 This de-sanitizes all generic names (Repo, ServiceA, PROJ-) with your company's real names, sets default paths, and asks about any project-specific paths your team uses.
 
+For teams using the private marketplace, no de-sanitization is needed — files already have real names.
+
+## Auto-Onboarding (for repo owners)
+
+Add the marketplace to your project's `.claude/settings.json` so new team members get prompted automatically when they trust the project:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "marketplace-private": {
+      "source": {
+        "source": "github",
+        "repo": "your-username/marketplace-private"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-toolkit@marketplace-private": true
+  }
+}
+```
+
 ## Update
 
+**Plugin:** Updates happen automatically on startup (if `GITHUB_TOKEN` is set for private repos), or manually:
+```bash
+/plugin marketplace update
+```
+
+**DTF CLI:**
 ```bash
 dtf update    # Pull latest, verify symlinks, regenerate CLAUDE.md
 dtf doctor    # Health check — config, symlinks, tools

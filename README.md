@@ -46,6 +46,23 @@ Three-tier permission ladder — personal sandbox, shared standards, team-enforc
 
 ---
 
+## Repository Architecture
+
+Dream Team Flow is split across three repos:
+
+| Repo | Visibility | Purpose |
+|------|-----------|---------|
+| **[dream-team-flow](https://github.com/your-username/dream-team-flow)** | Public | This repo — DTF documentation, improvement plan, `dtf` CLI, company config templates |
+| **[marketplace](https://github.com/your-username/marketplace)** | Public | Plugin marketplace — all commands, agents, scripts, hooks, and docs (sanitized) |
+| **marketplace-private** | Private | Same plugin files, unsanitized — for team use without de-sanitization |
+
+**Why the split?**
+- **Plugin files** (commands, agents, scripts) live in the marketplace repos so any project can install them via Claude Code's plugin system — not tied to Dream Team Flow specifically
+- **DTF docs and CLI** live here — framework documentation, improvement plan, company config templates, setup guides
+- **Team members** install from `marketplace-private` (real names, no setup needed). **Community users** install from `marketplace` and run `dtf install --company-config` to de-sanitize
+
+---
+
 ## How It Works
 
 ```
@@ -92,7 +109,7 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 
 | Guide | Description |
 |-------|-------------|
-| **[Installation](docs/installation.md)** | Prerequisites, install, team/enterprise setup, supported terminals |
+| **[Installation](docs/installation.md)** | Prerequisites, install methods (plugin + dtf CLI), team setup |
 | **[Usage](docs/usage.md)** | Modes (full, lite, local), flags, PR review, reviewer auto-assignment |
 | **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes with comparison table |
@@ -102,14 +119,30 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
 | **[Retrospectives](docs/retrospectives.md)** | Self-learning loop, learning destinations, feedback routing |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
-| **[Project Structure](docs/project-structure.md)** | Annotated file tree — commands, agents, scripts, security, docs |
+| **[Project Structure](docs/project-structure.md)** | Repo architecture — what lives where across the three repos |
 | **[Token Efficiency](docs/token-efficiency.md)** | How DTF minimizes AI costs — no MCP, deterministic nodes, disk-based memory, targeted reads |
-| **[Integrations](docs/integrations.md)** | Hooks, subagents, GitHub Actions, Slack |
+| **[Improvement Plan](docs/improvement-plan.md)** | Architecture decisions, feature comparisons with native Claude Code, prioritized roadmap |
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
 
 ---
 
 ## Quick Start
+
+### Option A: Plugin Install (recommended)
+
+Install the plugin marketplace and the toolkit:
+
+```bash
+# Public (community — needs de-sanitization with company config)
+/plugin marketplace add your-username/marketplace
+/plugin install claude-toolkit@marketplace
+
+# Private (team — ready to use, no de-sanitization needed)
+/plugin marketplace add your-username/marketplace-private
+/plugin install claude-toolkit@marketplace-private
+```
+
+### Option B: DTF CLI Install (full setup with company config)
 
 ```bash
 git clone https://github.com/your-username/dream-team-flow.git
@@ -117,7 +150,26 @@ bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dre
 brew install tmux jq
 ```
 
-The installer symlinks all commands, agents, and scripts into `~/.claude/` and generates your config. For team installs, pass a `company-config.json` to auto-configure service names, Jira domain, and paths.
+Pass a company config for team installs:
+
+```bash
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+  --company-config company-config.json
+```
+
+### Option C: Both (recommended for teams)
+
+Use the plugin for commands/agents/scripts, and the DTF CLI for company-specific setup:
+
+```bash
+# 1. Install plugin (gets all commands, agents, scripts)
+/plugin marketplace add your-username/marketplace-private
+/plugin install claude-toolkit@marketplace-private
+
+# 2. Run DTF CLI for company config (sets Jira domain, service names, personal config)
+bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+  --company-config company-config.json
+```
 
 See **[Installation](docs/installation.md)** for prerequisites, team/enterprise setup, and supported terminals.
 
@@ -152,13 +204,38 @@ Built for monorepos with:
 - **Backend:** .NET Web API, Entity Framework Core, C#
 - **Infrastructure:** Docker Compose, EF Core Migrations
 
-The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions in [`commands/my-dream-team.md`](commands/my-dream-team.md) to match your stack.
+The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions to match your stack.
 
 ---
 
 ## Project Structure
 
-Commands, agents, scripts, security configs, and docs — all symlinked into `~/.claude/` after install. Updates are instant via `git pull`.
+Three repos, clear separation:
+
+```
+dream-team-flow/                    ← This repo: docs + dtf CLI
+├── docs/                           # Framework documentation
+│   ├── improvement-plan.md         # Architecture decisions & roadmap
+│   ├── installation.md             # Install guide
+│   ├── usage.md                    # Usage guide
+│   └── ...                         # Workflow, features, team, etc.
+├── security/                       # Security config templates (3 levels)
+├── CLAUDE.md.template              # Template for ~/.claude/CLAUDE.md
+├── dtf-config.template.json        # Per-user config template
+├── company-config.example.json     # Example company config
+├── SETUP-GUIDE.md                  # Full setup reference
+└── SECURITY.md                     # Security ladder guide
+
+marketplace/ (or marketplace-private/)  ← Plugin repos: commands + agents + scripts
+├── .claude-plugin/
+│   ├── marketplace.json            # Plugin catalog
+│   └── plugin.json                 # Plugin manifest
+├── commands/                       # All slash commands
+├── agents/                         # Agent definitions
+├── scripts/                        # Shell scripts (quality gates, hooks, etc.)
+├── skills/                         # Agent skills (mermaid diagrams, etc.)
+└── docs/                           # Operational docs (checklist, learning system)
+```
 
 See **[Project Structure](docs/project-structure.md)** for the full annotated file tree.
 
@@ -169,7 +246,7 @@ See **[Project Structure](docs/project-structure.md)** for the full annotated fi
 This is an actively evolving project. Contributions are welcome:
 
 - **Workflow improvements:** After Dream Team sessions, run `dtf contribute` to export your retro learnings as a PR
-- **New agent types:** Add agent definitions to `agents/` for your tech stack
+- **New agent types:** Add agent definitions to the marketplace repo for your tech stack
 - **Terminal support:** Add new terminals to `scripts/open-terminal.sh`
 - **Bug fixes & features:** Standard GitHub PR workflow
 
