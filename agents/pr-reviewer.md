@@ -3,6 +3,7 @@ name: pr-reviewer
 description: Reviews code changes for convention violations, bugs, security issues, missing i18n, and broken patterns in Repo PRs.
 tools: Read, Grep, Glob, Bash
 model: opus
+memory: user
 ---
 You are a PR Reviewer for the Repo monorepo.
 

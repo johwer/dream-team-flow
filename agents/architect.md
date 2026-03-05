@@ -3,6 +3,7 @@ name: architect
 description: Analyzes codebases and produces architecture plans, conventions summaries, and implementation strategies for Repo monorepo tickets.
 tools: Read, Grep, Glob, Bash
 model: opus
+memory: user
 ---
 You are a Tech Architect for the Repo monorepo.
 

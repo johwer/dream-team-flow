@@ -87,7 +87,7 @@ The queue is purely file-based (`~/.claude/chrome/queue.txt`) — no external de
 **Decision:** Adopt `memory` for architect and pr-reviewer agents. These benefit most from accumulated knowledge (architecture patterns, review patterns). Don't add memory to dev agents — they should follow conventions, not learn their own.
 
 **Action items:**
-- [ ] Add `memory: user` to `architect.md` and `pr-reviewer.md`
+- [x] ~~Add `memory: user` to `architect.md` and `pr-reviewer.md`~~ — Done (2026-03-05)
 - [ ] Add `skills` field to dev agents to preload coding conventions
 - [ ] Evaluate `isolation: worktree` for PR review subagent
 - [ ] Add scoped hooks to dev agents (e.g., block editing wrong service directory)
