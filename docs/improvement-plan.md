@@ -155,19 +155,68 @@ DTF's multi-agent architecture *is* opusplan — Opus plans, Sonnet executes —
 
 ### Plugin System
 
+Plugins support **self-hosted private marketplaces** — no global marketplace required. A marketplace is just a `marketplace.json` file in a git repo. Teams add it with `/plugin marketplace add owner/repo` (GitHub) or any git URL. Private repos work if the user has git credentials.
+
 | Aspect | DTF (current) | Native Plugins |
 |--------|--------------|----------------|
 | **Distribution** | `dtf install` CLI — clones repo, symlinks into `~/.claude/` | `/plugin install` — built-in install, versioning, namespacing |
-| **Updates** | `dtf update` — pull + verify symlinks | Plugins auto-update or manual update |
+| **Updates** | `dtf update` — pull + verify symlinks | Auto-update on startup (with `GITHUB_TOKEN` for private repos), or `/plugin marketplace update` |
 | **Namespacing** | Not namespaced — commands are global | Plugin skills get `plugin-name:skill-name` prefix |
 | **Packaging** | Git repo with scripts | `.claude-plugin/plugin.json` manifest + directory structure |
+| **Hosting** | Public GitHub repo | GitHub, GitLab, Bitbucket, self-hosted git, local paths, npm, pip |
+| **Access control** | Public only | Private repos (git credentials), managed `strictKnownMarketplaces` to lock down allowed sources |
+| **Team onboarding** | `dtf install <url> --company-config <path>` | `extraKnownMarketplaces` in `.claude/settings.json` auto-prompts on project trust + `enabledPlugins` for defaults |
+| **Components** | Commands (.md), agents (.md), hooks, scripts | Commands, agents, hooks, MCP servers, LSP servers — all in one package |
 
-**Decision:** Keep `dtf` CLI for now. It handles company-specific config, de-sanitization, and personal setup that plugins don't support. **Long-term goal:** Package the generic framework as a plugin, keep `dtf` for company-specific setup layer on top.
+#### Self-hosted marketplace architecture
+
+A marketplace is a git repo with this structure:
+```
+my-marketplace/
+├── .claude-plugin/
+│   └── marketplace.json    ← catalog listing plugins + sources
+└── plugins/
+    ├── dream-team/
+    │   ├── .claude-plugin/
+    │   │   └── plugin.json ← manifest (name, version, components)
+    │   ├── commands/        ← skills/commands
+    │   ├── agents/          ← agent definitions
+    │   └── hooks/           ← hook scripts
+    └── review-tools/
+        └── ...
+```
+
+Plugins can source from: relative paths (same repo), GitHub repos, git URLs, git subdirectories (sparse clone for monorepos), npm packages, or pip packages. Each supports version pinning via `ref` (branch/tag) and `sha` (exact commit).
+
+#### DTF as a plugin vs `dtf` CLI — what changes
+
+| Capability | Plugin can handle | Still needs `dtf` CLI |
+|-----------|:-:|:-:|
+| Skills/commands (my-dream-team, review-pr, etc.) | Yes | — |
+| Agents (architect, backend-dev, etc.) | Yes | — |
+| Hooks (migration guard, lint reminder, etc.) | Yes | — |
+| Scripts (quality-gate.sh, chrome-queue.sh, etc.) | Yes (via `${CLAUDE_PLUGIN_ROOT}`) | — |
+| Docs (checklist, learning-system, etc.) | Yes | — |
+| Version management + auto-updates | Yes (built-in) | — |
+| Namespaced commands (`dtf:my-dream-team`) | Yes | — |
+| Company config de-sanitization | — | Yes |
+| Personal config (`dtf-config.json`) | — | Yes |
+| Jira project/domain setup | — | Yes |
+| Service name mapping | — | Yes |
+| Interactive install wizard | — | Yes |
+
+**Decision:** The plugin system is mature enough for the **generic framework** (skills, agents, hooks, scripts). Self-hosted marketplace solves the distribution problem without depending on a global marketplace. `dtf` CLI stays for the **company-specific layer** (de-sanitization, Jira setup, service names, personal config).
+
+**Architecture:** Two layers:
+1. **Plugin** (`dream-team-flow` marketplace) — generic framework anyone can install via `/plugin marketplace add johwer/dream-team-flow` + `/plugin install dream-team@dream-team-flow`
+2. **`dtf` CLI** — company-specific setup on top: `dtf install --company-config company-config.json` applies de-sanitization, sets Jira domain, maps service names, creates `dtf-config.json`
 
 **Action items:**
-- [ ] Evaluate plugin packaging for the public repo (generic framework)
-- [ ] Keep dtf for company config layer (de-sanitization, Jira setup, service names)
-- [ ] Consider hybrid: plugin for skills/agents, dtf for company config
+- [ ] Restructure dream-team-flow repo as a plugin marketplace (add `.claude-plugin/marketplace.json` + `plugin.json`)
+- [ ] Test self-hosted private marketplace with the team (private repo variant)
+- [ ] Evaluate `extraKnownMarketplaces` in project `.claude/settings.json` for auto-onboarding
+- [ ] Keep `dtf` CLI for company config layer — update it to work alongside plugin install
+- [ ] Test `enabledPlugins` for default-on behavior when team trusts the project
 
 ---
 
@@ -216,7 +265,7 @@ DTF's multi-agent architecture *is* opusplan — Opus plans, Sonnet executes —
 
 ### P2 — Evaluate Later
 6. **Agent Teams migration** — Wait for experimental flag to be removed. Track progress.
-7. **Plugin packaging** — Package generic DTF as a plugin when plugin ecosystem matures.
+7. **Plugin packaging** — Restructure DTF repo as a self-hosted plugin marketplace. Generic framework as plugin, `dtf` CLI for company config layer.
 8. **`sonnet[1m]`** — Test for long Dream Team sessions.
 9. **`/batch` and `/simplify`** — Test as supplementary tools.
 
