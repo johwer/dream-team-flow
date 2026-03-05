@@ -237,18 +237,42 @@ marketplace/ (or marketplace-private/)
 
 ### Built-in Skills
 
-| Skill | What it does | DTF equivalent |
-|-------|-------------|----------------|
-| `/batch` | Parallel implementation across files, each in worktree with PR | No equivalent — useful for large migrations |
-| `/simplify` | 3 parallel review agents (reuse, quality, efficiency) | `/review-pr` does similar but focused on PR diff |
-| `/debug` | Reads session debug log for troubleshooting | No equivalent |
-| `/claude-api` | API reference for building with Claude | Not relevant to DTF |
-
-**Decision:** `/batch` is useful for large-scale changes that Dream Team doesn't handle well (e.g., rename across 200 files). `/simplify` could run after Dream Team implementation as a quality pass.
+| Skill | What it does | DTF equivalent | Verdict |
+|-------|-------------|----------------|---------|
+| `/batch` | Parallel implementation across files, each in worktree with PR | No equivalent | **Document as available** — fills a niche DTF doesn't (200-file renames, large migrations) |
+| `/simplify` | 3 parallel review agents (reuse, quality, efficiency) | Maya (pr-reviewer) + security scan | **Skip** — DTF already runs code review + security scan. Third pass adds cost without clear value |
+| `/debug` | Reads session debug log for troubleshooting | No equivalent | **Nice to know** — useful for debugging stuck sessions |
+| `/claude-api` | API reference for building with Claude | Not relevant | Skip |
 
 **Action items:**
-- [ ] Test `/simplify` as a post-implementation step in Dream Team workflow
 - [ ] Document `/batch` as available for large migrations in CLAUDE.md
+- [x] ~~Test `/simplify`~~ — Skipped. Maya + security scan already cover reuse, quality, and efficiency
+
+---
+
+### Medium Impact Features — Reviewed (2026-03-05)
+
+| Feature | Verdict | Reasoning |
+|---------|---------|-----------|
+| **`context: fork`** | **Adopt** | `/ticket-scout` reads full Jira tickets, `/retro-proposals` reads all learnings — both pollute the main session. Forking keeps context clean |
+| **Subagent `skills` field** | **Adopt** | Preloading coding conventions saves dev agents from discovering docs manually every session |
+| **`!command`` in skills** | **Adopt** | `/ticket-scout` can pre-fetch Jira data before Claude sees the prompt — fewer tokens, less hallucination |
+| **`sonnet[1m]`** | **Test** | Team lead session coordinates everything and often hits compaction. 1M context could prevent information loss in long sessions |
+| **`isolation: worktree`** | **Skip** | DTF already manages worktrees manually with port allocation, env setup, and Chrome queue. Native isolation would conflict with this custom setup |
+| **Background subagents** | **Skip** | DTF uses tmux sessions for parallelism — more robust, visible, resumable. Background subagents are for single-session workflows |
+| **`/simplify`** | **Skip** | Maya + security scan already cover code quality review. Third pass adds cost without clear value |
+
+---
+
+### Low Impact Features — Reviewed (2026-03-05)
+
+| Feature | Verdict | Reasoning |
+|---------|---------|-----------|
+| **Effort slider (`/model`)** | **Skip** | `ultrathink` is more precise (per-turn vs per-session). Slider doesn't add value over what we have |
+| **`--agents` CLI flag** | **Dev convenience** | Useful when iterating on agent prompts during development. Not a workflow change |
+| **Subagent hooks (frontmatter)** | **Evaluate** | Blocking agents from editing wrong service dirs is useful but global hooks (migration guard, lock file guard) already cover the main cases. Consider for service-scoped dev agents if cross-editing becomes a problem |
+| **Plan approval for teammates** | **Already have this** | DTF's architect → dev handoff IS plan approval. Devs don't start until the architect's analysis is reviewed. Agent Teams just formalizes it differently |
+| **`CLAUDE_CODE_SUBAGENT_MODEL` env var** | **Dev convenience** | Quick way to test Dream Team on cheaper/different models. Useful for cost experiments, not a workflow change |
 
 ---
 
@@ -269,25 +293,30 @@ marketplace/ (or marketplace-private/)
 
 ## Improvement Priority
 
+### Done
+- [x] **Subagent `memory`** — Added to architect and pr-reviewer (2026-03-05)
+- [x] **Plugin packaging** — Three-repo architecture: marketplace-private, marketplace, dream-team-flow (2026-03-05)
+- [x] ~~**`opusplan`**~~ — Skipped. DTF's agent architecture already splits Opus/Sonnet
+
 ### P0 — Do Soon
-1. **Chrome Integration** — Two-tier system in place: AppleScript primary (no MCP needed), Chrome extension via queue for GIF recording. Document the terminal-reopen flow.
-2. **Subagent `memory`** — Add to architect and pr-reviewer. Low effort, high compound value.
+1. **Chrome Integration docs** — Two-tier system in place. Document the terminal-reopen-with-chrome flow in `visual-testing.md`
+2. **Skill `context: fork`** — Add to `/ticket-scout` and `/retro-proposals` to avoid context pollution
+3. **`!command`` in skills** — Convert `/ticket-scout` to pre-fetch Jira data with `!`acli jira...``
 
 ### P1 — Do Next
-3. **Skill `context: fork`** — Add to `/ticket-scout` and `/retro-proposals` to avoid context pollution.
-4. ~~**`opusplan` for architect**~~ — Skipped. DTF's agent architecture already splits Opus (planning) / Sonnet (execution). See Model Configuration section.
-5. **Subagent `skills` preloading** — Inject coding conventions into dev agents.
+4. **Subagent `skills` preloading** — Inject coding conventions into dev agents at startup
+5. **`sonnet[1m]`** — Test for long Dream Team lead sessions that hit compaction
+6. **`/batch` documentation** — Document as available for large migrations
 
 ### P2 — Evaluate Later
-6. **Agent Teams migration** — Wait for experimental flag to be removed. Track progress.
-7. ~~**Plugin packaging**~~ — **DONE.** Three-repo architecture: `marketplace-private` (team), `marketplace` (community), `dream-team-flow` (docs/CLI). `sync-config` pushes to all three.
-8. **`sonnet[1m]`** — Test for long Dream Team sessions.
-9. **`/batch` and `/simplify`** — Test as supplementary tools.
+7. **Agent Teams migration** — Wait for experimental flag to be removed. Track progress
+8. **Subagent hooks (frontmatter)** — Service-scoped editing restrictions if cross-editing becomes a problem
+9. **Plugin auto-onboarding** — Test `extraKnownMarketplaces` + `enabledPlugins` in project settings
 
 ### P3 — Monitor
-10. **HTTP hooks** — If we build a Dream Team dashboard.
-11. **Prompt hooks** — For nuanced validation.
-12. **`WorktreeCreate`/`WorktreeRemove` hooks** — Custom worktree setup.
+10. **HTTP hooks** — If we build a Dream Team dashboard
+11. **Prompt hooks** — For nuanced validation
+12. **`WorktreeCreate`/`WorktreeRemove` hooks** — Custom worktree setup
 
 ---
 
@@ -305,3 +334,4 @@ marketplace/ (or marketplace-private/)
 | 2026-03-05 | Skipped `opusplan` — DTF agent architecture already splits Opus/Sonnet | Model Configuration |
 | 2026-03-05 | Implemented three-repo plugin architecture (marketplace, marketplace-private, dream-team-flow) | Plugin System |
 | 2026-03-05 | Updated sync-config for three-repo sync | Plugin System |
+| 2026-03-05 | Reviewed all medium and low impact features — verdicts recorded | Medium/Low Impact, Priority |
