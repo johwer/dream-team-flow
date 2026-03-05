@@ -26,41 +26,45 @@ Living document tracking Claude Code platform features, how DTF relates to them,
 
 ---
 
-### Visual Testing & Browser Automation — ADOPTED
+### Visual Testing & Browser Automation
 
-**Status:** Chrome Integration is already the primary approach. The dev-workflow-checklist (Section 1) uses `gif_creator` via the Chrome extension, and agents coordinate access through the Chrome Browser Queue.
+DTF uses a two-tier approach: AppleScript as the always-available primary, Chrome extension (`--chrome`) as the enhanced path when an agent wins the queue.
 
-| Aspect | How DTF handles it |
-|--------|--------------------|
-| **Primary method** | Chrome extension (`gif_creator` tool) — click, type, read DOM, record GIFs natively |
-| **Fallback** | AppleScript → Chrome `execute javascript` (documented in `visual-testing.md`) — JS click-by-index, coordinate mapping. Used only when Chrome extension is unavailable |
-| **Port convention** | Port 3000 — Vite dev server must run on 3000 because the Chrome plugin connects there |
-| **GIF recording** | `gif_creator action=start_recording` → screenshots → `action=stop_recording` → `action=export` |
-| **Queue system** | `~/.claude/scripts/chrome-queue.sh` — file-based FIFO queue with heartbeat and stale-entry cleanup |
+| Aspect | AppleScript (primary) | Chrome Extension (enhanced) |
+|--------|----------------------|----------------------------|
+| **How it works** | `execute javascript` in Chrome tabs via AppleScript. JS click-by-index, DOM reading, navigation | `claude --chrome` flag enables MCP connection to Chrome extension. Native `gif_creator` tool |
+| **Availability** | Always — no special flags, no MCP, works in every agent session | One agent at a time — requires `--chrome` flag and winning the Chrome Browser Queue |
+| **Capabilities** | Screenshots (`screencapture`), JS execution, navigation, clicking by index | Click, type, read console, record GIFs natively, read DOM, interact with auth'd sites |
+| **GIF recording** | `screencapture -v` → `ffmpeg` conversion, or Pillow screenshot stitch | `gif_creator action=start_recording` → `action=stop_recording` → `action=export` |
+| **Reliability** | Retina coordinate issues for System Events clicks (JS clicks work fine). Tab management requires explicit tab selection | Native integration, handles tabs and modals. But only one session can connect |
+| **Documentation** | `visual-testing.md` — full patterns for JS click-by-index, accordions, toggles, radio buttons | `dev-workflow-checklist.md` Section 1 — recording steps via `gif_creator` |
 
-#### Why not `claude --chrome` on every agent?
+#### Why AppleScript stays primary
 
-The Chrome extension connects to **one Claude session at a time**. Dream Team runs 2-5 agents in parallel, each in its own tmux session. If every agent launched with `--chrome`, they would all compete for the single Chrome connection — only one would actually get it, and the rest would either fail silently or steal focus from each other.
+AppleScript doesn't use MCP. It works in every agent session without any special flags or queue coordination. When Dream Team runs 2-5 parallel agents, all of them can use AppleScript for basic visual checks (screenshots, DOM inspection, navigation) without waiting. This matters because visual verification is a hard gate — every UI agent needs it.
 
-**Solution: Chrome Browser Queue.** Agents self-organize via a shared queue file (`~/.claude/chrome/queue.txt`):
+#### How Chrome extension fits in (the queue)
 
-1. When an agent needs Chrome (visual verification phase), it calls `chrome-queue.sh join <TICKET_ID> <AGENT_NAME>`
-2. It polls `chrome-queue.sh my-turn <TICKET_ID>` — only proceeds when it's first in line
-3. It starts Vite on port 3000, records GIFs, takes screenshots
-4. When done, it calls `chrome-queue.sh done <TICKET_ID>` — this also kills port 3000 so the next agent can bind it
-5. Stale entries (no heartbeat for 3+ minutes) are auto-cleaned so a crashed agent doesn't block the queue
+The Chrome extension connects to **one Claude session at a time**. You can't launch every agent with `--chrome` — they'd compete for the single connection. DTF solves this by **reopening the worktree terminal with `--chrome`** when it's that agent's turn:
 
-This means only **one agent at a time** uses Chrome, while the rest continue their non-visual work (coding, testing, reviewing). The queue is purely file-based — no external dependencies, works across tmux sessions and worktrees.
+1. Agent needs Chrome (for GIF recording or richer interaction) → calls `chrome-queue.sh join <TICKET_ID> <AGENT_NAME>`
+2. Polls `chrome-queue.sh my-turn <TICKET_ID>` — waits until first in line
+3. **Worktree terminal reopens with `--chrome` flag** — now this agent has the MCP Chrome connection
+4. Agent starts Vite on port 3000 (Chrome plugin connects there), records GIFs via `gif_creator`, does visual work
+5. Calls `chrome-queue.sh done <TICKET_ID>` — kills port 3000 so the next agent can bind it
+6. Stale entries (no heartbeat for 3+ minutes) auto-clean so a crashed agent doesn't block the queue
 
-#### What the improvement plan originally got wrong
+The queue is purely file-based (`~/.claude/chrome/queue.txt`) — no external dependencies, works across tmux sessions and worktrees.
 
-The original comparison table listed "AppleScript → Chrome execute javascript" as DTF's current approach. This was the **old** approach. DTF migrated to Chrome extension as primary after adopting `gif_creator` and building the queue system. `visual-testing.md` still documents the AppleScript patterns as fallback reference, but the checklist (Section 1) already uses Chrome extension as the default path.
+#### Summary
 
-**Remaining action items:**
-- [x] ~~Test Chrome extension with MedHelp frontend~~ — Working, used in production
-- [x] ~~Update dev-workflow-checklist Section 1~~ — Already uses `gif_creator` and Chrome queue
-- [ ] Update `visual-testing.md` to lead with Chrome approach, move AppleScript to "Legacy Fallback" section
-- [ ] Document Chrome queue usage patterns for new agents (join → poll → work → done cycle)
+- **Most visual work** (screenshots, DOM checks, navigation) → AppleScript, no queue needed
+- **GIF recording and rich interaction** → Chrome extension via queue, terminal reopens with `--chrome`
+- Agents never sit idle waiting for Chrome — they do AppleScript-based checks or non-visual work while waiting
+
+**Action items:**
+- [ ] Document the terminal-reopen-with-chrome flow in `visual-testing.md`
+- [ ] Add Chrome queue usage examples to agent onboarding docs
 
 ---
 
@@ -178,7 +182,7 @@ The original comparison table listed "AppleScript → Chrome execute javascript"
 ## Improvement Priority
 
 ### P0 — Do Soon
-1. ~~**Chrome Integration**~~ — **DONE.** Adopted as primary. Chrome queue handles multi-agent coordination. AppleScript is fallback only.
+1. **Chrome Integration** — Two-tier system in place: AppleScript primary (no MCP needed), Chrome extension via queue for GIF recording. Document the terminal-reopen flow.
 2. **Subagent `memory`** — Add to architect and pr-reviewer. Low effort, high compound value.
 
 ### P1 — Do Next
