@@ -47,13 +47,14 @@ These commands are available globally from any project:
 **Code Review & Analysis:**
 - `/review-pr` — Review a PR with line-level GitHub comments. Auto-detects PR from current branch, or specify a PR number. Fast (API-only) or full (local worktree + builds + deeper review with `--full`)
 - `/ticket-scout` — Pre-analyze upcoming Jira tickets before sprint planning
+- `/refine-ticket` — Analyze codebase for a Jira ticket and post concrete proposal examples (data mappings, sentence templates, type combos) as a formatted comment
 
 **Team & Config:**
 - `/reviewers` — Manage pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Auto-assigned when Dream Team PRs go ready.
 - `/team-stats` — Dream Team leaderboard and history
 - `/retro-proposals` — Analyze Dream Team learnings and route improvements to destination files
 - `/pr-insights` — Surface review patterns from scraped PR data and propose convention changes
-- `/sync-config` — Push all Claude config to GitHub (private + sanitized public repos)
+- `/sync-config` — Push all Claude config to GitHub (private + sanitized public repos). New commands/skills must be added to `PLUGIN_FILES`/`PLUGIN_DIRS` in `~/.claude/scripts/sync-config.sh` to be tracked
 - `/acli-jira-cheatsheet` — Reference for ACLI Jira CLI commands
 
 ## Subagents
