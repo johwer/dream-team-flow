@@ -7,10 +7,10 @@ Dream Team Flow supports team-wide deployment via the `dtf` CLI. One command to 
 **For new team members:**
 ```bash
 # Public repo (generic):
-dtf install https://github.com/your-username/dream-team-flow
+dtf install https://github.com/johwer/dream-team-flow
 
 # With company config (de-sanitizes names, sets defaults):
-dtf install https://github.com/your-username/dream-team-flow --company-config company-config.json
+dtf install https://github.com/johwer/dream-team-flow --company-config company-config.json
 ```
 
 **Key commands:**
