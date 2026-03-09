@@ -7,13 +7,13 @@ Dream Team Flow is designed for team-wide deployment from day one. One command t
 ## One-Command Install
 
 ```bash
-dtf install https://github.com/your-username/dream-team-flow
+dtf install https://github.com/johwer/dream-team-flow
 ```
 
 The installer runs an interactive wizard, symlinks all commands, agents, and scripts into `~/.claude/`, and generates a personal config file. For team installs, pass a `company-config.json` to auto-configure everything:
 
 ```bash
-dtf install https://github.com/your-username/dream-team-flow --company-config company-config.json
+dtf install https://github.com/johwer/dream-team-flow --company-config company-config.json
 ```
 
 ### Company Config

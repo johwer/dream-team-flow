@@ -10,5 +10,6 @@
     "workflowRepo": "~/dream-team-flow"
   },
   "extraPaths": {},
-  "terminal": "Alacritty"
+  "terminal": "Alacritty",
+  "verification": "playwright-cli"
 }

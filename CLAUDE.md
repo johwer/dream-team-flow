@@ -46,8 +46,9 @@ These commands are available globally from any project:
 
 **Code Review & Analysis:**
 - `/review-pr` — Review a PR with line-level GitHub comments. Auto-detects PR from current branch, or specify a PR number. Fast (API-only) or full (local worktree + builds + deeper review with `--full`)
-- `/ticket-scout` — Pre-analyze upcoming Jira tickets before sprint planning
-- `/refine-ticket` — Analyze codebase for a Jira ticket and post concrete proposal examples (data mappings, sentence templates, type combos) as a formatted comment
+- `/ticket-scout` — Batch sprint triage: scan tickets, assign story points 1-4, verdict (READY/REFINE/PUSH BACK/SKIP)
+- `/ticket-refine` — Deep quality gate for a single ticket: push back on missing info, domain model impact, UX flows, conflicts. Depth scales with story points
+- `/ticket-examples` — On-demand code variation examples: enumerate all enum/type combinations from existing codebase patterns for a ticket
 
 **Team & Config:**
 - `/reviewers` — Manage pre-configured PR reviewers per category (frontend, backend, fullstack, infra, data). Auto-assigned when Dream Team PRs go ready.

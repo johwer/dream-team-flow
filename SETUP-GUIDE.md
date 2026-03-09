@@ -61,13 +61,13 @@ For solo use or trying it out:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-username/dream-team-flow.git
+git clone https://github.com/johwer/dream-team-flow.git
 
 # 2. Install CLI tools
 brew install tmux jq
 
 # 3. Run the installer
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow
 ```
 
 The installer will ask you:
@@ -105,7 +105,7 @@ The installer detects `company-config.json` in the repo and applies it automatic
 Your team lead shares a `company-config.json` file (via Slack, email, or internal docs):
 
 ```bash
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow \
   --company-config ~/Downloads/company-config.json
 ```
 

@@ -23,11 +23,11 @@ Install the marketplace and toolkit directly in Claude Code:
 
 ```bash
 # Team (private — unsanitized, ready to use)
-/plugin marketplace add your-username/marketplace-private
+/plugin marketplace add johwer/marketplace-private
 /plugin install claude-toolkit@marketplace-private
 
 # Community (public — sanitized, needs company config to de-sanitize)
-/plugin marketplace add your-username/marketplace
+/plugin marketplace add johwer/marketplace
 /plugin install claude-toolkit@marketplace
 ```
 
@@ -36,8 +36,8 @@ This gives you all commands (`/create-stories`, `/my-dream-team`, `/review-pr`, 
 ### Method 2: DTF CLI Install
 
 ```bash
-git clone https://github.com/your-username/dream-team-flow.git
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
+git clone https://github.com/johwer/dream-team-flow.git
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow
 brew install tmux jq
 ```
 
@@ -53,12 +53,12 @@ Use the plugin for the toolkit and the DTF CLI for company-specific setup:
 
 ```bash
 # 1. Install plugin (commands, agents, scripts)
-/plugin marketplace add your-username/marketplace-private
+/plugin marketplace add johwer/marketplace-private
 /plugin install claude-toolkit@marketplace-private
 
 # 2. Run DTF CLI for company config (Jira domain, service names, personal config)
-git clone https://github.com/your-username/dream-team-flow.git
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+git clone https://github.com/johwer/dream-team-flow.git
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow \
   --company-config company-config.json
 
 # 3. Install CLI tools
@@ -88,7 +88,7 @@ Add the marketplace to your project's `.claude/settings.json` so new team member
     "marketplace-private": {
       "source": {
         "source": "github",
-        "repo": "your-username/marketplace-private"
+        "repo": "johwer/marketplace-private"
       }
     }
   },

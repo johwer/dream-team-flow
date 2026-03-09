@@ -52,8 +52,8 @@ Dream Team Flow is split across three repos:
 
 | Repo | Visibility | Purpose |
 |------|-----------|---------|
-| **[dream-team-flow](https://github.com/your-username/dream-team-flow)** | Public | This repo — DTF documentation, improvement plan, `dtf` CLI, company config templates |
-| **[marketplace](https://github.com/your-username/marketplace)** | Public | Plugin marketplace — all commands, agents, scripts, hooks, and docs (sanitized) |
+| **[dream-team-flow](https://github.com/johwer/dream-team-flow)** | Public | This repo — DTF documentation, improvement plan, `dtf` CLI, company config templates |
+| **[marketplace](https://github.com/johwer/marketplace)** | Public | Plugin marketplace — all commands, agents, scripts, hooks, and docs (sanitized) |
 | **marketplace-private** | Private | Same plugin files, unsanitized — for team use without de-sanitization |
 
 **Why the split?**
@@ -134,26 +134,26 @@ Install the plugin marketplace and the toolkit:
 
 ```bash
 # Public (community — needs de-sanitization with company config)
-/plugin marketplace add your-username/marketplace
+/plugin marketplace add johwer/marketplace
 /plugin install claude-toolkit@marketplace
 
 # Private (team — ready to use, no de-sanitization needed)
-/plugin marketplace add your-username/marketplace-private
+/plugin marketplace add johwer/marketplace-private
 /plugin install claude-toolkit@marketplace-private
 ```
 
 ### Option B: DTF CLI Install (full setup with company config)
 
 ```bash
-git clone https://github.com/your-username/dream-team-flow.git
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow
+git clone https://github.com/johwer/dream-team-flow.git
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow
 brew install tmux jq
 ```
 
 Pass a company config for team installs:
 
 ```bash
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow \
   --company-config company-config.json
 ```
 
@@ -163,11 +163,11 @@ Use the plugin for commands/agents/scripts, and the DTF CLI for company-specific
 
 ```bash
 # 1. Install plugin (gets all commands, agents, scripts)
-/plugin marketplace add your-username/marketplace-private
+/plugin marketplace add johwer/marketplace-private
 /plugin install claude-toolkit@marketplace-private
 
 # 2. Run DTF CLI for company config (sets Jira domain, service names, personal config)
-bash dream-team-flow/scripts/dtf.sh install https://github.com/your-username/dream-team-flow \
+bash dream-team-flow/scripts/dtf.sh install https://github.com/johwer/dream-team-flow \
   --company-config company-config.json
 ```
 
