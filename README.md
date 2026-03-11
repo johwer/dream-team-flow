@@ -20,6 +20,12 @@ Run tickets in parallel with isolated worktrees and Docker — multiply your tea
 
 Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
+### [Self-learning — your standards, your pitfalls, your codebase](#adapt-to-your-codebase)
+
+Every bug found, every review comment, every best-practice article your team reads gets baked into agent prompts, coding style docs, and pre-hydrated context. The same mistake never happens twice. Standards stay consistent across every developer and every ticket — human or AI.
+
+Agents that just know "React + .NET" produce generic code. Agents that know **your** serialization gotchas, **your** idempotency rules, **your** permission model produce code that passes review on the first try.
+
 ### [Parallel everything — 4x story output or more](docs/parallel.md)
 
 Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract. Pause overnight, resume the next day from disk — zero token cost between sessions.
@@ -43,12 +49,6 @@ Every session ends with a retro that feeds improvements back into prompts and do
 Every PR gets a 7-category OWASP security scan before it reaches a human reviewer. Schema changes require Mermaid diagrams and explicit human approval — agents cannot autonomously change your data model. Quality hooks physically prevent agents from skipping steps.
 
 Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. For regulated industries, security review and change governance are built into the pipeline, not bolted on after.
-
-### [Self-learning — your standards, your pitfalls, your codebase](#adapt-to-your-codebase)
-
-Every bug found, every review comment, every best-practice article your team reads gets baked into agent prompts, coding style docs, and pre-hydrated context. The same mistake never happens twice. Standards stay consistent across every developer and every ticket — human or AI.
-
-Agents that just know "React + .NET" produce generic code. Agents that know **your** serialization gotchas, **your** idempotency rules, **your** permission model produce code that passes review on the first try.
 
 ---
 
