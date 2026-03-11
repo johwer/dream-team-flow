@@ -16,7 +16,7 @@
 
 **Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR.**
 
-Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after.
+Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after. Every session feeds learnings back into agent prompts and coding style docs — the system adapts to your codebase and gets smarter with every ticket shipped.
 
 Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
@@ -36,13 +36,19 @@ Per-ticket API costs stay predictable regardless of complexity.
 
 One command to install, one command to update. `company-config.json` auto-configures service names, Jira domain, and paths — new developers ship PRs in minutes, not days. Updates deep-merge without breaking personal config. `/ticket-scout` flags vague requirements before sprint starts. i18n ships with all languages from day one.
 
-Every session ends with a retro that feeds improvements back into prompts and docs. The team gets smarter with every ticket shipped.
+Every session ends with a retro that feeds improvements back into prompts and docs — the self-learning loop that makes the system [adapt to your codebase](#adapt-to-your-codebase) over time.
 
 ### [Secure by default — compliance without slowing down](SECURITY.md)
 
 Every PR gets a 7-category OWASP security scan before it reaches a human reviewer. Schema changes require Mermaid diagrams and explicit human approval — agents cannot autonomously change your data model. Quality hooks physically prevent agents from skipping steps.
 
 Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. For regulated industries, security review and change governance are built into the pipeline, not bolted on after.
+
+### [Self-learning — adapts to your codebase over time](#adapt-to-your-codebase)
+
+When your team discovers a critical pattern — from an article, a production incident, or a code review — that learning flows into agent prompts, coding style docs, and pre-hydrated context files. Every future ticket benefits automatically.
+
+The agents don't just know your tech stack — they know your codebase's specific patterns, pitfalls, and conventions. And they get smarter with every ticket shipped.
 
 ---
 
@@ -117,7 +123,7 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 | **[Built for Teams](docs/built-for-teams.md)** | Install, update, company config, ticket scout, i18n automation, self-learning retros |
 | **[Features](docs/features.md)** | Full feature list — team setup, orchestration, review, resilience, self-learning |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
-| **[Retrospectives](docs/retrospectives.md)** | Self-learning loop, learning destinations, feedback routing |
+| **[Self-Learning System](docs/retrospectives.md)** | Five learning channels, routing rules, destinations, compounding effect |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
 | **[Project Structure](docs/project-structure.md)** | Repo architecture — what lives where across the three repos |
 | **[Token Efficiency](docs/token-efficiency.md)** | How DTF minimizes AI costs — no MCP, deterministic nodes, disk-based memory, targeted reads |
@@ -197,14 +203,37 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ---
 
-## Tech Stack
+## Adapt to Your Codebase
+
+Dream Team Flow isn't just configurable — it **learns your codebase** through five learning channels that continuously feed knowledge into agent prompts, coding style docs, and project conventions:
+
+| Channel | Source | Example |
+|---------|--------|---------|
+| **Session retros** | Agents reflect after every ticket | "Handlers should use atomic upserts" |
+| **PR review insights** | Patterns from merged PR feedback | "6 PRs had missing i18n — add to quality gate" |
+| **Jira pushback scraping** | AI reviewer comment analysis | "Tickets without ACs get 3x more review cycles" |
+| **Research & reading** | Internet articles, docs, best-practice guides | Microservices messaging patterns from an online guide |
+| **Cross-session analysis** | Pattern detection across retros | "4 sessions mentioned soft delete confusion" |
+
+Every learning flows to the right destination — agent prompts, coding style docs, pre-hydrated context, or command logic. Both humans and AI agents read the same docs, so knowledge compounds for everyone.
+
+**Example:** Your team reads an article on microservice messaging and extracts key patterns — idempotent handlers, no sync calls from event handlers, transactional outbox. Those learnings become:
+- A new section in your backend coding style guide (repo docs, via Jira + PR)
+- A critical rule in the backend agent's prompt ("every handler MUST be idempotent")
+- Pre-hydrated context for any ticket touching message handlers
+
+New team members inherit **everything** on day one — the accumulated knowledge isn't in someone's head, it's in agent prompts, coding style docs, and context files that every session reads automatically.
+
+Read more: **[Self-Learning System](docs/retrospectives.md)** — all five channels, routing rules, destinations, and the compounding effect.
+
+### Tech Stack
 
 Built for monorepos with:
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS, RTK Query
 - **Backend:** .NET Web API, Entity Framework Core, C#
 - **Infrastructure:** Docker Compose, EF Core Migrations
 
-The agent prompts reference these technologies, but the framework is adaptable. You can modify the agent definitions to match your stack.
+Agent definitions, coding style docs, and context templates are all customizable — swap in your stack, your conventions, your domain-specific rules.
 
 ---
 

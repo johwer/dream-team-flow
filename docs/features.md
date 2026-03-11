@@ -46,5 +46,12 @@
 
 ## Self-Learning
 
-- 🔄 **Retrospectives** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
-- 🗺️ **Learning Router** — [`/team-review`](commands.md#team-review) analyzes accumulated retro learnings and routes them to the right place: personal config files are applied directly, shared repo files (CLAUDE.md, AGENTS.md, docs/) go through Jira ticket + PR for team review
+Five channels continuously feed knowledge into agent prompts, coding style docs, and project conventions:
+
+- 🔄 **Session retrospectives** — Every session ends with a team retro: agents vote on improvements, learnings are tagged with destinations and saved for routing
+- 📊 **PR review insights** — [`/pr-insights`](commands.md#pr-insights) scrapes merged PR review comments to surface recurring patterns — what reviewers keep asking for, what conventions are unclear, what mistakes repeat
+- 🎯 **Jira pushback scraping** — [`/scrape-jira-pushback`](commands.md#scrape-jira-pushback) extracts learnings from AI ticket reviewer comments — ticket quality patterns, domain knowledge gaps, requirements patterns
+- 📚 **Research & reading** — Point Claude at an internet article, documentation page, or best-practice guide — it reads the content, extracts patterns that apply to your codebase, and distributes them into agent prompts, coding style docs, and pre-hydrated context. Source URLs preserved for reference
+- 🗺️ **Cross-session analysis** — [`/retro-proposals`](commands.md#retro-proposals) analyzes accumulated retro learnings across multiple sessions to find systemic patterns and route improvements to the right destination
+
+All learnings route to agent prompts (direct apply), coding style docs (Jira + PR), or project conventions — so every future ticket benefits automatically. See **[Self-Learning System](retrospectives.md)** for the full guide.
