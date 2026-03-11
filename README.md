@@ -16,7 +16,7 @@
 
 **Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR.**
 
-Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after. Every session feeds learnings back into agent prompts and coding style docs — the system adapts to your codebase and gets smarter with every ticket shipped.
+Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after. Every bug, review comment, and best-practice article feeds back into agent prompts and coding style docs — the same mistake never happens twice.
 
 Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
 
@@ -44,11 +44,11 @@ Every PR gets a 7-category OWASP security scan before it reaches a human reviewe
 
 Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. For regulated industries, security review and change governance are built into the pipeline, not bolted on after.
 
-### [Self-learning — adapts to your codebase over time](#adapt-to-your-codebase)
+### [Self-learning — your standards, your pitfalls, your codebase](#adapt-to-your-codebase)
 
-When your team discovers a critical pattern — from an article, a production incident, or a code review — that learning flows into agent prompts, coding style docs, and pre-hydrated context files. Every future ticket benefits automatically.
+Every bug found, every review comment, every best-practice article your team reads gets baked into agent prompts, coding style docs, and pre-hydrated context. The same mistake never happens twice. Standards stay consistent across every developer and every ticket — human or AI.
 
-The agents don't just know your tech stack — they know your codebase's specific patterns, pitfalls, and conventions. And they get smarter with every ticket shipped.
+Agents that just know "React + .NET" produce generic code. Agents that know **your** serialization gotchas, **your** idempotency rules, **your** permission model produce code that passes review on the first try.
 
 ---
 
