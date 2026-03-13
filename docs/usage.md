@@ -63,13 +63,13 @@ Flags can be mixed:
 When running multiple worktrees simultaneously, each needs unique ports to avoid collisions. Dream Team Flow handles this automatically via `/create-stories`, but you can also apply it manually:
 
 ```bash
-bash ~/.claude/scripts/worktree-port-overlay.sh PROJ-1234
+bash ~/.claude/scripts/allocate-ports.sh PROJ-1234
 ```
 
 **What it does:**
-1. Copies port infrastructure files from the feature branch into the worktree
-2. Runs `allocate-ports.sh` to derive unique ports from the ticket number
-3. Marks all overlay files as invisible to git (never appears in PRs)
+1. Derives unique ports from the ticket number
+2. Generates `.env` and `.env.local` with port mappings
+3. All generated files are git-invisible (never appears in PRs)
 
 **Port scheme:**
 - Vite dev server: `31xx` (e.g., ticket 1234 → slot 47 → port 3147)
@@ -79,19 +79,21 @@ bash ~/.claude/scripts/worktree-port-overlay.sh PROJ-1234
 - `.env` — Docker Compose port mappings
 - `.env.local` — Vite proxy port overrides (appended to existing)
 - `docker-compose.worktree.yml` — Worktree API services with `-wt` suffix
-- `scripts/allocate-ports.sh`, `worktree-service.sh`, `generate-api.sh`
+
+**Scripts** (all in `~/.claude/scripts/`):
+- `allocate-ports.sh` — Unique port allocation per worktree
+- `worktree-service.sh` — Docker service management for worktrees
+- `generate-api.sh` — RTK Query codegen with worktree ports
 
 **Running worktree API services:**
 ```bash
-./scripts/worktree-service.sh up hcm-api     # Start a service
-./scripts/worktree-service.sh logs hcm-api    # Tail logs
-./scripts/worktree-service.sh down            # Stop all
-./scripts/worktree-service.sh status          # Show ports and health
+bash ~/.claude/scripts/worktree-service.sh up hcm-api     # Start a service
+bash ~/.claude/scripts/worktree-service.sh logs hcm-api    # Tail logs
+bash ~/.claude/scripts/worktree-service.sh down            # Stop all
+bash ~/.claude/scripts/worktree-service.sh status          # Show ports and health
 ```
 
 Services connect to the main stack's infrastructure (postgres, redis, rabbitmq) while running your worktree's code on separate ports.
-
-**Note:** This currently uses an overlay script that copies files from an unmerged feature branch. Once that branch merges to main, the overlay is no longer needed — `allocate-ports.sh` and the env-var-aware vite config will be available directly.
 
 ## PR Review
 

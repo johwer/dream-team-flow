@@ -41,7 +41,7 @@
 - 🚦 **TeammateIdle gate** — Hook prevents dev agents from going idle without notes, journal entries, and clean formatting
 - ✋ **TaskCompleted gate** — Hook prevents dev agents from marking tasks complete without notes, journal, code changes, and passing type checks
 - 📋 **Granular task decomposition** — Each agent gets 5-6 small tasks instead of 1-2 big ones, enabling better progress tracking and quality checkpoints
-- 🔌 **Worktree port isolation** — Each worktree gets unique ports (Vite + API services) derived from the ticket number, preventing collisions when running multiple worktrees simultaneously. Uses `allocate-ports.sh` + env-var-aware `vite.config.mts`. Overlay script applies the infrastructure transparently until the feature branch merges to main.
+- 🔌 **Worktree port isolation** — Each worktree gets unique ports (Vite + API services) derived from the ticket number, preventing collisions when running multiple worktrees simultaneously. Uses `allocate-ports.sh` + env-var-aware `vite.config.mts`. Scripts live in `~/.claude/scripts/` as permanent DTF tooling.
 - 🧹 **Orchestrator cleanup** — Worktree removal, branch deletion, tmux kill handled from outside the workspace
 
 ## Self-Learning

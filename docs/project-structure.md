@@ -100,7 +100,9 @@ marketplace/
     teammate-idle-gate.sh         # Hook: enforces quality gates before idle
     task-completed-gate.sh        # Hook: enforces quality gates before task completion
     tool-usage-log.sh             # Hook: log all tool calls for analytics
-    worktree-port-overlay.sh      # Worktree port isolation overlay
+    allocate-ports.sh                 # Unique port allocation per worktree
+    worktree-service.sh               # Docker service management for worktrees
+    generate-api.sh                   # RTK Query codegen with worktree ports
   skills/
     mermaid-diagram/              # Mermaid diagram generation skill
   docs/
