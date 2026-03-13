@@ -40,6 +40,7 @@ dream-team-flow/
     the-team.md                   # Agent roster, roles, team sizing
     retrospectives.md             # Self-learning loop and routing
     token-efficiency.md           # AI cost optimization
+    instruction-delivery.md       # How CLAUDE.md, skills, commands, agents, hooks work together
     improvement-plan.md           # Architecture decisions & roadmap
     project-structure.md          # This file
 ```
