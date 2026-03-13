@@ -34,14 +34,21 @@ The architect (Amara) analyzes the ticket and decides:
 
 ## Agent definitions
 
-Each agent is defined as a standalone subagent in [`agents/`](../agents/):
+Each agent is defined as a standalone subagent in the [marketplace](https://github.com/johwer/marketplace) repo under `agents/`:
 
-| Agent file | Model | Tools |
-|------------|-------|-------|
-| [`architect.md`](../agents/architect.md) | Opus | Read-only + Bash |
-| [`backend-dev.md`](../agents/backend-dev.md) | Sonnet | Full |
-| [`frontend-dev.md`](../agents/frontend-dev.md) | Sonnet | Full |
-| [`pr-reviewer.md`](../agents/pr-reviewer.md) | Opus | Read-only + Bash |
-| [`data-engineer.md`](../agents/data-engineer.md) | Sonnet | Full |
+| Agent file | Role | Model | Tools |
+|------------|------|-------|-------|
+| [`architect.md`](https://github.com/johwer/marketplace/blob/main/agents/architect.md) | Tech Architect | Opus | Read-only + Bash |
+| [`backend-dev.md`](https://github.com/johwer/marketplace/blob/main/agents/backend-dev.md) | Backend Developer | Sonnet | Full |
+| [`frontend-dev.md`](https://github.com/johwer/marketplace/blob/main/agents/frontend-dev.md) | Frontend Developer | Sonnet | Full |
+| [`data-engineer.md`](https://github.com/johwer/marketplace/blob/main/agents/data-engineer.md) | Data Engineer | Sonnet | Full |
+| [`infra-engineer.md`](https://github.com/johwer/marketplace/blob/main/agents/infra-engineer.md) | Infrastructure Engineer | Sonnet | Full |
+| [`pr-reviewer.md`](https://github.com/johwer/marketplace/blob/main/agents/pr-reviewer.md) | PR Reviewer | Opus | Read-only + Bash |
+| [`security-reviewer.md`](https://github.com/johwer/marketplace/blob/main/agents/security-reviewer.md) | Security Reviewer | Opus | Read-only + Bash |
+| [`functional-tester.md`](https://github.com/johwer/marketplace/blob/main/agents/functional-tester.md) | Functional Tester | Sonnet | Full |
+| [`visual-verifier.md`](https://github.com/johwer/marketplace/blob/main/agents/visual-verifier.md) | Visual Verifier | Sonnet | Full |
+| [`summary-writer.md`](https://github.com/johwer/marketplace/blob/main/agents/summary-writer.md) | Summary Writer | Sonnet | Read-only + Bash |
 
-Agents can also be used standalone outside of Dream Team: "Use the pr-reviewer subagent to review this".
+Pool agents (Ravi, Elsa) reuse the `backend-dev` and `frontend-dev` definitions — they're second instances spawned when the architect identifies 2+ independent workstreams in the same discipline.
+
+Agents can also be used standalone outside of Dream Team: "Use the security-reviewer subagent to scan this PR".

@@ -73,8 +73,13 @@ marketplace/
     architect.md                  # Architecture analysis (Opus, persistent memory)
     backend-dev.md                # .NET backend implementation (Sonnet)
     frontend-dev.md               # React/TypeScript frontend (Sonnet)
-    pr-reviewer.md                # Code review (Opus, persistent memory)
     data-engineer.md              # Data mapping & migrations (Sonnet)
+    infra-engineer.md             # EF Core migrations, Docker, schema (Sonnet)
+    pr-reviewer.md                # Code review (Opus, persistent memory)
+    security-reviewer.md          # OWASP security scanning (Opus)
+    functional-tester.md          # API + integration testing (Sonnet)
+    visual-verifier.md            # Playwright e2e tests + screenshots (Sonnet)
+    summary-writer.md             # PR summaries + how-to-test (Sonnet)
   scripts/
     dtf.sh                        # DTF CLI (install, update, doctor, contribute)
     dtf-env.sh                    # Config loader for shell scripts
