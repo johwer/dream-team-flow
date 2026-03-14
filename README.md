@@ -92,6 +92,12 @@ Ticket → Architect → Parallel Dev → Code Review → Test → PR → Human 
 
 See **[Workflow Phases](docs/workflow-phases.md)** for detailed flowcharts of full, lite, and local modes.
 
+### Understanding the Building Blocks
+
+DTF is built on Claude Code's 7 instruction delivery mechanisms — each with a specific role. Understanding when to use CLAUDE.md vs Skills vs Commands vs Agents vs Hooks is key to making the system work:
+
+**[Instruction Delivery Guide](docs/instruction-delivery.md)** — How CLAUDE.md, skills, commands, agents, hooks, memory, and plugins work together, when to use each, and common anti-patterns to avoid.
+
 ---
 
 ## Features
