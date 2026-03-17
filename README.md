@@ -14,37 +14,56 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-**Free, open-source multi-agent orchestration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a Jira ticket — get back a production-ready, security-scanned, human-reviewed PR.**
+## Why DTF?
 
-Run tickets in parallel with isolated worktrees and Docker — multiply your team's story output without multiplying headcount. Keep AI costs predictable with shell-based quality gates, disk-based memory, and agents that read only what they need — no MCP servers, no bloated context windows. Onboard new developers in minutes with one install command and shared config. Ship every PR through a 7-category OWASP security scan — built into the pipeline, not bolted on after. Every bug, review comment, and best-practice article feeds back into agent prompts and coding style docs — the same mistake never happens twice.
+Claude Code is powerful out of the box. But running it on real tickets across a team exposes three gaps:
 
-Built on Claude Code's native multi-agent architecture — subagents, hooks, task coordination, structured tool use — following Anthropic's official patterns. No wrappers, no middleware, no vendor lock-in. When Claude Code ships a new feature, Dream Team Flow uses it directly.
+1. **No memory between sessions.** Claude makes the same mistakes twice. Your conventions live in your head, not in the system.
+2. **No structure at scale.** Running 5 tickets in parallel with raw Claude means 5 sessions that don't coordinate, don't share learnings, and burn tokens on work that should be deterministic.
+3. **No guardrails you can trust.** Claude can ignore a CLAUDE.md instruction. It can skip a step. When agents run unattended, "best effort" isn't enough.
 
-### [Self-learning — your standards, your pitfalls, your codebase](#adapt-to-your-codebase)
+Dream Team Flow fills these gaps with **a flow that learns, scales, and enforces** — built entirely on Claude Code's native architecture (subagents, hooks, tasks, structured tool use). No wrappers, no middleware, no vendor lock-in.
 
-Every bug found, every review comment, every best-practice article your team reads gets baked into agent prompts, coding style docs, and pre-hydrated context. The same mistake never happens twice. Standards stay consistent across every developer and every ticket — human or AI.
+**The flow is the product, not the agents.** Agents are interchangeable. What compounds over time is the orchestration (triage → hydrate → implement → verify → ship), the quality gates (hooks that can't be bypassed), and the learning loops (hooks capture → analyze → promote → skills, conventions, scripts, or memory).
+
+**Every session makes the next one better.** 6 learning paths feed improvements back automatically. The same mistake never happens twice.
+
+**The user stays in control.** Early triage before tokens are spent. Draft PRs. Human-in-the-loop at every gate. AI proposes, human disposes.
+
+### [Self-learning — the same mistake never happens twice](#adapt-to-your-codebase)
+
+Hooks capture data automatically. 6 learning paths feed improvements back into agent prompts, coding style docs, and pre-hydrated context:
+
+| Path | Source | Destination |
+|------|--------|-------------|
+| Session retros | Agents reflect after every ticket | Agent prompts, conventions |
+| PR review mining | Patterns from merged PR feedback | Convention updates, review templates |
+| Jira pushback | AI reviewer comment analysis | Ticket triage rules |
+| Tool usage patterns | `hooks capture → analyze → promote` | Skills, conventions, scripts, or memory |
+| Research & reading | Articles, docs, best-practice guides | Backend/frontend conventions |
+| Cross-session analysis | Pattern detection across all retros | Process improvements |
 
 Agents that just know "React + .NET" produce generic code. Agents that know **your** serialization gotchas, **your** idempotency rules, **your** permission model produce code that passes review on the first try.
 
-### [Parallel everything — 4x story output or more](docs/parallel.md)
+### [Parallel everything — unlimited concurrent tickets](docs/parallel.md)
 
-Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract. Pause overnight, resume the next day from disk — zero token cost between sessions.
-
-A single developer can sustain the story output of a 4-person team — or more — because the work happens concurrently, not sequentially.
+Run as many tickets simultaneously as you want. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract. Pause overnight, resume the next day from disk — zero token cost between sessions.
 
 ### [Lean by design — cut your AI spend, not your output](docs/token-efficiency.md)
 
-Each ticket is routed to the right mode — full team, lite, or just a worktree — so trivial tickets cost zero and only complex ones get the full team. Formatting, linting, and builds run as shell scripts — zero LLM tokens. Structured handoff templates eliminate agent back-and-forth. Deadlock detection catches stuck agents at 10 minutes. CI fixes capped at 2 rounds.
-
-New in this release: **early triage checkpoint** kills tickets before pre-hydration tokens are spent — the user sees full Jira data and decides GO/SKIP/WORKTREE before any Sonnet agent runs. Pre-hydration agents are budget-capped at 30 tool uses. `MAX_THINKING_TOKENS` caps hidden reasoning cost (~70% reduction). `cost-tracker.sh` reports session costs with per-tool breakdowns — know exactly where tokens go. `phase-cost-tracker.sh` tracks costs per Dream Team phase so you can compare sessions and spot regressions.
-
-Per-ticket API costs stay predictable — and now measurable.
+| What | How | Tokens saved |
+|------|-----|-------------|
+| Formatting, linting, builds | `quality-gate.sh` (shell script) | 100% — zero LLM tokens |
+| Early triage | User decides GO/SKIP before agents run | 100% on skipped tickets |
+| Pre-hydration | Budget-capped at 30 tool uses per ticket | ~50% vs uncapped |
+| Hidden reasoning | `MAX_THINKING_TOKENS: 16000` | ~70% reduction |
+| Context management | Strategic compaction at phase boundaries | Prevents quality degradation |
+| Cost visibility | `cost-tracker.sh` + `phase-cost-tracker.sh` | Know exactly where tokens go |
+| Mode routing | Full team / lite / local per ticket | Trivial tickets cost near zero |
 
 ### [Built for teams — onboard in minutes, not days](docs/built-for-teams.md)
 
-One command to install, one command to update. `company-config.json` auto-configures service names, Jira domain, and paths — new developers ship PRs in minutes, not days. Updates deep-merge without breaking personal config. `/ticket-scout` flags vague requirements before sprint starts. i18n ships with all languages from day one.
-
-Every session ends with a retro that feeds improvements back into prompts and docs — the self-learning loop that makes the system [adapt to your codebase](#adapt-to-your-codebase) over time.
+One command to install, one command to update. `company-config.json` auto-configures service names, Jira domain, and paths — new developers ship PRs in minutes, not days. Updates deep-merge without breaking personal config. `/ticket-scout` flags vague requirements before sprint starts.
 
 ### [Secure by default — compliance without slowing down](SECURITY.md)
 
@@ -54,15 +73,13 @@ Three-tier permission ladder — personal sandbox, shared standards, team-enforc
 
 ### [Code review that filters its own false positives](docs/review-modes.md)
 
-Most AI code review produces a wall of findings — some real, some noise. Developers learn to ignore it all. DTF's `/review-pr --deep` solves this with a multi-agent validation pipeline:
+Most AI code review produces a wall of findings — some real, some noise. DTF's `/review-pr --deep` solves this:
 
 1. **4 parallel agents** review the PR (2x convention on Sonnet, 2x bug/security on Opus)
 2. **Every finding gets independently verified** by a fresh validation agent
 3. **Only confirmed issues reach you** — false positives are silently filtered out
 
-The result: fewer findings, but the ones you see are real. Combine with `--full` for local build verification — type errors and compilation failures that no diff-only reviewer can catch.
-
-Three depth levels to match the situation: **fast** (API-only, seconds), **full** (local builds), **deep** (multi-agent + validation). Mix them: `--deep --full` for maximum thoroughness on critical PRs.
+Three depth levels: **fast** (API-only, seconds), **full** (local builds), **deep** (multi-agent + validation). Combine `--deep --full` for maximum thoroughness.
 
 ---
 
