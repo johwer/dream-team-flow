@@ -50,6 +50,18 @@ Every PR gets a 7-category OWASP security scan before it reaches a human reviewe
 
 Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. For regulated industries, security review and change governance are built into the pipeline, not bolted on after.
 
+### [Code review that filters its own false positives](docs/review-modes.md)
+
+Most AI code review produces a wall of findings — some real, some noise. Developers learn to ignore it all. DTF's `/review-pr --deep` solves this with a multi-agent validation pipeline:
+
+1. **4 parallel agents** review the PR (2x convention on Sonnet, 2x bug/security on Opus)
+2. **Every finding gets independently verified** by a fresh validation agent
+3. **Only confirmed issues reach you** — false positives are silently filtered out
+
+The result: fewer findings, but the ones you see are real. Combine with `--full` for local build verification — type errors and compilation failures that no diff-only reviewer can catch.
+
+Three depth levels to match the situation: **fast** (API-only, seconds), **full** (local builds), **deep** (multi-agent + validation). Mix them: `--deep --full` for maximum thoroughness on critical PRs.
+
 ---
 
 ## Repository Architecture
@@ -110,8 +122,14 @@ DTF is built on Claude Code's 7 instruction delivery mechanisms — each with a 
 - **Stale worktree cleanup** — Merged/closed PRs detected automatically; orphan worktrees cleaned up before new ones are created
 - **Non-destructive PR updates** — PR description edits preserve manually added images and screenshots
 - **Jira completion comments** — Ticket creator auto-notified with PR link and summary when work is done
-- **Standalone PR review** — `/review-pr` reviews any PR with line-level GitHub comments via API — no local checkout needed. `--full` mode adds local builds, type checks, and test runs for deeper analysis
+- **Standalone PR review** — `/review-pr` reviews any PR with line-level GitHub comments. Three depth levels: fast (API-only), full (`--full` — local builds/tests), deep (`--deep` — 4 parallel agents + validation pass to eliminate false positives). Combine `--deep --full` for maximum depth
 - **Granular task decomposition** — 5-6 small tasks per agent instead of 1-2 big ones — better progress visibility, checkpoint-level quality enforcement, and less work lost on crashes
+- **De-sloppify pass** — Cleanup phase before commit: removes over-engineering, dead code, premature abstractions, and defensive bloat that agents naturally introduce
+- **Strategic compaction** — Proactive context management with defined compact points at phase boundaries — prevents quality degradation in long sessions
+- **Context modes** — Dev/review/research mindsets with distinct priorities and tool preferences — auto-activates for relevant commands
+- **Continuous learning from tool usage** — 4th learning path: analyze tool usage patterns, detect context gaps and struggle points, promote to skills/conventions/scripts via `/evolve`
+- **Cost tracking** — Session cost reports with relative units per tool, top sessions, and per-session breakdowns
+- **Config health scanner** — Security/health scan of your Claude Code configuration (secrets, performance, hygiene) with A-F grading
 
 See **[Features](docs/features.md)** for the full list — team setup, orchestration, review, resilience, and self-learning.
 
@@ -129,7 +147,7 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 | **[Built for Teams](docs/built-for-teams.md)** | Install, update, company config, ticket scout, i18n automation, self-learning retros |
 | **[Features](docs/features.md)** | Full feature list — team setup, orchestration, review, resilience, self-learning |
 | **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
-| **[Self-Learning System](docs/retrospectives.md)** | Five learning channels, routing rules, destinations, compounding effect |
+| **[Self-Learning System](docs/retrospectives.md)** | Six learning channels, routing rules, destinations, compounding effect |
 | **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
 | **[Project Structure](docs/project-structure.md)** | Repo architecture — what lives where across the three repos |
 | **[Token Efficiency](docs/token-efficiency.md)** | How DTF minimizes AI costs — no MCP, deterministic nodes, disk-based memory, targeted reads |
@@ -196,7 +214,14 @@ See **[Installation](docs/installation.md)** for prerequisites, team/enterprise 
 /review-pr 1670                                  # Review any PR
 ```
 
-Three modes: **Full** (multi-agent team), **Lite** (Claude decides), and **Local** (no PR/push). Flags like `--no-worktree` and `--local` can be combined.
+Three modes: **Full** (multi-agent team), **Lite** (Claude decides, same quality gates), and **Local** (no PR/push). Flags like `--no-worktree` and `--local` can be combined. Lite mode includes strategic compaction, context mode switching, and de-sloppify — same quality, fewer agents.
+
+```
+bash ~/.claude/scripts/analyze-patterns.sh           # Detect usage patterns
+/evolve                                              # Promote patterns to skills/conventions
+bash ~/.claude/scripts/cost-tracker.sh report        # Session cost report
+bash ~/.claude/scripts/config-scan.sh                # Config health check (A-F)
+```
 
 See **[Usage Guide](docs/usage.md)** for all modes, flags, PR review, and reviewer auto-assignment.
 
@@ -212,13 +237,14 @@ Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing l
 
 ## Adapt to Your Codebase
 
-Dream Team Flow isn't just configurable — it **learns your codebase** through five learning channels that continuously feed knowledge into agent prompts, coding style docs, and project conventions:
+Dream Team Flow isn't just configurable — it **learns your codebase** through six learning channels that continuously feed knowledge into agent prompts, coding style docs, and project conventions:
 
 | Channel | Source | Example |
 |---------|--------|---------|
 | **Session retros** | Agents reflect after every ticket | "Handlers should use atomic upserts" |
 | **PR review insights** | Patterns from merged PR feedback | "6 PRs had missing i18n — add to quality gate" |
 | **Jira pushback scraping** | AI reviewer comment analysis | "Tickets without ACs get 3x more review cycles" |
+| **Tool usage patterns** | Behavioral analysis from tool logs | "settings.json read 12x — add to CLAUDE.md" |
 | **Research & reading** | Internet articles, docs, best-practice guides | Microservices messaging patterns from an online guide |
 | **Cross-session analysis** | Pattern detection across retros | "4 sessions mentioned soft delete confusion" |
 
