@@ -154,6 +154,7 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 | **[Project Structure](docs/project-structure.md)** | Repo architecture — what lives where across the three repos |
 | **[Token Efficiency](docs/token-efficiency.md)** | How DTF minimizes AI costs — no MCP, deterministic nodes, disk-based memory, targeted reads |
 | **[Instruction Delivery](docs/instruction-delivery.md)** | How CLAUDE.md, skills, commands, agents, hooks, memory, and plugins work together — when to use each |
+| **[Best-in-Class Comparison](docs/comparison.md)** | Side-by-side with Stripe Minions, Claude Code best practices, and ECC across 7 categories |
 | **[Improvement Plan](docs/improvement-plan.md)** | Architecture decisions, feature comparisons with native Claude Code, prioritized roadmap |
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
 
