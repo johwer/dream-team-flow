@@ -36,7 +36,9 @@ A single developer can sustain the story output of a 4-person team — or more �
 
 Each ticket is routed to the right mode — full team, lite, or just a worktree — so trivial tickets cost zero and only complex ones get the full team. Formatting, linting, and builds run as shell scripts — zero LLM tokens. Structured handoff templates eliminate agent back-and-forth. Deadlock detection catches stuck agents at 10 minutes. CI fixes capped at 2 rounds.
 
-Per-ticket API costs stay predictable regardless of complexity.
+New in this release: **early triage checkpoint** kills tickets before pre-hydration tokens are spent — the user sees full Jira data and decides GO/SKIP/WORKTREE before any Sonnet agent runs. Pre-hydration agents are budget-capped at 30 tool uses. `MAX_THINKING_TOKENS` caps hidden reasoning cost (~70% reduction). `cost-tracker.sh` reports session costs with per-tool breakdowns — know exactly where tokens go. `phase-cost-tracker.sh` tracks costs per Dream Team phase so you can compare sessions and spot regressions.
+
+Per-ticket API costs stay predictable — and now measurable.
 
 ### [Built for teams — onboard in minutes, not days](docs/built-for-teams.md)
 
