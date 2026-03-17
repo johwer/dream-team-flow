@@ -45,7 +45,7 @@ Hooks capture data automatically. 6 learning paths feed improvements back into a
 
 Agents that just know "React + .NET" produce generic code. Agents that know **your** serialization gotchas, **your** idempotency rules, **your** permission model produce code that passes review on the first try.
 
-### [Parallel everything — unlimited concurrent tickets](docs/parallel.md)
+### [Parallel everything — your review capacity is the bottleneck, not code](docs/parallel.md)
 
 Run as many tickets simultaneously as you want. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts. Backend and frontend agents work in parallel within each ticket via a shared API contract. Pause overnight, resume the next day from disk — zero token cost between sessions.
 

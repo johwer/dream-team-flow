@@ -1,12 +1,12 @@
-# Parallel Everything — 4x Story Output or More
+# Parallel Everything — Your Review Capacity Is the Bottleneck, Not Code
 
-A single developer using Dream Team Flow can sustain the story output of a 4-person team — or more — because the work happens concurrently, not sequentially. The bottleneck stops being "how fast can one developer code" and becomes "how many tickets can your team review."
+Run as many tickets as you can review. Each ticket gets its own isolated environment — worktree, Docker stack, agent team — completely independent, zero conflicts. The bottleneck shifts from "how fast can one developer code" to "how fast can your team review and merge."
 
 ---
 
 ## Cross-Ticket Parallelism
 
-Run 4, 6, 10 tickets simultaneously. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts.
+Run as many tickets simultaneously as you want. Each ticket gets its own git worktree, its own Docker containers with isolated ports, and its own agent team — completely independent, zero conflicts.
 
 ### Isolated Worktrees
 Every ticket runs in a dedicated git worktree branched from `main`. Worktrees are created automatically by `/create-stories` or `/workspace-launch`, with npm dependencies installed and environment files copied.
