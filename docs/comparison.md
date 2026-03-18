@@ -116,9 +116,9 @@ How Dream Team Flow stacks up against the three leading approaches to AI-assiste
 |---|---|---|---|
 | Stripe | **Sub-second lint daemon** — cached background process instead of running linters per-edit | High (needs custom daemon) | Medium (saves seconds per edit, adds up) |
 | Stripe | **Selective test runs** — run only tests affected by changed files, not full suite | Medium (need test dependency graph) | High (faster CI, cheaper) |
-| Stripe | **Pre-warmed environments** — Docker images with pre-built dependencies, cached builds | Medium (Docker layer caching) | High (faster worktree startup) |
-| Claude Docs | **Interview pattern** — Claude interviews user before complex features, writes spec first | Low (prompt change) | High (surfaces unknowns early) |
-| Claude Docs | **Explore-Plan-Implement-Commit** as explicit mode switching (not just context modes) | Low (prompt change) | Medium (cleaner phase transitions) |
+| Stripe | **Pre-warmed environments** — Docker images with pre-built dependencies, cached builds | Partially done ✅ (worktrees created parallel with pre-hydration, npm i runs in background) | Remaining: Docker layer caching for faster container rebuilds |
+| Claude Docs | **Interview pattern** — Claude interviews user before complex features, writes spec first | Done ✅ (`--interview` flag) | — |
+| Claude Docs | **Explore-Plan-Implement-Commit** as explicit mode switching (not just context modes) | Done ✅ (lite mode phase gates) | — |
 | ECC | **AgentShield for config** — scan CLAUDE.md, settings, MCP, hooks for security issues | Done ✅ (`config-scan.sh`) | — |
 | ECC | **Continuous learning instincts** | Done ✅ (`analyze-patterns.sh` + `/evolve`) | — |
 | ECC | **TDD-first enforcement** — dedicated TDD agent that enforces RED-GREEN-REFACTOR | Medium (new agent definition) | Medium (better test quality) |
