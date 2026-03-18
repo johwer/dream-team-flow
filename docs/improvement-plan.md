@@ -298,6 +298,7 @@ marketplace/ (or marketplace-private/)
 - [x] **Plugin packaging** — Three-repo architecture: marketplace-private, marketplace, dream-team-flow (2026-03-05)
 - [x] ~~**`opusplan`**~~ — Skipped. DTF's agent architecture already splits Opus/Sonnet
 - [x] ~~**`/batch`**~~ — Skipped. `/create-stories` covers ticket-level parallelism; `/batch` available natively for file-level changes
+- [x] **Community skills (2026-03-17)** — Added 6 skills from aihero.dev + mattpocock comparison: `/tdd`, `/triage-issue`, `/design-an-interface`, `/request-refactor-plan`, `/improve-codebase-architecture`, `/grill-me`. Wired into flows: dev agents auto-load `/tdd`, `/my-dream-team` suggests triage/design pre-flight, `/improve-codebase-architecture` escalates to refactor-plan for 3+ findings
 
 ### P0 — Do Soon
 ~~1. **Chrome Integration docs** — Done (2026-03-06). Added Chrome queue flow to `visual-testing.md`~~
@@ -335,3 +336,7 @@ marketplace/ (or marketplace-private/)
 | 2026-03-05 | Implemented three-repo plugin architecture (marketplace, marketplace-private, dream-team-flow) | Plugin System |
 | 2026-03-05 | Updated sync-config for three-repo sync | Plugin System |
 | 2026-03-05 | Reviewed all medium and low impact features — verdicts recorded | Medium/Low Impact, Priority |
+| 2026-03-17 | Added 6 community skills: `/tdd`, `/triage-issue`, `/design-an-interface`, `/request-refactor-plan`, `/improve-codebase-architecture`, `/grill-me` | Skills System |
+| 2026-03-17 | Wired skills into flows: dev agents auto-load `/tdd`; `/my-dream-team` pre-flight suggests triage/design; `/improve-codebase-architecture` escalates to refactor-plan | Skills System |
+| 2026-03-17 | Updated `docs/commands.md` with Skills section | Skills System |
+| 2026-03-17 | Marked ECC TDD-first + mattpocock items as Done in comparison.md | Comparison |
