@@ -55,6 +55,25 @@ Categories: `frontend`, `backend`, `fullstack`, `infra`, `data`
 
 PRs stay as **drafts** until the user explicitly confirms. When the user says "ship it", the PR is marked ready and reviewers are auto-assigned based on the ticket scope category.
 
+## Skills
+
+Skills are auto-loaded context injected into the right agent at the right moment — via `autoTrigger` phrases or `skills:` frontmatter in agent definitions. You don't invoke them like commands; they activate automatically or you can call them by name.
+
+| Skill | Triggers on | What it does |
+|-------|-------------|-------------|
+| `/triage-issue` | "triage", bug report | Explore codebase → root cause → TDD fix plan → Jira ticket |
+| `/design-an-interface` | "design it twice", new service/API | 3 parallel sub-agents with radically different constraints → pick best |
+| `/request-refactor-plan` | "refactor plan", "RFC" | Interview → verify → tiny commits → Jira ticket |
+| `/tdd` | "tdd", "test-driven" | Red-green-refactor loop — confirms interface before writing implementation |
+| `/improve-codebase-architecture` | "improve architecture", "audit" | P1/P2 audit → suggests `/request-refactor-plan` for 3+ findings |
+| `/grill-me` | "grill me on X" | Design-tree interview — flesh out ideas before writing code or tickets |
+
+### How skills wire into the Dream Team flow
+
+- **`/my-dream-team`** — suggests `/triage-issue` for bug tickets, `/design-an-interface` for new service/API tickets (pre-flight, non-blocking)
+- **`backend-dev` and `frontend-dev` agents** — auto-load `/tdd` via `skills:` frontmatter
+- **`/improve-codebase-architecture`** — suggests `/request-refactor-plan` when 3+ P1/P2 findings exist
+
 ## Analysis & Learning
 
 | Command | Description |
