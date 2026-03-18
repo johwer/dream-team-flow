@@ -121,4 +121,11 @@ How Dream Team Flow stacks up against the three leading approaches to AI-assiste
 | Claude Docs | **Explore-Plan-Implement-Commit** as explicit mode switching (not just context modes) | Done ✅ (lite mode phase gates) | — |
 | ECC | **AgentShield for config** — scan CLAUDE.md, settings, MCP, hooks for security issues | Done ✅ (`config-scan.sh`) | — |
 | ECC | **Continuous learning instincts** | Done ✅ (`analyze-patterns.sh` + `/evolve`) | — |
-| ECC | **TDD-first enforcement** — dedicated TDD agent that enforces RED-GREEN-REFACTOR | Medium (new agent definition) | Medium (better test quality) |
+| ECC | **TDD-first enforcement** — dedicated TDD agent that enforces RED-GREEN-REFACTOR | Done ✅ (`/tdd` skill — confirms interface → red → green → refactor, auto-detects Vitest vs xUnit) | — |
+| Community (mattpocock) | **Triage-issue** — codebase exploration → root cause → TDD fix plan → Jira ticket | Done ✅ (`/triage-issue` skill) | — |
+| Community (mattpocock) | **Design-an-interface** — "Design It Twice": 3 parallel sub-agents with different constraints, pick the best | Done ✅ (`/design-an-interface` skill) | — |
+| Community (mattpocock) | **Request-refactor-plan** — interview → codebase verify → tiny commits → Jira ticket | Done ✅ (`/request-refactor-plan` skill) | — |
+| Community (mattpocock) | **Improve-codebase-architecture** — P1/P2 audit for confusing boundaries, shallow modules, tight coupling | Done ✅ (`/improve-codebase-architecture` skill) | — |
+| Community (aihero.dev) | **Grill-me** — design-tree interview to flesh out ideas before writing code or tickets | Done ✅ (`/grill-me` skill — marketplace only, not wired into main flow) | — |
+| Stripe | **Sub-second lint daemon** — cached background process instead of running linters per-edit | High (needs custom daemon) | Medium (saves seconds per edit, adds up) |
+| Stripe | **Selective test runs** — run only tests affected by changed files, not full suite | Medium (need test dependency graph) | High (faster CI, cheaper) |
