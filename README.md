@@ -133,24 +133,33 @@ DTF is built on Claude Code's 7 instruction delivery mechanisms — each with a 
 
 ## Features
 
+### New — Role-Based Flows
+- **12 roles** — Frontend, Backend, Fullstack, Data Engineer, Data Analyst, Infra/DevOps, QA/Tester, UAT Stakeholder, PO, Sales, Marketing, Customer Ops
+- **Custom workflow steps** — Automated checks (⚡) and reminders (📋) at 5 phases: on-start, before-commit, before-push, before-pr, after-pr. Add, remove, customize anytime with `dtf steps`
+- **`dtf configure`** — Set or change role and steps for existing users (no reinstall)
+- **`/infra-ticket`** — Full Terraform workflow: Jira → branch → plan → PR with structured plan summary
+
+### New — Performance & Code Quality
+- **Performance skills** — Frontend (Core Web Vitals, bundle, React 19), Backend (EF Core, N+1, caching), AWS (CloudWatch, RDS, cost optimization)
+- **Code insights** — Opt-in refactoring nudges on your changed files + DTO analysis with mermaid diagrams for PR descriptions
+- **Memory hygiene** — Automatic memory health check at session start (0 token cost bash script)
+- **15 external plugins** — Trail of Bits security (3.8k stars), Vercel React (21k stars), dotnet-skills (658 stars), codebase auditors, and more
+
+### Core
 - **Parallel context pre-hydration** — All tickets analyzed in parallel before sessions start
 - **Dynamic team sizing** — Architect spawns only the agents the ticket needs
 - **Draft PR from the start** — Created after architecture analysis; stays draft until user explicitly confirms
 - **Drift detection** — Build baseline captured before implementation, compared before push — regressions caught locally, not in CI
 - **Crash recovery** — Agents write notes to disk; crashed agents respawn with full context
 - **Stale worktree cleanup** — Merged/closed PRs detected automatically; orphan worktrees cleaned up before new ones are created
-- **Non-destructive PR updates** — PR description edits preserve manually added images and screenshots
-- **Jira completion comments** — Ticket creator auto-notified with PR link and summary when work is done
-- **Standalone PR review** — `/review-pr` reviews any PR with line-level GitHub comments. Three depth levels: fast (API-only), full (`--full` — local builds/tests), deep (`--deep` — 4 parallel agents + validation pass to eliminate false positives). Combine `--deep --full` for maximum depth
-- **Granular task decomposition** — 5-6 small tasks per agent instead of 1-2 big ones — better progress visibility, checkpoint-level quality enforcement, and less work lost on crashes
-- **De-sloppify pass** — Cleanup phase before commit: removes over-engineering, dead code, premature abstractions, and defensive bloat that agents naturally introduce
-- **Strategic compaction** — Proactive context management with defined compact points at phase boundaries — prevents quality degradation in long sessions
-- **Context modes** — Dev/review/research mindsets with distinct priorities and tool preferences — auto-activates for relevant commands
-- **Continuous learning from tool usage** — 4th learning path: analyze tool usage patterns, detect context gaps and struggle points, promote to skills/conventions/scripts via `/evolve`
-- **Cost tracking** — Session cost reports with relative units per tool, top sessions, and per-session breakdowns
-- **Config health scanner** — Security/health scan of your Claude Code configuration (secrets, performance, hygiene) with A-F grading
+- **Standalone PR review** — `/review-pr` reviews any PR with line-level GitHub comments. Three depth levels: fast, full (`--full`), deep (`--deep` — 4 parallel agents + validation)
+- **De-sloppify pass** — Cleanup phase before commit: removes over-engineering, dead code, premature abstractions
+- **Strategic compaction** — Proactive context management at phase boundaries
+- **Context modes** — Dev/review/research mindsets with distinct priorities
+- **Self-learning** — 6 learning paths: session retros, PR mining, Jira scraping, tool usage patterns, research, cross-session analysis
+- **Cost tracking** — Session cost reports, config health scanner (A-F grading)
 
-See **[Features](docs/features.md)** for the full list — team setup, orchestration, review, resilience, and self-learning.
+See **[Features](docs/features.md)** for the full list.
 
 ---
 
@@ -158,22 +167,23 @@ See **[Features](docs/features.md)** for the full list — team setup, orchestra
 
 | Guide | Description |
 |-------|-------------|
-| **[Installation](docs/installation.md)** | Prerequisites, install methods (plugin + dtf CLI), team setup |
+| **[Installation](docs/installation.md)** | Prerequisites, install methods, role selection, workflow steps |
+| **[Built for Teams](docs/built-for-teams.md)** | Role-based setup, company config, `dtf configure`, `dtf steps`, onboarding |
+| **[The Team](docs/the-team.md)** | 29 agents in 8 domains, per-role loading, team sizing, personas |
 | **[Usage](docs/usage.md)** | Modes (full, lite, local), flags, PR review, reviewer auto-assignment |
-| **[Commands](docs/commands.md)** | All slash commands, flags, DTF CLI, typical workflow |
-| **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes with comparison table |
-| **[Parallel Everything](docs/parallel.md)** | Cross-ticket parallelism, Docker isolation, pause/resume, Chrome queue, merge pre-check |
-| **[Built for Teams](docs/built-for-teams.md)** | Install, update, company config, ticket scout, i18n automation, self-learning retros |
-| **[Features](docs/features.md)** | Full feature list — team setup, orchestration, review, resilience, self-learning |
-| **[The Team](docs/the-team.md)** | Agent roster, roles, dynamic team sizing, agent definitions |
-| **[Self-Learning System](docs/retrospectives.md)** | Six learning channels, routing rules, destinations, compounding effect |
-| **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation, deny rules, bypass mode |
+| **[Commands](docs/commands.md)** | All slash commands including `/infra-ticket`, DTF CLI |
+| **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes |
+| **[Parallel Everything](docs/parallel.md)** | Cross-ticket parallelism, Docker isolation, pause/resume |
+| **[Worktree Port Setup](docs/worktree-port-setup.md)** | How to adapt Vite, Docker, and ports for any project |
+| **[Features](docs/features.md)** | Full feature list — orchestration, review, resilience, self-learning |
+| **[Self-Learning System](docs/retrospectives.md)** | Six learning channels, routing rules, compounding effect |
+| **[Security Guide](SECURITY.md)** | Security ladder (3 levels), sandbox, network isolation |
+| **[Token Efficiency](docs/token-efficiency.md)** | Cost architecture: baseline ~5,750 tokens, everything else on-demand |
+| **[Instruction Delivery](docs/instruction-delivery.md)** | How CLAUDE.md, skills, commands, agents, hooks, memory work together |
 | **[Project Structure](docs/project-structure.md)** | Repo architecture — what lives where across the three repos |
-| **[Token Efficiency](docs/token-efficiency.md)** | How DTF minimizes AI costs — no MCP, deterministic nodes, disk-based memory, targeted reads |
-| **[Instruction Delivery](docs/instruction-delivery.md)** | How CLAUDE.md, skills, commands, agents, hooks, memory, and plugins work together — when to use each |
-| **[Best-in-Class Comparison](docs/comparison.md)** | Side-by-side with Stripe Minions, Claude Code best practices, and ECC across 7 categories |
-| **[Improvement Plan](docs/improvement-plan.md)** | Architecture decisions, feature comparisons with native Claude Code, prioritized roadmap |
-| **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config creation, DTF CLI, lifecycle walkthrough, troubleshooting |
+| **[Best-in-Class Comparison](docs/comparison.md)** | Side-by-side with Stripe Minions, Claude Code best practices, and ECC |
+| **[Improvement Plan](docs/improvement-plan.md)** | Architecture decisions, prioritized roadmap |
+| **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config, DTF CLI, troubleshooting |
 
 ---
 
@@ -228,22 +238,36 @@ See **[Installation](docs/installation.md)** for prerequisites, team/enterprise 
 
 ## Usage
 
+### Daily Work
 ```
 /create-stories PROJ-1234                        # Full lifecycle — ticket to PR
 /my-dream-team --lite <ticket>                   # Claude decides agent usage
+/infra-ticket PROJ-2345                          # Terraform workflow — Jira to PR
 /review-pr 1670                                  # Review any PR
 ```
 
-Three modes: **Full** (multi-agent team), **Lite** (Claude decides, same quality gates), and **Local** (no PR/push). Flags like `--no-worktree` and `--local` can be combined. Lite mode includes strategic compaction, context mode switching, and de-sloppify — same quality, fewer agents.
-
+### Your Workflow
 ```
+dtf configure                                    # Pick role, customize steps
+dtf steps list                                   # See your steps
+dtf steps add                                    # Add a custom check or reminder
+```
+
+### Code Quality
+```
+/code-insights                                   # Refactoring nudges + DTO analysis on your diff
+/code-review                                     # Official 4-agent diff review
+```
+
+### Analytics
+```
+bash ~/.claude/scripts/memory-health.sh              # Memory health (0 tokens)
 bash ~/.claude/scripts/analyze-patterns.sh           # Detect usage patterns
-/evolve                                              # Promote patterns to skills/conventions
 bash ~/.claude/scripts/cost-tracker.sh report        # Session cost report
 bash ~/.claude/scripts/config-scan.sh                # Config health check (A-F)
 ```
 
-See **[Usage Guide](docs/usage.md)** for all modes, flags, PR review, and reviewer auto-assignment.
+Three modes: **Full** (multi-agent team), **Lite** (Claude decides, same quality gates), and **Local** (no PR/push). See **[Usage Guide](docs/usage.md)** for all modes, flags, and reviewer auto-assignment.
 
 ---
 
@@ -294,11 +318,24 @@ Read more: **[Self-Learning System](docs/retrospectives.md)** — all five chann
 ### Tech Stack
 
 Built for monorepos with:
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, RTK Query
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, RTK Query
 - **Backend:** .NET Web API, Entity Framework Core, C#
-- **Infrastructure:** Docker Compose, EF Core Migrations
+- **Infrastructure:** Terraform, AWS, Docker Compose, GitHub Actions
 
 Agent definitions, coding style docs, and context templates are all customizable — swap in your stack, your conventions, your domain-specific rules.
+
+### By the Numbers
+
+| What | Count |
+|------|-------|
+| Agents | 29 (in 8 domains) |
+| Skills | 42+ (conventions, performance, workflows, security, marketing) |
+| Commands | 21 (orchestration, review, triage, infra, analytics) |
+| Scripts | 33 (quality gates, terraform, memory, cost tracking) |
+| Roles | 12 (dev, data, infra, QA, PO, sales, marketing, ops) |
+| External plugins | 15+ (Trail of Bits, Vercel, dotnet-skills, audit suite) |
+| Token baseline | ~5,750 per prompt (0.6% of context) |
+| Everything else | 0 tokens until used |
 
 ---
 
