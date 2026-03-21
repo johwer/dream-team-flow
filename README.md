@@ -326,6 +326,7 @@ Agent definitions, coding style docs, and context templates are all customizable
 
 ### By the Numbers
 
+<!-- STATS:START -->
 | What | Count |
 |------|-------|
 | Agents | 29 (in 8 domains) |
@@ -333,9 +334,9 @@ Agent definitions, coding style docs, and context templates are all customizable
 | Commands | 21 (orchestration, review, triage, infra, analytics) |
 | Scripts | 33 (quality gates, terraform, memory, cost tracking) |
 | Roles | 12 (dev, data, infra, QA, PO, sales, marketing, ops) |
-| External plugins | 15+ (Trail of Bits, Vercel, dotnet-skills, audit suite) |
 | Token baseline | ~5,750 per prompt (0.6% of context) |
 | Everything else | 0 tokens until used |
+<!-- STATS:END -->
 
 ---
 
