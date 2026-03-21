@@ -325,12 +325,11 @@ Built for monorepos with:
 Agent definitions, coding style docs, and context templates are all customizable — swap in your stack, your conventions, your domain-specific rules.
 
 ### By the Numbers
-
 <!-- STATS:START -->
 | What | Count |
 |------|-------|
 | Agents | 29 (in 8 domains) |
-| Skills | 42+ (conventions, performance, workflows, security, marketing) |
+| Skills | 74+ (conventions, performance, workflows, security, marketing) |
 | Commands | 21 (orchestration, review, triage, infra, analytics) |
 | Scripts | 33 (quality gates, terraform, memory, cost tracking) |
 | Roles | 12 (dev, data, infra, QA, PO, sales, marketing, ops) |
