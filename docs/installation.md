@@ -43,9 +43,12 @@ brew install tmux jq
 
 The installer:
 1. Asks your name, GitHub username, monorepo path, and terminal preference
-2. Symlinks all commands, scripts, agents, and skills into `~/.claude/`
-3. Generates your personal `CLAUDE.md` with your settings
-4. Merges hooks into `settings.json`
+2. **Asks your role** (12 roles: Frontend Dev, Backend Dev, Fullstack, Data Engineer, Data Analyst, Infra/DevOps, QA/Tester, UAT Stakeholder, PO, Sales, Marketing, Customer Ops)
+3. **Shows default workflow steps** for your role — you can customize, add, or remove
+4. **Recommends external plugins** based on your role
+5. Symlinks all commands, scripts, agents, and skills into `~/.claude/`
+6. Generates your personal `CLAUDE.md` with your settings
+7. Merges hooks into `settings.json`
 
 ### Method 3: Plugin + DTF CLI (recommended for teams)
 
@@ -107,8 +110,11 @@ Add the marketplace to your project's `.claude/settings.json` so new team member
 
 **DTF CLI:**
 ```bash
-dtf update    # Pull latest, verify symlinks, regenerate CLAUDE.md
-dtf doctor    # Health check — config, symlinks, tools
+dtf update      # Pull latest, verify symlinks, regenerate CLAUDE.md
+dtf configure   # Set or change role and workflow steps (existing users)
+dtf steps list  # See your current workflow steps
+dtf steps add   # Add a custom step (automated check or reminder)
+dtf doctor      # Health check — config, symlinks, tools
 ```
 
 ## macOS Permissions

@@ -7,29 +7,55 @@ Dream Team Flow is designed for team-wide deployment from day one. One command t
 ## One-Command Install
 
 ```bash
-dtf install https://github.com/johwer/dream-team-flow
+dtf install <REPO_URL> --company-config company-config.json
 ```
 
-The installer runs an interactive wizard, symlinks all commands, agents, and scripts into `~/.claude/`, and generates a personal config file. For team installs, pass a `company-config.json` to auto-configure everything:
+The installer runs an interactive wizard:
+1. Name, GitHub username, monorepo path, terminal
+2. **Role selection** — 12 roles: Developer (Frontend/Backend/Fullstack), Data Engineer, Data Analyst, Infra/DevOps, QA/Tester, UAT Stakeholder, PO, Sales, Marketing, Customer Ops
+3. **Workflow steps** — default steps per role, customize right away
+4. Extra project paths from company config
 
-```bash
-dtf install https://github.com/johwer/dream-team-flow --company-config company-config.json
-```
+Your role determines which agents (3-7 of 29), skills, and default workflow steps you get.
 
 ### Company Config
 
 Shared by the team lead, contains:
 - Project/repo name, Jira domain, ticket prefix
 - Service name mappings (any number)
+- **Role definitions** with agent/skill mappings per role
 - Default paths and extra project-specific paths
 - During install, all generic placeholder names get replaced with real ones
 
 ### Personal Config
 
-`~/.claude/dtf-config.json` — per-user, never committed:
+`~/.claude/dtf-config.json` (version 2) — per-user, never committed:
+- **Role** and role config (agents, skills)
+- **Workflow steps** (automated checks + reminders per phase)
 - Monorepo path, worktree parent, terminal preference
 - Extra paths (from company config + user-added)
-- All commands read this config and adapt automatically
+
+### Existing Users — Add Role Later
+
+```bash
+dtf configure    # Pick role, get defaults, customize steps
+```
+
+No reinstall needed. Preserves all existing paths and settings.
+
+### Custom Workflow Steps
+
+Every role gets default steps. Customize anytime:
+
+```bash
+dtf steps list     # See steps grouped by phase
+dtf steps add      # Add automated check or reminder
+dtf steps remove   # Remove a step
+dtf steps reset    # Reset to role defaults
+```
+
+Two types: ⚡ automated (runs command) and 📋 reminder (checklist).
+Five phases: on-start, before-commit, before-push, before-pr, after-pr.
 
 ### Health Check
 
@@ -37,7 +63,7 @@ Shared by the team lead, contains:
 dtf doctor
 ```
 
-Verifies the entire installation: config files, required tools (jq, tmux, gh, git), optional tools (acli), symlink integrity, CLAUDE.md existence, and terminal configuration. Reduces onboarding support from 30-minute debugging sessions to 5-minute self-service.
+Verifies the entire installation: config files, required tools (jq, tmux, gh, git), optional tools (acli), symlink integrity, CLAUDE.md existence, and terminal configuration.
 
 ---
 
