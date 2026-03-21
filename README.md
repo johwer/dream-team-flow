@@ -63,7 +63,7 @@ Run as many tickets simultaneously as you want. Each ticket gets its own git wor
 
 ### [Built for teams — onboard in minutes, not days](docs/built-for-teams.md)
 
-One command to install, one command to update. `company-config.json` auto-configures service names, Jira domain, and paths — new developers ship PRs in minutes, not days. Updates deep-merge without breaking personal config. `/ticket-scout` flags vague requirements before sprint starts.
+One command to install, role-based setup, customizable workflow steps. `company-config.json` auto-configures service names, Jira domain, paths, and role definitions. 12 roles: Developer (Frontend/Backend/Fullstack), Data Engineer, Data Analyst, Infra/DevOps, QA/Tester, UAT Stakeholder, Product Owner, Sales, Marketing, Customer Operations. Each role gets tailored agents, skills, and default workflow steps. `dtf configure` lets existing users add their role anytime. `dtf steps` manages personal workflow steps (automated checks + reminders).
 
 ### [Secure by default — compliance without slowing down](SECURITY.md)
 
@@ -249,7 +249,19 @@ See **[Usage Guide](docs/usage.md)** for all modes, flags, PR review, and review
 
 ## The Team
 
-11 specialized agents — architect, backend/frontend developers, data engineer, infra, reviewer, tester, visual verifier, and summary writer. The architect analyzes each ticket and dynamically spawns only the agents needed: 2-3 for simple changes, the full team for complex multi-service work.
+29 specialized agents across 8 domains — engineering, data, design, infrastructure, marketing, operations, product, and testing. Your role determines which agents load (3-7 per role, not all 29). The architect analyzes each ticket and dynamically spawns only the agents needed.
+
+```
+engineering/     (7)  frontend-dev, backend-dev, architect, pr-reviewer,
+                      api-designer, performance-analyst, migration-planner
+data/            (4)  data-engineer, data-analyst, pipeline-builder, insights-reporter
+design/          (2)  ui-designer, ux-researcher
+infrastructure/  (3)  infra-engineer, ci-cd-engineer, security-auditor
+marketing/       (4)  marketing-ops, sales-enablement, content-creator, social-strategist
+operations/      (2)  customer-ops, support-responder
+product/         (3)  po-analyst, requirements-analyst, sprint-prioritizer
+testing/         (4)  qa-tester, uat-tester, api-tester, performance-benchmarker
+```
 
 Read more: **[The Team](docs/the-team.md)** — full agent roster, team sizing logic, and agent definitions.
 
@@ -312,11 +324,16 @@ marketplace/ (or marketplace-private/)  ← Plugin repos: commands + agents + sc
 ├── .claude-plugin/
 │   ├── marketplace.json            # Plugin catalog
 │   └── plugin.json                 # Plugin manifest
-├── commands/                       # All slash commands
-├── agents/                         # Agent definitions
-├── scripts/                        # Shell scripts (quality gates, hooks, etc.)
-├── skills/                         # Agent skills (mermaid diagrams, etc.)
-└── docs/                           # Operational docs (checklist, learning system)
+├── commands/                       # 21 slash commands
+├── agents/                         # 29 agents in 8 domain subdirectories
+│   ├── engineering/                # frontend-dev, backend-dev, architect, pr-reviewer, ...
+│   ├── data/                       # data-engineer, data-analyst, pipeline-builder, ...
+│   ├── infrastructure/             # infra-engineer, ci-cd-engineer, security-auditor
+│   ├── testing/                    # qa-tester, uat-tester, api-tester, ...
+│   └── ...                         # design, marketing, operations, product
+├── scripts/                        # 33 shell scripts (quality gates, terraform, hooks, etc.)
+├── skills/                         # 42+ skills (conventions, performance, workflows, etc.)
+└── docs/                           # Operational docs (dtf-roles, checklist, learning system)
 ```
 
 See **[Project Structure](docs/project-structure.md)** for the full annotated file tree.
