@@ -63,9 +63,9 @@ Every role gets default workflow steps. Customize with `dtf steps add` — autom
 
 Token baseline **~5,750 per prompt** (0.6% of context). Formatting, linting, builds run as shell scripts (0 tokens). Skills and agents load on-demand. Memory hygiene at session start prevents bloat. See **[Token Efficiency](docs/token-efficiency.md)**.
 
-### Secure Setup
+### [Secure Setup](SECURITY.md)
 
-Skills are scanned from the marketplace. `company-config.json` defines exactly which agents, skills, and roles your team gets — no surprises. Three-tier permission ladder, OWASP scanning on every PR, quality hooks that can't be bypassed. See **[Security Guide](SECURITY.md)**.
+DTF security is built into the configuration files, not into manual approval. `company-config.json` defines exactly which agents, skills, and roles each person gets. `settings.json` controls permissions, sandbox mode, network isolation, and allowed commands — applied across the team via `dtf install`. Three levels: personal sandbox → project allowlist → team-enforced lockdown. See **[Security Guide](SECURITY.md)**.
 
 ---
 
