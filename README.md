@@ -14,11 +14,13 @@
 
 > **Beta** — Actively developed and used in production, but expect breaking changes between updates. Feedback and contributions welcome.
 
-## What is DTF?
+## Pick Your Role. Build Your Flow.
 
-Dream Team Flow gives every role on your team an AI-powered workflow — not just developers. Pick your role, get tailored agents, skills, and workflow steps. One CLI to install, one command to customize.
+Dream Team Flow gives every role on your team an AI-powered workflow tailored to how you actually work. Developers get multi-agent teams and code review. Infra gets Terraform automation. POs get ticket triage. Sales gets pitch decks. Everyone gets the best version of their workflow — not a one-size-fits-all.
 
-**The flow is the product, not the agents.** Agents are interchangeable. What compounds over time is the orchestration, quality gates, and learning loops. Every session makes the next one better.
+Pick your role → get agents, skills, and workflow steps designed for you → customize with your own checks and reminders → every session makes the next one better.
+
+**The flow is the product, not the agents.** Agents are interchangeable. What compounds over time is the orchestration, quality gates, and learning loops that adapt to your team.
 
 ---
 
