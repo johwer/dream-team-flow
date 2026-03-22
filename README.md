@@ -94,6 +94,7 @@ See **[Security Guide](SECURITY.md)**.
 | **[Instruction Delivery](docs/instruction-delivery.md)** | How CLAUDE.md, skills, agents, hooks work together |
 | **[Comparison](docs/comparison.md)** | DTF vs Stripe Minions, Claude Docs, ECC |
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config, troubleshooting |
+| **[Changelog](CHANGELOG.md)** | Version history — what's new, what changed |
 
 ---
 <!-- STATS:START -->
