@@ -55,9 +55,9 @@ See **[Installation](docs/installation.md)** for all methods, prerequisites, and
 
 6 learning paths capture what went wrong and feed it back — into agent prompts, coding style docs, and triage rules. New team members inherit everything on day one. See **[Self-Learning System](docs/retrospectives.md)**.
 
-### Build Your Own Workflow
+### [Build Your Own Workflow](docs/workflow-steps.md)
 
-Every role gets default workflow steps. Customize with `dtf steps add` — automated checks (⚡ runs a command) and reminders (📋 you confirm) at 5 phases. See your role guide for defaults and examples.
+Every role gets default workflow steps. Customize with `dtf steps add` — automated checks (⚡ runs a command) and reminders (📋 you confirm) at 5 phases. See **[Workflow Steps Guide](docs/workflow-steps.md)** for setup, examples, and defaults per role.
 
 ### Cost-First Architecture
 
@@ -74,7 +74,8 @@ Skills are scanned from the marketplace. `company-config.json` defines exactly w
 | Guide | Description |
 |-------|-------------|
 | **[Installation](docs/installation.md)** | Prerequisites, install methods, role selection |
-| **[Built for Teams](docs/built-for-teams.md)** | Company config, `dtf configure`, `dtf steps`, onboarding |
+| **[Workflow Steps](docs/workflow-steps.md)** | Build your own workflow — add, remove, customize steps per phase |
+| **[Built for Teams](docs/built-for-teams.md)** | Company config, `dtf configure`, onboarding |
 | **[The Team](docs/the-team.md)** | 29 agents in 8 domains, per-role loading, team sizing |
 | **[Features](docs/features.md)** | Complete feature list by role + shared features |
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes |
