@@ -96,7 +96,6 @@ See **[Security Guide](SECURITY.md)**.
 | **[Setup Guide](SETUP-GUIDE.md)** | Full reference — company config, troubleshooting |
 
 ---
-
 <!-- STATS:START -->
 | What | Count |
 |------|-------|
