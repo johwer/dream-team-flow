@@ -65,7 +65,15 @@ Token baseline **~5,750 per prompt** (0.6% of context). Formatting, linting, bui
 
 ### [Secure Setup](SECURITY.md)
 
-DTF security is built into the configuration files, not into manual approval. `company-config.json` defines exactly which agents, skills, and roles each person gets. `settings.json` controls permissions, sandbox mode, network isolation, and allowed commands — applied across the team via `dtf install`. Three levels: personal sandbox → project allowlist → team-enforced lockdown. See **[Security Guide](SECURITY.md)**.
+DTF security is built into the configuration files, not into manual approval. `company-config.json` defines exactly which agents, skills, and roles each person gets. `settings.json` controls permissions, sandbox mode, network isolation, and allowed commands — applied across the team via `dtf install`. Three levels: personal sandbox → project allowlist → team-enforced lockdown.
+
+Scan your setup anytime — checks secrets, skill injection patterns, permissions, company config, and MCP surface:
+
+```bash
+bash ~/.claude/scripts/config-scan.sh    # Grades A-F
+```
+
+See **[Security Guide](SECURITY.md)**.
 
 ---
 
