@@ -1,11 +1,20 @@
 # Features
 
+## Role-Based Flows
+
+- 🎭 **12 roles** — Developer (Frontend/Backend/Fullstack), Data Engineer, Data Analyst, Infra/DevOps, QA/Tester, UAT Stakeholder, Product Owner, Sales, Marketing, Customer Operations
+- 🤖 **29 agents in 8 domains** — Engineering, Data, Design, Infrastructure, Marketing, Operations, Product, Testing. Your role loads 2-7 agents, not all 29
+- 🔧 **Custom workflow steps** — Build your own workflow with automated checks (⚡) and reminders (📋) at 5 phases: on-start, before-commit, before-push, before-pr, after-pr. `dtf steps add/remove/reset`
+- 🔄 **Role switching** — `dtf configure` changes your role and steps anytime, no reinstall needed
+- 📋 **Role-specific skills** — Each role gets tailored conventions, performance checks, and workflow guides loaded on demand
+
 ## Team & Setup
 
-- 🚀 **One-command team setup** — `dtf install` symlinks everything, generates config, merges hooks — new team members are productive in minutes
-- 🏢 **Company config** — Share a `company-config.json` to auto-configure service names, Jira domain, paths for your whole team
+- 🚀 **One-command team setup** — `dtf install` runs wizard (name, paths, terminal, role, workflow steps), symlinks everything, generates config
+- 🏢 **Company config with roles** — Share a `company-config.json` with role definitions, service names, Jira domain, paths — new members pick their role during install
 - 🧠 **Shared learnings** — `dtf contribute` exports retro insights as PRs; team curates into shared knowledge base
 - 🖥️ **10 terminals supported** — macOS, Linux, and Windows (WSL) across Alacritty, Kitty, WezTerm, Ghostty, Warp, and more
+- 📊 **Auto-sync** — `/sync-config` pushes all changes to GitHub repos; README stats auto-update from live file counts
 
 ## Agent Orchestration
 
@@ -55,3 +64,34 @@ Five channels continuously feed knowledge into agent prompts, coding style docs,
 - 🗺️ **Cross-session analysis** — [`/retro-proposals`](commands.md#retro-proposals) analyzes accumulated retro learnings across multiple sessions to find systemic patterns and route improvements to the right destination
 
 All learnings route to agent prompts (direct apply), coding style docs (Jira + PR), or project conventions — so every future ticket benefits automatically. See **[Self-Learning System](retrospectives.md)** for the full guide.
+
+## Code Quality & Performance
+
+- 💡 **Code insights** — Opt-in refactoring nudges after your first draft. Scans only changed files, React 19 aware (no useMemo/useCallback nudges). Max 5-7 suggestions with pros/cons
+- 🏗️ **DTO & architecture analysis** — Deep analysis with mermaid diagrams (data flow, entity relationships, cross-service impact) ready to paste in PR description
+- ⚡ **Frontend performance** — Core Web Vitals targets, bundle analysis checklist, React rendering patterns, RTK Query optimization
+- ⚡ **Backend performance** — EF Core query optimization, N+1 detection, caching strategies, async/await patterns, memory profiling
+- ☁️ **AWS performance** — CloudWatch monitoring, RDS tuning, auto-scaling, S3 lifecycle, cost optimization quick wins
+- 🔍 **15+ external plugins installed** — Trail of Bits security (3.8k stars), Vercel React (21k stars), dotnet-skills (658 stars), codebase audit suite, and more
+
+## Infrastructure Workflows
+
+- 🏗️ **`/infra-ticket`** — Full Terraform workflow: Jira → branch → explore modules → implement → plan → PR with structured plan in body
+- 📊 **Structured plan output** — `terraform-plan-summary.sh` shows add/change/destroy counts in a box, warns loudly on destroys
+- ✅ **GH Actions verification** — `verify-infra-workflows.sh` checks plan/apply workflows exist, CODEOWNERS covers infra/, lock files committed
+- 📐 **Infra conventions** — WAF rate limiting, monitoring patterns, ECR security, RDS SSL, deployment notifications
+
+## Non-Developer Workflows
+
+- 📋 **Product Owner** — `/ticket-scout` batch triage (READY/REFINE/PUSH BACK/SKIP), `/ticket-refine` deep quality gate, impact analysis — no code knowledge needed
+- 📈 **Sales** — PowerPoint generation (official PPTX skill), ROI models, customer data insights, competitive analysis
+- 📝 **Marketing** — 12 marketing skills (SEO audit, AI SEO, copywriting, email sequences, social content, content strategy, competitor alternatives, lead magnets, launch strategy)
+- 🔧 **Customer Ops** — Integration configuration patterns, ITSM ticket investigation, customer onboarding
+- 🧪 **UAT** — Acceptance criteria checklists, permission matrix testing, structured Jira bug reports — no code contact
+
+## Cost & Memory Management
+
+- 💰 **Token baseline ~5,750** — CLAUDE.md + MEMORY.md + system = 0.6% of context. Everything else on demand
+- 🧹 **Memory hygiene** — `memory-health.sh` runs at session start (0 tokens), flags stale memories and oversized files
+- 📉 **Promotion path** — Stable memories get promoted to CLAUDE.md/conventions docs, then deleted. Learn → remember → formalize → forget
+- 📊 **Cost tracker** — `cost-tracker.sh` shows session costs, `config-scan.sh` grades config health A-F

@@ -80,60 +80,76 @@ See **[Installation](docs/installation.md)** for all methods, prerequisites, and
 
 ## Core Features
 
-### Custom Workflow Steps
+### Build Your Own Workflow
 
-Every role gets default steps. Build your own — automated checks and reminders at 5 phases:
+Every role gets default steps — then you make it yours. Add automated checks that run shell commands, or reminders that show up as a checklist at the right moment.
 
-```
-dtf steps list     # See your steps
-dtf steps add      # Add automated check or reminder
-dtf steps remove   # Remove a step
+```bash
+dtf steps list     # See your steps grouped by phase
+dtf steps add      # Add your own automated check or reminder
+dtf steps remove   # Remove what you don't need
 dtf steps reset    # Back to role defaults
 ```
 
-Two types: ⚡ automated (runs a command) and 📋 reminder (checklist you confirm).
-Five phases: `on-start`, `before-commit`, `before-push`, `before-pr`, `after-pr`.
+| Phase | When it runs | Example |
+|-------|-------------|---------|
+| `on-start` | Beginning of session | 📋 Acceptance criteria listed |
+| `before-commit` | Before `git commit` | ⚡ `terraform fmt -check` |
+| `before-push` | Before `git push` | ⚡ `dotnet test` |
+| `before-pr` | Before creating PR | 📋 Visual verification done |
+| `after-pr` | After PR created | 📋 Stakeholders notified |
 
-### Self-Learning
+### Tailored to Every Role
 
-6 learning paths feed improvements back automatically:
+Not just different agents — different workflows entirely:
 
-| Path | Source | Destination |
-|------|--------|-------------|
-| Session retros | Agents reflect after every ticket | Agent prompts, conventions |
-| PR review mining | Patterns from merged PR feedback | Convention updates |
-| Jira pushback | AI reviewer comment analysis | Ticket triage rules |
-| Tool usage patterns | Behavioral analysis from logs | Skills, scripts, or memory |
-| Research & reading | Articles, docs, best practices | Coding style docs |
-| Cross-session analysis | Pattern detection across retros | Process improvements |
+| Role | What's different |
+|------|-----------------|
+| **Developer** | Multi-agent teams, code insights on your diff, performance checks, parallel backend+frontend |
+| **Infra** | `/infra-ticket` with structured Terraform plan, GH Actions verification, WAF/monitoring/ECR conventions |
+| **Data** | dbt build/test steps, SQL review, notebook workflows, pipeline building |
+| **PO** | `/ticket-scout` batch triage, `/ticket-refine` quality gate — no code knowledge needed |
+| **QA** | Test plan templates, Playwright E2E, API testing, permission matrix verification |
+| **UAT** | Acceptance criteria checklists, structured Jira bug reports, role-based permission testing |
+| **Sales** | PowerPoint generation, ROI models, customer data insights, competitive analysis |
+| **Marketing** | 12 marketing skills (SEO, copywriting, email, social), brand guidelines, content calendars |
+| **Customer Ops** | Integration config patterns, ITSM ticket investigation, customer onboarding |
 
-### Code Insights
+### Self-Learning — Every Session Makes the Next One Better
 
-After your first draft, say "check my changes":
+6 learning paths feed improvements back automatically. The same mistake never happens twice:
 
-- **Quick nudges** — scans only your changed files (React 19 aware, .NET patterns), max 5-7 suggestions with pros/cons
-- **DTO & architecture insights** — deeper analysis with mermaid diagrams, ready for PR description
+| Path | What it captures | Where it goes |
+|------|-----------------|---------------|
+| Session retros | What agents got wrong, what conventions they discovered | Agent prompts, coding style docs |
+| PR review mining | What reviewers keep flagging | Convention updates |
+| Jira pushback | Ticket quality patterns | Triage rules |
+| Tool usage | Context gaps, repeated lookups | Skills, scripts, memory |
+| Research | Articles, best practices | Coding style docs |
+| Cross-session | Systemic patterns across retros | Process improvements |
 
-### Performance Skills
+New team members inherit all accumulated knowledge on day one.
 
-Built-in checklists with antipatterns:
-- `frontend-performance` — Core Web Vitals, bundle analysis, React rendering
-- `backend-performance` — EF Core queries, N+1 detection, caching, async/await
-- `aws-performance` — CloudWatch, RDS tuning, cost optimization
+### Lean by Design — Cost Control Built In
 
-### Memory Hygiene
+| What | How | Saving |
+|------|-----|--------|
+| Formatting, linting, builds | Shell scripts (0 tokens) | 100% |
+| Workflow steps (automated) | Shell commands, not LLM | 100% |
+| Skills, agents | Loaded on-demand, not always | 0 until used |
+| Memory hygiene | `memory-health.sh` at session start | Prevents bloat |
+| Early triage | User decides GO/SKIP before agents run | 100% on skipped |
+| Mode routing | Full / lite / local per ticket | Right-size each ticket |
 
-Memory files cost tokens every prompt. Automatic health check at session start (0 token cost):
-
-```bash
-bash ~/.claude/scripts/memory-health.sh
-```
+Token baseline: **~5,750 per prompt** (0.6% of context). Everything else is 0 until invoked.
 
 ### Secure by Default
 
 Every PR gets a 7-category OWASP security scan. Schema changes require Mermaid diagrams and human approval. Quality hooks physically prevent agents from skipping steps.
 
-Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown.
+Three-tier permission ladder — personal sandbox, shared standards, team-enforced lockdown. See **[Security Guide](SECURITY.md)**.
+
+See **[Features](docs/features.md)** for the complete list.
 
 ---
 
