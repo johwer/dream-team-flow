@@ -101,8 +101,8 @@ See **[Security Guide](SECURITY.md)**.
 | What | Count |
 |------|-------|
 | Agents | 29 (in 8 domains) |
-| Skills | 77+ (conventions, performance, workflows, security, marketing) |
-| Commands | 23 (orchestration, review, triage, infra, analytics) |
+| Skills | 79+ (conventions, performance, workflows, security, marketing) |
+| Commands | 24 (orchestration, review, triage, infra, analytics) |
 | Scripts | 43 (quality gates, terraform, memory, cost tracking) |
 | Roles | 12 (dev, data, infra, QA, PO, sales, marketing, ops) |
 | Token baseline | ~5,750 per prompt (0.6% of context) |
