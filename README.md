@@ -61,7 +61,11 @@ Every role gets default workflow steps. Customize with `dtf steps add` — autom
 
 ### Cost-First Architecture
 
-Token baseline **~5,750 per prompt** (0.6% of context). Formatting, linting, builds run as shell scripts (0 tokens). Skills and agents load on-demand. Memory hygiene at session start prevents bloat. See **[Token Efficiency](docs/token-efficiency.md)**.
+Token baseline **~5,750 per prompt** (0.6% of context). Formatting, linting, builds run as shell scripts (0 tokens). Skills and agents load on-demand. Memory hygiene at session start prevents bloat. See **[Token Efficiency](docs/token-efficiency.md)** and **[Context Management](docs/context-management.md)**.
+
+### [Context Management](docs/context-management.md)
+
+The context window is the real bottleneck, not the model. DTF manages it as a resource: pre-flight hydration into `.dream-team/context.md`, compaction at 50% and at phase boundaries, on-demand skills (0 tokens until invoked), context modes per task, and disk-based memory with session-start hygiene. See **[Context Management](docs/context-management.md)**.
 
 ### [Secure Setup](SECURITY.md)
 
@@ -89,6 +93,7 @@ See **[Security Guide](SECURITY.md)**.
 | **[Workflow Phases](docs/workflow-phases.md)** | Flowcharts for full, lite, and local modes |
 | **[Parallel Everything](docs/parallel.md)** | Cross-ticket parallelism, Docker isolation, port setup |
 | **[Token Efficiency](docs/token-efficiency.md)** | Cost architecture, zero-token patterns |
+| **[Context Management](docs/context-management.md)** | Hydration, compaction, rule scoping, modes, memory |
 | **[Self-Learning](docs/retrospectives.md)** | Six learning channels, routing rules |
 | **[Security](SECURITY.md)** | Permission ladder, scanning, hooks |
 | **[Instruction Delivery](docs/instruction-delivery.md)** | How CLAUDE.md, skills, agents, hooks work together |
