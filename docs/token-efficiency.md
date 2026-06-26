@@ -47,6 +47,21 @@ The architect prepares a focused bullet-point conventions summary for each agent
 ### Verified file paths
 The architect verifies every file path with Read or Glob before including it in the architecture report. Downstream agents get full resolved paths directly, eliminating silent Read failures and wasted round-trips.
 
+### Compact early, at phase boundaries
+DTF sets `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE: 50`, so context is compacted at ~50% capacity rather than waiting until it overflows. A full window is a slow, expensive window: every subsequent call re-reads bloated context, and quality degrades as the model loses the thread. The `strategic-compact` skill complements this by compacting at *logical* breakpoints (after research, after a milestone, after debugging) — never mid-implementation — so the summary keeps what matters and drops the noise. This is a borrowed best practice: the broader agent community has converged on "compact proactively, well before the limit" as one of the highest-leverage cost controls for long sessions.
+
+### Memory hygiene
+Persistent memory (`MEMORY.md` plus per-fact files) is loaded into context every session, so unbounded memory is a recurring per-prompt tax. DTF keeps it lean: `memory-health.sh` runs as a zero-token bash check at the start of `/create-stories` (Step 0.5), flagging when `MEMORY.md` exceeds its ~1,500-token budget, when learnings files grow too large, or when files have gone stale (90+ days untouched). The `memory-hygiene` skill then archives, prunes, and consolidates on demand. The principle mirrors context hygiene generally — only pay for the memory you actually use each prompt.
+
+### Capped thinking budget
+`MAX_THINKING_TOKENS: 16000` bounds hidden reasoning tokens per turn (~70% reduction versus uncapped extended thinking) while leaving enough headroom for the planning DTF actually needs. Most steps don't require unbounded deliberation; the cap prevents silent token burn on over-thinking.
+
+### Model right-sizing per task
+DTF tiers the model to the difficulty of each step rather than running everything on the most capable (and most expensive) model. Cheap, mechanical work — fetching tickets, extracting data — runs on Haiku; pre-hydration and most implementation run on Sonnet; only genuinely hard reasoning (architecture, synthesis, adversarial review) is reserved for Opus. The same right-sizing logic that picks a mode per ticket applies one level down, per agent and per task.
+
+### Cost observability
+`cost-tracker.sh` and `phase-cost-tracker.sh` record token spend per session and per phase, so cost is measured rather than guessed. Right-sizing decisions (mode, team size, model tier) are fed by real data on where tokens actually go, turning cost control into a feedback loop instead of a one-time setting.
+
 ---
 
 ## The Result
