@@ -106,7 +106,7 @@ See **[Security Guide](SECURITY.md)**.
 | What | Count |
 |------|-------|
 | Agents | 29 (in 8 domains) |
-| Skills | 81+ (conventions, performance, workflows, security, marketing) |
+| Skills | 82+ (conventions, performance, workflows, security, marketing) |
 | Commands | 25 (orchestration, review, triage, infra, analytics) |
 | Scripts | 48 (quality gates, terraform, memory, cost tracking) |
 | Roles | 12 (dev, data, infra, QA, PO, sales, marketing, ops) |
