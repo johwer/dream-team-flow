@@ -1,6 +1,5 @@
 {
   "_comment": "Company config for Dream Team Flow. Share this with team members. They pass it to: dtf install <REPO_URL> --company-config company-config.json",
-
   "_instructions": {
     "projectName": "Your project/repo name (replaces 'Repo' in all files)",
     "repoUrl": "Git URL for the monorepo (shown during install as default clone target)",
@@ -10,12 +9,10 @@
     "defaultPaths": "Suggested defaults shown during install. Users can override all of these.",
     "extraPaths": "Additional named paths your team uses. Users will be asked to set each one during install."
   },
-
   "projectName": "Repo",
   "repoUrl": "git@github.com:RepoAB/Repo.git",
   "ticketPrefix": "PLRS",
   "jiraDomain": "your-company.atlassian.net",
-
   "services": {
     "ServiceA": "ServiceA",
     "ServiceB": "ServiceB",
@@ -24,12 +21,10 @@
     "ServiceE": "ServiceE",
     "TranslationService": "TranslationService"
   },
-
   "defaultPaths": {
     "monorepo": "~/Documents/Repo",
     "worktreeParent": "~/Documents"
   },
-
   "extraPaths": {
     "frontendApp": {
       "description": "Path to the frontend app within the monorepo (relative to monorepo root)",
@@ -39,5 +34,14 @@
       "description": "Path to backend services directory (relative to monorepo root)",
       "default": "services"
     }
+  },
+  "aws": {
+    "profileName": "<accountId>_<RoleName>  e.g. 123456789012_YourRoleName",
+    "ssoStartUrl": "https://<your-directory-id>.awsapps.com/start",
+    "ssoRegion": "<REGION HOSTING IDENTITY CENTER - not your default region; see docs/aws-access.md>",
+    "accountId": "<accountId>",
+    "roleName": "<RoleName>",
+    "defaultRegion": "<region for service calls, e.g. eu-west-1>",
+    "s3TranslationsBucket": "<translations-bucket-name>"
   }
 }
